@@ -1,7 +1,5 @@
 <html>
 <body>
-  <h1>It works!</h1>
-  
   <ul>
   {% for post in site.posts %}
     <li>
