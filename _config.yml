@@ -1,10 +1,10 @@
 ###########
 # site.title
 
-title: Vladimir Kukushkin's personal space
+title: Vladimir Kukushkin here
 description: Vladimir Kukushkin's personal space
 # baseurl: "/jekyllBear" # the subpath of your site, e.g. /blog/
-url: "https://wowone.github.io/" # the base hostname & protocol for your site
+url: "https://wowone.github.io" # the base hostname & protocol for your site
 # host: 0.0.0.0
 
 #########################
@@ -63,4 +63,5 @@ links:
 
 # Add links for more focus here
 special_links:
-  "Search": https://duckduckgo.com
+  "LinkedIn": https://www.linkedin.com/in/vladimir-kukushkin-95b6487/
+  "GitHub": https://github.com/wowone
