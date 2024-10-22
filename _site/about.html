@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>About – Vladimir Kukushkin’s blog</title>
+<title>About – Vladimir Kukushkin</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -67,7 +67,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.scss">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -78,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Vladimir Kukushkin’s blog</span>
+    <span class="navbar-title">Vladimir Kukushkin</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -98,6 +98,11 @@ ul.task-list li input[type="checkbox"] {
   </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://www.linkedin.com/in/vladimir-kukushkin-95b6487/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="./index.xml"> <i class="bi bi-rss" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -124,7 +129,16 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
   </div>
 </header><main class="content" id="quarto-document-content">
-<p>About this blog</p>
+<p>Hi! My name is Vladimir Kukushkin, and I have over 10 years of experience as a data scientist / data analyst. The slash signifies that I typically work at the intersection of product analytics and data science, tackling problems that require advanced techniques like predictive analytics, causal inference, and building statistical models. My specialization is user behavior analysis a.k.a. quantitative UX research or, more broadly, sequential data analysis.</p>
+<p>My projects:</p>
+<ul>
+<li><a href="https://doc.retentioneering.com/stable/doc/">retentioneering</a>. An open-source Python library for user behavior analysis.</li>
+</ul>
+<p>My publications:</p>
+<ul>
+<li><a href="https://dl.acm.org/doi/10.1145/3394486.3403369">Prediction of Hourly Earnings and Completion Time on a Crowdsourcing Platform (KDD-2020)</a></li>
+<li><a href="http://dl.acm.org/citation.cfm?id=2767727">On the Relation Between Assessor’s Agreement and Accuracy in Gamified Relevance Assessment (SIGIR-2015)</a></li>
+</ul>
 
 
 </main> 
@@ -226,7 +240,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/wowone\.github\.io");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

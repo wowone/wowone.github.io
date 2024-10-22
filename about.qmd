@@ -13,4 +13,13 @@ about:
 
 ---
 
-About this blog
+Hi! My name is Vladimir Kukushkin, and I have over 10 years of experience as a data scientist / data analyst. The slash signifies that I typically work at the intersection of product analytics and data science, tackling problems that require advanced techniques like predictive analytics, causal inference, and building statistical models. My specialization is user behavior analysis a.k.a. quantitative UX research or, more broadly, sequential data analysis.
+
+My projects:
+
+- [retentioneering](https://doc.retentioneering.com/stable/doc/). An open-source Python library for user behavior analysis.
+
+My publications:
+
+- [Prediction of Hourly Earnings and Completion Time on a Crowdsourcing Platform (KDD-2020)](https://dl.acm.org/doi/10.1145/3394486.3403369)
+- [On the Relation Between Assessor's Agreement and Accuracy in Gamified Relevance Assessment (SIGIR-2015)](http://dl.acm.org/citation.cfm?id=2767727)
