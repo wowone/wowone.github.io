@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://wowone.github.io/posts/welcome/index.html</loc>
-    <lastmod>2024-10-22T12:28:40.490Z</lastmod>
+    <loc>https://wowone.github.io/about.html</loc>
+    <lastmod>2024-10-22T14:56:31.487Z</lastmod>
+  </url>
+  <url>
+    <loc>https://wowone.github.io/posts/2024-10-22_Welcome/index.html</loc>
+    <lastmod>2024-10-22T15:13:14.028Z</lastmod>
   </url>
   <url>
     <loc>https://wowone.github.io/index.html</loc>
     <lastmod>2024-10-22T12:32:53.235Z</lastmod>
-  </url>
-  <url>
-    <loc>https://wowone.github.io/posts/post-with-code/index.html</loc>
-    <lastmod>2024-10-22T11:54:06.243Z</lastmod>
-  </url>
-  <url>
-    <loc>https://wowone.github.io/posts/2024-10-22 - Welcome/index.html</loc>
-    <lastmod>2024-10-22T12:28:40.490Z</lastmod>
-  </url>
-  <url>
-    <loc>https://wowone.github.io/posts/2024-10-22_Welcome/index.html</loc>
-    <lastmod>2024-10-22T14:38:02.078Z</lastmod>
-  </url>
-  <url>
-    <loc>https://wowone.github.io/about.html</loc>
-    <lastmod>2024-10-22T14:56:31.487Z</lastmod>
   </url>
 </urlset>
