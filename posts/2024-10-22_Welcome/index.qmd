@@ -1,0 +1,30 @@
+---
+title: "Welcome to Journal Papers Product Minds Club"
+date: "2024-10-22"
+categories: [news]
+image: "Sgt_Peppers_Lonely_Hearts_Club_Band.jpg"
+---
+
+<div class="float-figure">
+![](Sgt_Peppers_Lonely_Hearts_Club_Band.jpg)
+</div>
+
+I've been working as a data scientist / data analyst over 10 years. The slash signifies that I typically work at the intersection of product analytics and data science, tackling problems that require advanced techniques like predictive analytics, causal inference, and building statistical models. My specialization is in user behavior analysis a.k.a. quantitative UX research or, more broadly, in analyzing sequential data. In addition to working as a data analyst, I played a key role in developing an open-source Python library [retentioneering](https://doc.retentioneering.com/stable/doc/), which aims to simplify research in this area.
+
+In my view, this field deserves much more attention than it currently receives. While these analyses are more complex than traditional funnel or cohort analysis, quantitative UX provides a deeper understanding of how users interact with your product. It reveals insights such as:
+
+- What drives users to churn, make purchases, subscribe, etc. (causal inference),
+- What segments users form (cluster analysis),
+- What caused unexpected behavior in dashboard charts (root cause analysis)
+- What distinguishes one user group from another, e.g. mobile VS desktop, AB-experiment groups, before and after release.
+
+These research questions are not an empty sound. Finding the answers helps identify product bottlenecks, understand what drives user satisfaction or dissatisfaction, and ultimately improve your product. This is the core purpose of product analytics.
+
+Given the lack of substantial literature on the subject, here I aim to collect and review papers, books, and publications that I find insightful.
+
+Like how Sgt. Pepper’s Lonely Hearts Club Band expanded horizons in music, I hope this journal club will attract data analysts and data scientists eager to broaden their understanding of these topics. The term “club” in the title reflects my wish to engage with enthusiasts and foster discussions around these fascinating subjects.
+*
+<br><br>♫ Music playing ♫<br>
+We're Sgt. Pepper's Lonely Hearts Club Band<br>
+We hope you will enjoy the show<br>
+*
