@@ -1,0 +1,5 @@
+.float-figure {
+    float: left;
+    margin-right: 20px; /* adjust the margin for spacing */
+    width: 40%; /* adjust figure width */
+}

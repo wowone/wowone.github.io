@@ -1,0 +1,16 @@
+---
+title: "About"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/vladimir-kukushkin-95b6487/
+    - icon: github
+      text: Github
+      href: https://github.com/wowone
+
+---
+
+About this blog
