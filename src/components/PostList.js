@@ -2,14 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // Function to import all markdown files from the posts directory
-const importAll = (r) => r.keys().map((key) => {
-  const content = r(key);
-  console.log('Loaded file:', key, 'Content:', content); // Debugging: Log loaded file and its content
-  return {
-    path: key,
-    content: content.default || content
-  };
-});
+const importAll = (r) => r.keys().map((key) => ({
+  path: key,
+  url: r(key)
+}));
 const markdownFiles = importAll(require.context('../posts', false, /\.md$/));
 
 const PostList = () => {
@@ -17,12 +13,10 @@ const PostList = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      console.log('Markdown files:', markdownFiles); // Debugging: Log imported markdown files
-
-      const postPromises = markdownFiles.map((file) => {
-        console.log('Processing file:', file);
-        const text = file.content;
-        console.log('File content:', text); // Debugging: Log file content
+      const postPromises = markdownFiles.map(async (file) => {
+        const response = await fetch(file.url);
+        const text = await response.text();
+        console.log('Content: \n' + text); // Debugging: Log file content
 
         const title = text.split('\n')[0].replace('# ', ''); // Assuming the first line is the title
         const tags = text.match(/#\w+/g) || []; // Extract hashtags
@@ -31,7 +25,6 @@ const PostList = () => {
       });
 
       const posts = await Promise.all(postPromises);
-      console.log('Processed posts:', posts); // Debugging: Log processed posts
       setPosts(posts);
     };
 
