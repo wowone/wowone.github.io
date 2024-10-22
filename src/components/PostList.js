@@ -16,8 +16,6 @@ const PostList = () => {
       const postPromises = markdownFiles.map(async (file) => {
         const response = await fetch(file.url);
         const text = await response.text();
-        console.log('Content: \n' + text); // Debugging: Log file content
-
         const title = text.split('\n')[0].replace('# ', ''); // Assuming the first line is the title
         const tags = text.match(/#\w+/g) || []; // Extract hashtags
         const id = file.path.split('/').pop().replace('.md', '');
