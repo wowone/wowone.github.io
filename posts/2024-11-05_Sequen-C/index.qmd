@@ -31,7 +31,7 @@ Let $\lambda$ be the output of the MSA algorithm applied to a set of unique sequ
 $$
 I_j = 1 - \frac{E_j}{\log_2(|A| + 1)}, \;\;\;\; E_j = \sum_{a\in A_j\cup\{-\}}
 \begin{cases}
--P_a\log_2\left(\frac{P_a}{G_j}\right)\, & \text{if a = '-'}\\
+-P_a\log_2\left(\frac{P_a}{G_j}\right)\, & \text{if } a = \text{'-'}\\
 -P_a\log_2 P_a, & \text{otherwise},
 \end{cases}
 $$
@@ -52,6 +52,7 @@ Once the $I_j$ score is calculated for each column $j$, we can treat each column
 </center></figure>
 
 Finally, we can granulate our clickstream representation using two axes:
+
 1. We can consider different clusters of the agglomerative clustering output tree $T$. Now it's clear why they preferred this clustering algorithm instead of, say, K-Means. Considering different levels of $T$, we obtain more/less homogeneous clusters. More homogeneous clusters provide better and clearer output of the MSA algorithm.
 2. $\tau$. By varying $\tau$, we can make the sequence visualization more/less coarse.
 
