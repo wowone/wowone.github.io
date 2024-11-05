@@ -1,0 +1,67 @@
+---
+title: "Sequen-C: A Multilevel Overview of Temporal Event Sequences"
+date: "2024-11-05"
+categories: [journalclub, clickstream visualizations]
+---
+
+Let me start our journal club with the most impressive paper related to clickstream visualizations I've ever read: [Sequen-C: A Multilevel Overview of Temporal Event Sequences](https://arxiv.org/abs/2108.03043) by Jessica Magallanes, Tony Stone, Paul D. Morris, Suzanne Mason, Steven Wood, and Maria-Cruz Villa-Uriol.
+
+The authors address two very common issues that any quantitative UX researcher encounters:
+
+1. Clickstream data often comprises multiple behavioral paths. Treating and visualizing it as a whole is incorrect and often leads to contradictory results.
+2. Despite the fact that users follow certain (latent) scenarios, the ways they perform particular steps vary greatly: they may repeat the same steps multiple times, deviate from a scenario, or switch it. When analyzing such data, it's hard to understand the patterns of repetition, deviation, and switching.
+
+In the paper, the authors describe an interactive visualization tool that tackles both these issues and provides a methodology they call Align-Score-Simplify.
+
+## Methodology
+The first problem is addressed by applying (agglomerative) clustering. I'll explain further why they chose this algorithm. The second problem is solved using their framework called Align-Score-Simplify.
+
+### Align
+This part is the most elegant, amazing, and surprizing in the whole paper. They apply the [MSA algorithm (Multiple Sequence Alignment)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) stemming from bioinformatics. Originally, it was created to align amino acids or nucleotides in DNA sequences to identify common subsequences across DNAs belonging to multiple species. But this is exactly one of the goals we pursue in clickstream data analysis.
+
+<figure><center>
+<img src="MSA_example.png" height=100>
+<figcaption>Inserting `-` as gaps to align events in sequences. The coloured events might be considered as common at some steps. The others are considered as noise.</figcaption>
+</center></figure>
+
+### Score
+
+Let $\lambda$ be the output of the MSA algorithm applied to a set of unique sequences $S$ (the frequency of each path is denoted as $P_i$). They calculate the information score $I_j$ for each column $j$ in $\lambda$ as a measure of the column's impurity, somewhat similar to entropy but with some additional penalty for high amount of gaps:
+
+$$
+I_j = 1 - \frac{E_j}{\log_2(|A| + 1)}, \;\;\;\; E_j = \sum_{a\in A_j\cup\{-\}}
+\begin{cases}
+-P_a\log_2\left(\frac{P_a}{G_j}\right)\, & \text{if a = '-'}\\
+-P_a\log_2 P_a, & \text{otherwise},
+\end{cases}
+$$
+
+where
+
+- $A$ -- the set of unique events in $S$,
+- $A_j$ -- the set of unique events in column $j$,
+- $P_a$ -- the probability of the event $a$ in column $j$,
+- $G_j$ -- is the count of gaps in column $j$.
+
+### Simplify 
+Once the $I_j$ score is calculated for each column $j$, we can treat each column that exceeds a certain threshold $I_\tau$ as an event that prevails in this column, while all other columns might be collapsed as noise. As a result, we get a new table $\alpha$ that simplifies the initial clickstream $S$, as shown in the image below.
+
+<figure><center>
+<img src="simplified_clickstream.png" height=220>
+<figcaption>The </figcaption>
+</center></figure>
+
+Finally, we can granulate our clickstream representation using two axes:
+1. We can consider different clusters of the agglomerative clustering output tree $T$. Now it's clear why they preferred this clustering algorithm instead of, say, K-Means. Considering different levels of $T$, we obtain more/less homogeneous clusters. More homogeneous clusters provide better and clearer output of the MSA algorithm.
+2. $\tau$. By varying $\tau$, we can make the sequence visualization more/less coarse.
+
+As a result, we get the interface like this:
+
+<figure><center>
+<img src="framework_outline.png" height=500>
+<figcaption>The outline of the whole framework. (A) Building aggregate tree $T$ for input unique sequences $S = \{s_1, ...s_6\}$. (B) Each node in T has an alignment matrix $\lambda$ for its child sequences, a row-wise probabilities vector $P$, and a column-wise information score vector $I$. Two or more consecutive columns in $\lambda$ with $I_j < 0.8$ are not coloured. (C) Multilevel overviews for a range of number of clusters $k$ retrieved from $T$, where black blocks represent merged columns.</figcaption>
+</center></figure>
+
+In the following sections, the authors discuss tuning the parameters of the framework. They also describe how they tested their tool on a couple of real-world datasets. The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That's why I'm skeptical about applying this framework to product analytics clickstream data. Additionally, it's not clear how fast MSA would work with clickstream data.
+
+Anyway, the idea of the paper and the framework are super interesting to me. I would be happy to try to implement this tool some day.
