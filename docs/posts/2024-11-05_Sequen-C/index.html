@@ -195,7 +195,7 @@ window.Quarto = {
 <p>The first problem is addressed by applying (agglomerative) clustering. I’ll explain further why they chose this algorithm. The second problem is solved using their framework called Align-Score-Simplify.</p>
 <section id="align" class="level3">
 <h3 class="anchored" data-anchor-id="align">Align</h3>
-<p>This part is the most elegant, amazing, and surprizing in the whole paper. They apply the <a href="https://en.wikipedia.org/wiki/Multiple_sequence_alignment">MSA algorithm (Multiple Sequence Alignment)</a> stemming from bioinformatics. Originally, it was created to align amino acids or nucleotides in DNA sequences to identify common subsequences across DNAs belonging to multiple species. But this is exactly one of the goals we pursue in clickstream data analysis.</p>
+<p>This part is the most elegant, amazing, and surprizing in the whole paper. They apply the <a href="https://en.wikipedia.org/wiki/Multiple_sequence_alignment">MSA algorithm (Multiple Sequence Alignment)</a> stemming from bioinformatics. Originally, it was created to align amino acids or nucleotides in DNA sequences to identify common subsequences across DNAs belonging to multiple species. But this is exactly one of the goals we pursue in clickstream data analysis. Once we align user trajectories in similar way, we understand what events are common for the most users at some specific steps.</p>
 <figure class="figure">
 <center>
 <img src="MSA_example.png" height="100" class="figure-img">
@@ -207,7 +207,7 @@ Inserting <code>-</code> as gaps to align events in sequences. The coloured even
 </section>
 <section id="score" class="level3">
 <h3 class="anchored" data-anchor-id="score">Score</h3>
-<p>Let <span class="math inline">\(\lambda\)</span> be the output of the MSA algorithm applied to a set of unique sequences <span class="math inline">\(S\)</span> (the frequency of each path is denoted as <span class="math inline">\(P_i\)</span>). They calculate the information score <span class="math inline">\(I_j\)</span> for each column <span class="math inline">\(j\)</span> in <span class="math inline">\(\lambda\)</span> as a measure of the column’s impurity, somewhat similar to entropy but with some additional penalty for high amount of gaps:</p>
+<p>Let <span class="math inline">\(\lambda\)</span> be the output of the MSA algorithm applied to a set of unique sequences <span class="math inline">\(S\)</span> (the frequency of each path is denoted as <span class="math inline">\(P_i\)</span>). They calculate the information score <span class="math inline">\(I_j\)</span> for each column <span class="math inline">\(j\)</span> in <span class="math inline">\(\lambda\)</span> as a measure of the column’s impurity, somewhat similar to entropy but with some additional penalty for the high amount of gaps:</p>
 <p><span class="math display">\[
 I_j = 1 - \frac{E_j}{\log_2(|A| + 1)}, \;\;\;\; E_j = \sum_{a\in A_j\cup\{-\}}
 \begin{cases}
@@ -248,8 +248,9 @@ The outline of the whole framework. (A) Building aggregate tree <span class="mat
 </figcaption>
 </center>
 </figure>
-<p>In the following sections, the authors discuss tuning the parameters of the framework. They also describe how they tested their tool on a couple of real-world datasets. The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.</p>
-<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be to implement this tool someday.</p>
+<p>In the following sections, the authors describe the GUI of a more complex tool developed as an application for a couple of particular datasets from the public health domain. I won’t talk about it here since its underlying idea is the same, while the interface is more sophisticated and includes some information about events distribution, unique sequence view, and individual sequence view.</p>
+<p>The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m quite skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.</p>
+<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be great to implement such a tool someday.</p>
 
 
 </section>
