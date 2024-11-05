@@ -4,6 +4,8 @@ date: "2024-11-05"
 categories: [journalclub, clickstream visualizations]
 ---
 
+My name is Vladimir Kukushkin. I've been working as a data analyst/data scientist for more than 10 years. A couple of years ago I heavily shifted to quantitative UX research area which turned into my passion. While eagerly trying to find some sources to read regarding this topic, I realized that there are not so many of them. That's why I decided to write a series of posts towards quantitative UX research. Basically, it will be reviews of papers, books and other publications that I find insightful. I'd be happy to find here enthusiasts who are also interested in this domain.
+
 Let me start our journal club with the most impressive paper related to clickstream visualizations I've ever read: [Sequen-C: A Multilevel Overview of Temporal Event Sequences](https://arxiv.org/abs/2108.03043) by Jessica Magallanes, Tony Stone, Paul D. Morris, Suzanne Mason, Steven Wood, and Maria-Cruz Villa-Uriol.
 
 The authors address two very common issues that any quantitative UX researcher encounters:
@@ -48,7 +50,7 @@ Once the $I_j$ score is calculated for each column $j$, we can treat each column
 
 <figure><center>
 <img src="simplified_clickstream.png" height=220>
-<figcaption>The </figcaption>
+<figcaption>The outline of the Align-Score-Simplify workflow.</figcaption>
 </center></figure>
 
 Finally, we can granulate our clickstream representation using two axes:
@@ -60,9 +62,9 @@ As a result, we get the interface like this:
 
 <figure><center>
 <img src="framework_outline.png" height=500>
-<figcaption>The outline of the whole framework. (A) Building aggregate tree $T$ for input unique sequences $S = \{s_1, ...s_6\}$. (B) Each node in T has an alignment matrix $\lambda$ for its child sequences, a row-wise probabilities vector $P$, and a column-wise information score vector $I$. Two or more consecutive columns in $\lambda$ with $I_j < 0.8$ are not coloured. (C) Multilevel overviews for a range of number of clusters $k$ retrieved from $T$, where black blocks represent merged columns.</figcaption>
+<figcaption>The outline of the whole framework. (A) Building aggregate tree $T$ for input unique sequences $S = \{s_1, ...s_6\}$. (B) Each node in $T$ has an alignment matrix $\lambda$ for its child sequences, a row-wise probabilities vector $P$, and a column-wise information score vector $I$. Two or more consecutive columns in $\lambda$ with $I_j < 0.8$ are not coloured. (C) Multilevel overviews for a range of number of clusters $k$ retrieved from $T$, where black blocks represent merged columns. Image by authors.</figcaption>
 </center></figure>
 
 In the following sections, the authors discuss tuning the parameters of the framework. They also describe how they tested their tool on a couple of real-world datasets. The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That's why I'm skeptical about applying this framework to product analytics clickstream data. Additionally, it's not clear how fast MSA would work with clickstream data.
 
-Anyway, the idea of the paper and the framework are super interesting to me. I would be happy to try to implement this tool some day.
+Anyway, the idea of the paper and the framework are super interesting to me. It would be to implement this tool someday.
