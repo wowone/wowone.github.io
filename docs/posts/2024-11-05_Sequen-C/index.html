@@ -210,7 +210,7 @@ Inserting <code>-</code> as gaps to align events in sequences. The coloured even
 <p><span class="math display">\[
 I_j = 1 - \frac{E_j}{\log_2(|A| + 1)}, \;\;\;\; E_j = \sum_{a\in A_j\cup\{-\}}
 \begin{cases}
--P_a\log_2\left(\frac{P_a}{G_j}\right)\, &amp; \text{if a = '-'}\\
+-P_a\log_2\left(\frac{P_a}{G_j}\right)\, &amp; \text{if } a = \text{'-'}\\
 -P_a\log_2 P_a, &amp; \text{otherwise},
 \end{cases}
 \]</span></p>
@@ -233,7 +233,11 @@ The
 </figcaption>
 </center>
 </figure>
-<p>Finally, we can granulate our clickstream representation using two axes: 1. We can consider different clusters of the agglomerative clustering output tree <span class="math inline">\(T\)</span>. Now it’s clear why they preferred this clustering algorithm instead of, say, K-Means. Considering different levels of <span class="math inline">\(T\)</span>, we obtain more/less homogeneous clusters. More homogeneous clusters provide better and clearer output of the MSA algorithm. 2. <span class="math inline">\(\tau\)</span>. By varying <span class="math inline">\(\tau\)</span>, we can make the sequence visualization more/less coarse.</p>
+<p>Finally, we can granulate our clickstream representation using two axes:</p>
+<ol type="1">
+<li>We can consider different clusters of the agglomerative clustering output tree <span class="math inline">\(T\)</span>. Now it’s clear why they preferred this clustering algorithm instead of, say, K-Means. Considering different levels of <span class="math inline">\(T\)</span>, we obtain more/less homogeneous clusters. More homogeneous clusters provide better and clearer output of the MSA algorithm.</li>
+<li><span class="math inline">\(\tau\)</span>. By varying <span class="math inline">\(\tau\)</span>, we can make the sequence visualization more/less coarse.</li>
+</ol>
 <p>As a result, we get the interface like this:</p>
 <figure class="figure">
 <center>
