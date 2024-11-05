@@ -81,7 +81,7 @@ The outline of the whole framework. (A) Building aggregate tree <img src="https:
 </center>
 </figure>
 <p>In the following sections, the authors discuss tuning the parameters of the framework. They also describe how they tested their tool on a couple of real-world datasets. The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.</p>
-<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be to implement this tool someday.</p>
+<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be great to implement such a tool someday.</p>
 
 
 </section>
