@@ -1,5 +1,5 @@
 ---
-title: "Journal Papers Product Minds Club"
+title: "Vladimir Kukushkin's blog"
 listing:
   contents: posts
   sort: "date desc"

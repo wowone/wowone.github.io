@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "Vladimir Kukushkin"
+  title: "Quant UX researcher's blog"
   site-url: https://wowone.github.io
   description: "Vladimir Kukushkin's personal space"
   navbar:
