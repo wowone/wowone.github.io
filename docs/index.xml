@@ -20,6 +20,7 @@
 
 
 
+<p>My name is Vladimir Kukushkin. I’ve been working as a data analyst/data scientist for more than 10 years. A couple of years ago I heavily shifted to quantitative UX research area which turned into my passion. While eagerly trying to find some sources to read regarding this topic, I realized that there are not so many of them. That’s why I decided to write a series of posts towards quantitative UX research. Basically, it will be reviews of papers, books and other publications that I find insightful. I’d be happy to find here enthusiasts who are also interested in this domain.</p>
 <p>Let me start our journal club with the most impressive paper related to clickstream visualizations I’ve ever read: <a href="https://arxiv.org/abs/2108.03043">Sequen-C: A Multilevel Overview of Temporal Event Sequences</a> by Jessica Magallanes, Tony Stone, Paul D. Morris, Suzanne Mason, Steven Wood, and Maria-Cruz Villa-Uriol.</p>
 <p>The authors address two very common issues that any quantitative UX researcher encounters:</p>
 <ol type="1">
@@ -61,7 +62,7 @@ Inserting <code>-</code> as gaps to align events in sequences. The coloured even
 <center>
 <img src="https://wowone.github.io/posts/2024-11-05_Sequen-C/simplified_clickstream.png" height="220" class="figure-img">
 <figcaption>
-The
+The outline of the Align-Score-Simplify workflow.
 </figcaption>
 </center>
 </figure>
@@ -75,12 +76,12 @@ The
 <center>
 <img src="https://wowone.github.io/posts/2024-11-05_Sequen-C/framework_outline.png" height="500" class="figure-img">
 <figcaption>
-The outline of the whole framework. (A) Building aggregate tree <img src="https://latex.codecogs.com/png.latex?T"> for input unique sequences <img src="https://latex.codecogs.com/png.latex?S%20=%20%5C%7Bs_1,%20...s_6%5C%7D">. (B) Each node in T has an alignment matrix <img src="https://latex.codecogs.com/png.latex?%5Clambda"> for its child sequences, a row-wise probabilities vector <img src="https://latex.codecogs.com/png.latex?P">, and a column-wise information score vector <img src="https://latex.codecogs.com/png.latex?I">. Two or more consecutive columns in <img src="https://latex.codecogs.com/png.latex?%5Clambda"> with <img src="https://latex.codecogs.com/png.latex?I_j%20%3C%200.8"> are not coloured. (C) Multilevel overviews for a range of number of clusters <img src="https://latex.codecogs.com/png.latex?k"> retrieved from <img src="https://latex.codecogs.com/png.latex?T">, where black blocks represent merged columns.
+The outline of the whole framework. (A) Building aggregate tree <img src="https://latex.codecogs.com/png.latex?T"> for input unique sequences <img src="https://latex.codecogs.com/png.latex?S%20=%20%5C%7Bs_1,%20...s_6%5C%7D">. (B) Each node in <img src="https://latex.codecogs.com/png.latex?T"> has an alignment matrix <img src="https://latex.codecogs.com/png.latex?%5Clambda"> for its child sequences, a row-wise probabilities vector <img src="https://latex.codecogs.com/png.latex?P">, and a column-wise information score vector <img src="https://latex.codecogs.com/png.latex?I">. Two or more consecutive columns in <img src="https://latex.codecogs.com/png.latex?%5Clambda"> with <img src="https://latex.codecogs.com/png.latex?I_j%20%3C%200.8"> are not coloured. (C) Multilevel overviews for a range of number of clusters <img src="https://latex.codecogs.com/png.latex?k"> retrieved from <img src="https://latex.codecogs.com/png.latex?T">, where black blocks represent merged columns. Image by authors.
 </figcaption>
 </center>
 </figure>
 <p>In the following sections, the authors discuss tuning the parameters of the framework. They also describe how they tested their tool on a couple of real-world datasets. The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.</p>
-<p>Anyway, the idea of the paper and the framework are super interesting to me. I would be happy to try to implement this tool some day.</p>
+<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be to implement this tool someday.</p>
 
 
 </section>

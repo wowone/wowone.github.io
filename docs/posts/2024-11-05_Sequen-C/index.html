@@ -182,6 +182,7 @@ window.Quarto = {
 
 
 
+<p>My name is Vladimir Kukushkin. I’ve been working as a data analyst/data scientist for more than 10 years. A couple of years ago I heavily shifted to quantitative UX research area which turned into my passion. While eagerly trying to find some sources to read regarding this topic, I realized that there are not so many of them. That’s why I decided to write a series of posts towards quantitative UX research. Basically, it will be reviews of papers, books and other publications that I find insightful. I’d be happy to find here enthusiasts who are also interested in this domain.</p>
 <p>Let me start our journal club with the most impressive paper related to clickstream visualizations I’ve ever read: <a href="https://arxiv.org/abs/2108.03043">Sequen-C: A Multilevel Overview of Temporal Event Sequences</a> by Jessica Magallanes, Tony Stone, Paul D. Morris, Suzanne Mason, Steven Wood, and Maria-Cruz Villa-Uriol.</p>
 <p>The authors address two very common issues that any quantitative UX researcher encounters:</p>
 <ol type="1">
@@ -229,7 +230,7 @@ I_j = 1 - \frac{E_j}{\log_2(|A| + 1)}, \;\;\;\; E_j = \sum_{a\in A_j\cup\{-\}}
 <center>
 <img src="simplified_clickstream.png" height="220" class="figure-img">
 <figcaption>
-The
+The outline of the Align-Score-Simplify workflow.
 </figcaption>
 </center>
 </figure>
@@ -243,12 +244,12 @@ The
 <center>
 <img src="framework_outline.png" height="500" class="figure-img">
 <figcaption>
-The outline of the whole framework. (A) Building aggregate tree <span class="math inline">\(T\)</span> for input unique sequences <span class="math inline">\(S = \{s_1, ...s_6\}\)</span>. (B) Each node in T has an alignment matrix <span class="math inline">\(\lambda\)</span> for its child sequences, a row-wise probabilities vector <span class="math inline">\(P\)</span>, and a column-wise information score vector <span class="math inline">\(I\)</span>. Two or more consecutive columns in <span class="math inline">\(\lambda\)</span> with <span class="math inline">\(I_j &lt; 0.8\)</span> are not coloured. (C) Multilevel overviews for a range of number of clusters <span class="math inline">\(k\)</span> retrieved from <span class="math inline">\(T\)</span>, where black blocks represent merged columns.
+The outline of the whole framework. (A) Building aggregate tree <span class="math inline">\(T\)</span> for input unique sequences <span class="math inline">\(S = \{s_1, ...s_6\}\)</span>. (B) Each node in <span class="math inline">\(T\)</span> has an alignment matrix <span class="math inline">\(\lambda\)</span> for its child sequences, a row-wise probabilities vector <span class="math inline">\(P\)</span>, and a column-wise information score vector <span class="math inline">\(I\)</span>. Two or more consecutive columns in <span class="math inline">\(\lambda\)</span> with <span class="math inline">\(I_j &lt; 0.8\)</span> are not coloured. (C) Multilevel overviews for a range of number of clusters <span class="math inline">\(k\)</span> retrieved from <span class="math inline">\(T\)</span>, where black blocks represent merged columns. Image by authors.
 </figcaption>
 </center>
 </figure>
 <p>In the following sections, the authors discuss tuning the parameters of the framework. They also describe how they tested their tool on a couple of real-world datasets. The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.</p>
-<p>Anyway, the idea of the paper and the framework are super interesting to me. I would be happy to try to implement this tool some day.</p>
+<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be to implement this tool someday.</p>
 
 
 </section>
