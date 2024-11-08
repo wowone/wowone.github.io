@@ -33,5 +33,75 @@
     "title": "Sequen-C: A Multilevel Overview of Temporal Event Sequences",
     "section": "Methodology",
     "text": "Methodology\nThe first problem is addressed by applying (agglomerative) clustering. I’ll explain further why they chose this algorithm. The second problem is solved using their framework called Align-Score-Simplify.\n\nAlign\nThis part is the most elegant, amazing, and surprizing in the whole paper. They apply the MSA algorithm (Multiple Sequence Alignment) stemming from bioinformatics. Originally, it was created to align amino acids or nucleotides in DNA sequences to identify common subsequences across DNAs belonging to multiple species. But this is exactly one of the goals we pursue in clickstream data analysis. Once we align user trajectories in similar way, we understand what events are common for the most users at some specific steps.\n\n\n\n\nInserting - as gaps to align events in sequences. The coloured events might be considered as common at some steps. The others are considered as noise.\n\n\n\n\n\nScore\nLet \\(\\lambda\\) be the output of the MSA algorithm applied to a set of unique sequences \\(S\\) (the frequency of each path is denoted as \\(P_i\\)). They calculate the information score \\(I_j\\) for each column \\(j\\) in \\(\\lambda\\) as a measure of the column’s impurity, somewhat similar to entropy but with some additional penalty for the high amount of gaps:\n\\[\nI_j = 1 - \\frac{E_j}{\\log_2(|A| + 1)}, \\;\\;\\;\\; E_j = \\sum_{a\\in A_j\\cup\\{-\\}}\n\\begin{cases}\n-P_a\\log_2\\left(\\frac{P_a}{G_j}\\right)\\, & \\text{if } a = \\text{'-'}\\\\\n-P_a\\log_2 P_a, & \\text{otherwise},\n\\end{cases}\n\\]\nwhere\n\n\\(A\\) – the set of unique events in \\(S\\),\n\\(A_j\\) – the set of unique events in column \\(j\\),\n\\(P_a\\) – the probability of the event \\(a\\) in column \\(j\\),\n\\(G_j\\) – is the count of gaps in column \\(j\\).\n\n\n\nSimplify\nOnce the \\(I_j\\) score is calculated for each column \\(j\\), we can treat each column that exceeds a certain threshold \\(I_\\tau\\) as an event that prevails in this column, while all other columns might be collapsed as noise. As a result, we get a new table \\(\\alpha\\) that simplifies the initial clickstream \\(S\\), as shown in the image below.\n\n\n\n\nThe outline of the Align-Score-Simplify workflow.\n\n\n\nFinally, we can granulate our clickstream representation using two axes:\n\nWe can consider different clusters of the agglomerative clustering output tree \\(T\\). Now it’s clear why they preferred this clustering algorithm instead of, say, K-Means. Considering different levels of \\(T\\), we obtain more/less homogeneous clusters. More homogeneous clusters provide better and clearer output of the MSA algorithm.\n\\(\\tau\\). By varying \\(\\tau\\), we can make the sequence visualization more/less coarse.\n\nAs a result, we get the interface like this:\n\n\n\n\nThe outline of the whole framework. (A) Building aggregate tree \\(T\\) for input unique sequences \\(S = \\{s_1, ...s_6\\}\\). (B) Each node in \\(T\\) has an alignment matrix \\(\\lambda\\) for its child sequences, a row-wise probabilities vector \\(P\\), and a column-wise information score vector \\(I\\). Two or more consecutive columns in \\(\\lambda\\) with \\(I_j &lt; 0.8\\) are not coloured. (C) Multilevel overviews for a range of number of clusters \\(k\\) retrieved from \\(T\\), where black blocks represent merged columns. Image by authors.\n\n\n\nIn the following sections, the authors describe the GUI of a more complex tool developed as an application for a couple of particular datasets from the public health domain. I won’t talk about it here since its underlying idea is the same, while the interface is more sophisticated and includes some information about events distribution, unique sequence view, and individual sequence view.\nThe datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m quite skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.\nAnyway, the idea of the paper and the framework are super interesting to me. It would be great to implement such a tool someday."
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "",
+    "text": "Doubtlessly, DAU, WAU, and MAU are critical business metrics. An article “How Duolingo reignited user growth” by Jorge Mazal, former CPO of Duolingo is #1 the Growth section of Lenny’s Newsletter blog. In this article Jorge payed special attention to the methodology Duolingo used to model DAU metrics (see another article “Meaningful metrics: how data sharpened the focus of product teams” by Erin Gustafson). This methodology has multiple strenghts but I focus here on how one can use it for DAU forecasting.\nNew year is coming soon, so many companies are planning their budgets for the next year these days. Cost estimations are often require DAU forecast. In this article I’ll show you how you can get this prediction using the Duolingo’s growth model and share a DAU & MAU “calculator” designed as a Google Spreadsheet calculator."
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#duolingos-growth-model",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#duolingos-growth-model",
+    "title": "DAU & MAU prediction",
+    "section": "Duolingo’s growth model",
+    "text": "Duolingo’s growth model\nA quick recap on how the Duolingo’s growth model works. At day \\(d\\) (\\(d=1,2,\\ldots,\\)) of a user’s lifetime the user can be in one of the following 7 (mutually-exclusive) states:\n\n\n\n\nstate\n\n\nd = 1\n\n\nis active today\n\n\nwas active in [d-6, d-1]\n\n\nwas active in [d-29, d-7]\n\n\nwas active before d-30\n\n\n\n\n\nnew\n\n\n✅\n\n\n❓\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n\n\ncurrent\n\n\n❌\n\n\n✅\n\n\n✅\n\n\n❓\n\n\n❓\n\n\n\n\nreactivated\n\n\n❌\n\n\n✅\n\n\n❌\n\n\n✅\n\n\n❓\n\n\n\n\nresurrected\n\n\n❌\n\n\n✅\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n\n\nat_risk_wau\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n❓\n\n\n❓\n\n\n\n\nat_risk_mau\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n❓\n\n\n\n\ndormant\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n\nHaving these states defined, we can consider a user’s lifetime trajectory as a Markov chain. Let \\(M\\) be a transition matrix\nThe beauty and simplicity of this approach is that now we can fully describe states of the all users registered by a given day.\nIndeed, let \\(M\\) be the transition matrix derived from the historical data."
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#methodology",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#methodology",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Methodology",
+    "text": "Methodology\nA quick recap on how the Duolingo’s growth model works. At day \\(d\\) (\\(d=1,2,\\ldots,\\)) of a user’s lifetime the user can be in one of the following 7 (mutually-exclusive) states:\n\n\n\n\nstate\n\n\nd = 1\n\n\nis active today\n\n\nwas active in [d-6, d-1]\n\n\nwas active in [d-29, d-7]\n\n\nwas active before d-30\n\n\n\n\n\nnew\n\n\n✅\n\n\n❓\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n\n\ncurrent\n\n\n❌\n\n\n✅\n\n\n✅\n\n\n❓\n\n\n❓\n\n\n\n\nreactivated\n\n\n❌\n\n\n✅\n\n\n❌\n\n\n✅\n\n\n❓\n\n\n\n\nresurrected\n\n\n❌\n\n\n✅\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n\n\nat_risk_wau\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n❓\n\n\n❓\n\n\n\n\nat_risk_mau\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n❓\n\n\n\n\ndormant\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n❌\n\n\n✅\n\n\n\nHaving these states defined (as set \\(S\\)), we can consider a user’s lifetime trajectory as a Markov chain. Let \\(M\\) be a transition matrix associated with this Markov chain: \\(m_{i, j} = P(s_j | s_i)\\) are the probabilities that a user moves to state \\(s_j\\) right after being at state \\(s_i\\), \\(s_i, s_j \\in S\\). The matrix values are easily fetched from the historical data.\nThe beauty and simplicity of this approach is that matrix \\(M\\) fully describes states of the all users in the future. Suppose that vector \\(u_0\\) of length 7 contains the counts of users being in certain states at some calendar day denoted as 0. Thus, according to the Markov model, in the next day \\(u_1\\) we expect to have the following amount of users:\n\\[\n\\underbrace{\n\\begin{pmatrix}  \\#New_1 \\\\ \\#Current_1 \\\\ \\#Reactivated_1 \\\\ \\#Resurrected_1 \\\\ \\#AtRiskWau_1 \\\\ \\#AtRiskMau_1 \\\\ \\#Dormant_1 \\end{pmatrix}\n}_{u_1} = M^T \\cdot\n\\underbrace{\n\\begin{pmatrix}  \\#New_0 \\\\ \\#Current_0 \\\\ \\#Reactivated_0 \\\\ \\#Resurrected_0 \\\\ \\#AtRiskWau_0 \\\\ \\#AtRiskMau_0 \\\\ \\#Dormant_0 \\end{pmatrix}\n}_{u_0}\n\\]\nApplying this formula recursevely, we derive the amount of the users at any arbitrary day \\(t &gt; 0\\) in the future. The only thing we need to provide despite of the initial distribution \\(u_0\\) is to the amount of new users that would appear in the product each day in the future. We’ll get it by using historical data on new users appeared in the past and appyling the prophet library.\nNow, having \\(u_t\\) calculated, we can calculate DAU values at day t: \\[\\begin{equation} DAU_t = \\#New_t + \\#Current_t + \\#Reactivated_t +\\#Resurrected_t \\end{equation}.\\]\nAdditionally, we can easily calculate WAU and MAU metrics: \\[WAU_t = DAU_t +\\#AtRiskWau_t,\\] \\[MAU_t = DAU_t +\\#AtRiskWau_t + \\#AtRiskMau_t.\\]\nFinally, the algorithm looks like this:\n\nCalculate initial counts \\(u_0\\) corresponding to the day right before prediction.\nFor each prediction day \\(t=1, ..., T\\) calculate the expected amount of new users \\(\\#New_1, \\ldots, \\#New_T\\).\nCalculate recursively \\(u_{t+1} = M^T u_t\\).\nCalculate DAU, WAU, MAU for each prediction day \\(t=1, ..., T\\)."
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#getting-the-states",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#getting-the-states",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Getting the states",
+    "text": "Getting the states"
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#pred",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#pred",
+    "title": "DAU prediction",
+    "section": "Pred",
+    "text": "Pred"
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#predicting-new-users-amount",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#predicting-new-users-amount",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Predicting new users amount",
+    "text": "Predicting new users amount"
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#predicting-dau",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#predicting-dau",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Predicting DAU",
+    "text": "Predicting DAU"
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#prediction-testing",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#prediction-testing",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Prediction testing",
+    "text": "Prediction testing"
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#conclusions",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#conclusions",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Conclusions",
+    "text": "Conclusions"
+  },
+  {
+    "objectID": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#discussion",
+    "href": "notebooks/2024-11-01_dau_prediction/dau_prediction.html#discussion",
+    "title": "Modeling DAU, WAU, MAU with Markov chain",
+    "section": "Discussion",
+    "text": "Discussion"
   }
 ]
