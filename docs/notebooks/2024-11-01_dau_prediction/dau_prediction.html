@@ -20,10 +20,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -66,6 +100,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -350,7 +387,7 @@ dormant
 }_{u_0}
 \]</span></p>
 <p>Applying this formula recursevely, we derive the amount of the users at any arbitrary day <span class="math inline">\(t &gt; 0\)</span> in the future. The only thing we need to provide despite of the initial distribution <span class="math inline">\(u_0\)</span> is to the amount of new users that would appear in the product each day in the future. We’ll get it by using historical data on new users appeared in the past and appyling the <a href="http://facebook.github.io/prophet/">prophet</a> library.</p>
-<p>Now, having <span class="math inline">\(u_t\)</span> calculated, we can calculate DAU values at day t: <span class="math display">\[\begin{equation} DAU_t = \#New_t + \#Current_t + \#Reactivated_t +\#Resurrected_t \end{equation}.\]</span></p>
+<p>Now, having <span class="math inline">\(u_t\)</span> calculated, we can calculate DAU values at day t: <span class="math display">\[DAU_t = \#New_t + \#Current_t + \#Reactivated_t +\#Resurrected_t.\]</span></p>
 <p>Additionally, we can easily calculate WAU and MAU metrics: <span class="math display">\[WAU_t = DAU_t +\#AtRiskWau_t,\]</span> <span class="math display">\[MAU_t = DAU_t +\#AtRiskWau_t + \#AtRiskMau_t.\]</span></p>
 <p>Finally, the algorithm looks like this:</p>
 <ol type="1">
@@ -360,17 +397,532 @@ dormant
 <li>Calculate DAU, WAU, MAU for each prediction day <span class="math inline">\(t=1, ..., T\)</span>.</li>
 </ol>
 </section>
-<section id="getting-the-states" class="level2">
-<h2 class="anchored" data-anchor-id="getting-the-states">Getting the states</h2>
+<section id="implementation" class="level2">
+<h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
+<p>Suppose that today is 2022-10-31 and we want to predict the DAU metric for the next year. We define <code>PREDICTION_START</code> and <code>PREDICTION_END</code> constants to set this prediction range.</p>
+<div id="9922781d" class="cell" data-execution_count="241">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>PREDICTION_START <span class="op">=</span> <span class="st">'2022-11-01'</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>PREDICTION_END <span class="op">=</span> <span class="st">'2023-12-31'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We use a simulated dataset which is based on historical data of some SAAS app. The data is stored in the <code>dau_data.csv</code> file and contains three columns <code>user_id</code>, <code>date</code>, <code>registration_date</code>. Each record indicates a day when a user was active.</p>
+<p>The data includes the activity indicators for all users spotted in the app from 2020-11-01 to 2022-10-31. An additional month 2020-10 is included in order to calculate user states correctly (<code>AtRiskMau</code> and <code>dormant</code> states requires data 1 month behind).</p>
+<div id="d8e524c5" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'dau_data.csv.gz'</span>, compression<span class="op">=</span><span class="st">'gzip'</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Shape: </span><span class="sc">{</span>df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Total users: </span><span class="sc">{</span>df[<span class="st">'user_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Data range: [</span><span class="sc">{</span>df[<span class="st">'date'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>df[<span class="st">'date'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss">]'</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape: (447048, 3)
+Total users: 38093
+Data range: [2020-10-01, 2022-10-31]</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="244">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">user_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">registration_date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>7a010840-b4d1-543d-bd4c-fbb4ae2198c5</td>
+<td>2020-10-01</td>
+<td>2020-08-26</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>d565a211-1996-538b-b067-11a38616c8cf</td>
+<td>2020-10-01</td>
+<td>2020-10-01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>41fb29c7-8122-59db-a690-e9d9502f3c38</td>
+<td>2020-10-01</td>
+<td>2020-09-02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>310c15a2-fe92-5703-be1f-80270c1b83bd</td>
+<td>2020-10-01</td>
+<td>2020-08-27</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>234c3035-145f-5694-bd7f-bec58a5f0c5c</td>
+<td>2020-10-01</td>
+<td>2020-05-31</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>In practice, the most calculations are reasonable to run as SQL queries to a database where the data is stored. To simulate this, I’ll use the <code>duckdb</code> library.</p>
+<div id="f00045f9" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="predicting-new-users-amount" class="level3">
+<h3 class="anchored" data-anchor-id="predicting-new-users-amount">Predicting new users amount</h3>
+<p>Let’s start from the new users prediction. One of the easiest ways to do this is to use the <a href="http://facebook.github.io/prophet/">prophet</a> library. It simply requires a historical time-series and extends it in the future. The <code>new_users</code> Series contains such a historical data. A condition that indicates that a new user appeared is <code>df['date'] == df['registration_date']</code>.</p>
+<div id="8d953a72" class="cell" data-execution_count="218">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>new_users <span class="op">=</span> df[df[<span class="st">'date'</span>] <span class="op">==</span> df[<span class="st">'registration_date'</span>]]<span class="op">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    .assign(date<span class="op">=</span>pd.to_datetime(df[<span class="st">'date'</span>]))<span class="op">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">'date'</span>).size()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>new_users.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="218">
+<pre><code>date
+2020-10-01    4
+2020-10-02    3
+2020-10-03    3
+2020-10-04    4
+2020-10-05    8
+dtype: int64</code></pre>
+</div>
+</div>
+<p><code>prohet</code> requires a time-series as a DataFrame containing two columns, so we reformat <code>new_users</code> Series to <code>new_users_prophet</code> DataFrame. Another thing we need to prepare is to create the <code>future</code> variable containing certain days for prediction: from <code>PREDICTION_START</code> to <code>PREDICTION_END</code>. The plot illustrates predictions for both past and future dates.</p>
+<div id="cc95c915" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> Prophet()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>new_users_prophet <span class="op">=</span> pd.DataFrame({<span class="st">'ds'</span>: new_users.index, <span class="st">'y'</span>: new_users.values})</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>m.fit(new_users_prophet)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>periods <span class="op">=</span> <span class="bu">len</span>(pd.date_range(PREDICTION_START, PREDICTION_END))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>future <span class="op">=</span> m.make_future_dataframe(periods<span class="op">=</span>periods)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>m.plot(m.predict(future))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>21:53:31 - cmdstanpy - INFO - Chain [1] start processing
+21:53:31 - cmdstanpy - INFO - Chain [1] done processing</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-6-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now, let’s create a Series <code>new_users_pred</code> where we’ll keep predictions for the new users amount.</p>
+<div id="dfa2a6b7" class="cell" data-execution_count="220">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>new_users_pred <span class="op">=</span> m.predict(future)<span class="op">\</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    .assign(yhat<span class="op">=</span><span class="kw">lambda</span> _df: _df[<span class="st">'yhat'</span>].astype(<span class="bu">int</span>))<span class="op">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .rename(columns<span class="op">=</span>{<span class="st">'ds'</span>: <span class="st">'date'</span>, <span class="st">'yhat'</span>: <span class="st">'count'</span>})<span class="op">\</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    .loc[<span class="kw">lambda</span> _df: _df[<span class="st">'date'</span>] <span class="op">&gt;=</span> PREDICTION_START]<span class="op">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    .set_index(<span class="st">'date'</span>)<span class="op">\</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    [<span class="st">'count'</span>]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>new_users_pred.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="220">
+<pre><code>date
+2022-11-01    49
+2022-11-02    47
+2022-11-03    43
+2022-11-04    39
+2022-11-05    41
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
 </section>
-<section id="predicting-new-users-amount" class="level2">
-<h2 class="anchored" data-anchor-id="predicting-new-users-amount">Predicting new users amount</h2>
+<section id="getting-the-states" class="level3">
+<h3 class="anchored" data-anchor-id="getting-the-states">Getting the states</h3>
+<p>So we want assign one of 7 states for each day of a user’s lifetime (meaning lifetime within the app). According to the definition, for each day we need to consider at least 30 days in the past. This is when SQL window functions come in. However, since <code>df</code> data contains only <em>active</em> day indicators, we need to explicitly extend it with the days when a user was not active.</p>
+<p>For readability purposes we split the next SQL query into multiple subqueries.</p>
+<ul>
+<li><code>dau</code>. Simply transforms dates from string to date data type.</li>
+<li><code>full_range</code>. Creates a full sequence of dates for each user.</li>
+</ul>
+<div id="7f67aa64" class="cell" data-execution_count="58">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>DATASET_START <span class="op">=</span> <span class="st">'2021-11-01'</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>DATASET_END <span class="op">=</span> <span class="st">'2022-10-31'</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>OBSERVATION_START <span class="op">=</span> <span class="st">'2021-10-01'</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ss">WITH</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="ss">dau AS (</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="ss">        user_id,</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="ss">        date::date AS date,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="ss">        registration_date::date AS registration_date</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM df</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="ss">),</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="ss">full_range AS (</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="ss">        user_id, UNNEST(generate_series(greatest(registration_date, '</span><span class="sc">{</span>OBSERVATION_START<span class="sc">}</span><span class="ss">'), date '</span><span class="sc">{</span>DATASET_END<span class="sc">}</span><span class="ss">', INTERVAL 1 DAY))::date AS date</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM (</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="ss">        SELECT DISTINCT user_id, registration_date FROM dau</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="ss">    )</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="ss">),</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="ss">dau_full AS (</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="ss">        fr.user_id,</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="ss">        fr.date,</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="ss">        dau.date IS NOT NULL AS is_active,</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="ss">        registration_date</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM full_range AS fr</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="ss">    LEFT JOIN dau USING(user_id, date)</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="ss">),</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="ss">states AS (</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="ss">        user_id,</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="ss">        date,</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="ss">        is_active,</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="ss">        first_value(registration_date IGNORE NULLS) OVER (PARTITION BY user_id ORDER BY date) AS registration_date,</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="ss">        SUM(is_active::int) OVER (PARTITION BY user_id ORDER BY date ROWS BETWEEN 6 PRECEDING and 1 PRECEDING) AS active_days_back_6d,</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="ss">        SUM(is_active::int) OVER (PARTITION BY user_id ORDER BY date ROWS BETWEEN 29 PRECEDING and 1 PRECEDING) AS active_days_back_29d,</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="ss">        CASE</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN date = registration_date THEN 'new'</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = TRUE AND active_days_back_6d BETWEEN 1 and 6 THEN 'current'</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = TRUE AND active_days_back_6d = 0 AND IFNULL(active_days_back_29d, 0) &gt; 0 THEN 'reactivated'</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = TRUE AND active_days_back_6d = 0 AND IFNULL(active_days_back_29d, 0) = 0 THEN 'resurrected'</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = FALSE AND active_days_back_6d &gt; 0 THEN 'at_risk_wau'</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = FALSE AND active_days_back_6d = 0 AND ifnull(active_days_back_29d, 0) &gt; 0 THEN 'at_risk_mau'</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="ss">            ELSE 'dormant'</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="ss">        END AS state</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM dau_full</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="ss">)</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="ss">SELECT user_id, date, state FROM states</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="ss">WHERE date BETWEEN '</span><span class="sc">{</span>DATASET_START<span class="sc">}</span><span class="ss">' AND '</span><span class="sc">{</span>DATASET_END<span class="sc">}</span><span class="ss">'</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="ss">ORDER BY user_id, date</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> duckdb.sql(query).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="f2385527" class="cell" data-execution_count="169">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ss">SELECT</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ss">    date,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ss">    state_from,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ss">    state_to,</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ss">    COUNT(*) AS cnt,</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ss">FROM (</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ss">        date,</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ss">        state AS state_to,</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="ss">        lag(state) OVER (PARTITION BY user_id ORDER BY date) AS state_from</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM states</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ss">)</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="ss">WHERE state_from IS NOT NULL</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="ss">GROUP BY date, state_from, state_to</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ss">ORDER BY date, state_from, state_to;</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>transitions <span class="op">=</span> duckdb.sql(query).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="529fbf8a" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>PREDICTION_START <span class="op">=</span> <span class="st">'2022-11-01'</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>PREDICTION_END <span class="op">=</span> <span class="st">'2023-12-31'</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>states_order <span class="op">=</span> [<span class="st">'new'</span>, <span class="st">'current'</span>, <span class="st">'reactivated'</span>, <span class="st">'resurrected'</span>, <span class="st">'at_risk_wau'</span>, <span class="st">'at_risk_mau'</span>, <span class="st">'dormant'</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_transition_matrix(transitions, date1, date2):</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    probs <span class="op">=</span> transitions<span class="op">\</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        .loc[<span class="kw">lambda</span> _df: _df[<span class="st">'date'</span>].between(date1, date2)]<span class="op">\</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        .groupby([<span class="st">'state_from'</span>, <span class="st">'state_to'</span>], as_index<span class="op">=</span><span class="va">False</span>)<span class="op">\</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'cnt'</span>].<span class="bu">sum</span>()<span class="op">\</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        .assign(</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>            supp<span class="op">=</span><span class="kw">lambda</span> _df: _df.groupby(<span class="st">'state_from'</span>)[<span class="st">'cnt'</span>].transform(<span class="st">'sum'</span>),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>            prob<span class="op">=</span><span class="kw">lambda</span> _df: _df[<span class="st">'cnt'</span>] <span class="op">/</span> _df[<span class="st">'supp'</span>]</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> probs.pivot(index<span class="op">=</span><span class="st">'state_from'</span>, columns<span class="op">=</span><span class="st">'state_to'</span>, values<span class="op">=</span><span class="st">'prob'</span>)<span class="op">\</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        .reindex(states_order, axis<span class="op">=</span><span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>        .reindex(states_order, axis<span class="op">=</span><span class="dv">1</span>)<span class="op">\</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>        .fillna(<span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>        .astype(<span class="bu">float</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> M</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="predicting-dau" class="level2">
-<h2 class="anchored" data-anchor-id="predicting-dau">Predicting DAU</h2>
+<section id="predicting-dau" class="level3">
+<h3 class="anchored" data-anchor-id="predicting-dau">Predicting DAU</h3>
+<div id="ffd464d7" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_dau(M, state0, date1, date2, new_users):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Predicts DAU over a given date range.</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">    M : pandas.DataFrame</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">        Transition matrix representing user state changes.</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    state0 : pandas.Series</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">        counts of initial state of users.</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">    date1 : str</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">        Start date of the prediction period in 'YYYY-MM-DD' format.</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">    date2 : str</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">        End date of the prediction period in 'YYYY-MM-DD' format.</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">    new_users : int or pandas.Series</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">        The expected amount of new users for each day between date1 and date2.</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">        If a Series, it should have dates as the index.</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">        If an int, the same number is used for each day.</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">        </span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">    pandas.DataFrame</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">        DataFrame containing the predicted DAU, WAU, and MAU for each day in the date range,</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">        with columns for different user states and tot.</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    dates <span class="op">=</span> pd.date_range(date1, date2)</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    dates.name <span class="op">=</span> <span class="st">'date'</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>    dau_pred <span class="op">=</span> []</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    new_dau <span class="op">=</span> state0.copy()</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> date <span class="kw">in</span> dates:</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>        new_dau <span class="op">=</span> (M.transpose() <span class="op">@</span> new_dau).astype(<span class="bu">int</span>)</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(new_users, <span class="bu">int</span>):</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>            new_users_today <span class="op">=</span> new_users</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>            new_users_today <span class="op">=</span> new_users.astype(<span class="bu">int</span>).loc[date] </span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>        new_dau.loc[<span class="st">'new'</span>] <span class="op">=</span> new_users_today</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>        dau_pred.append(new_dau.tolist())</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>    dau_pred <span class="op">=</span> pd.DataFrame(dau_pred, index<span class="op">=</span>dates, columns<span class="op">=</span>states_order)</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>    dau_pred[<span class="st">'dau'</span>] <span class="op">=</span> dau_pred[<span class="st">'new'</span>] <span class="op">+</span> dau_pred[<span class="st">'current'</span>] <span class="op">+</span> dau_pred[<span class="st">'reactivated'</span>] <span class="op">+</span> dau_pred[<span class="st">'resurrected'</span>]</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>    dau_pred[<span class="st">'wau'</span>] <span class="op">=</span> dau_pred[<span class="st">'dau'</span>] <span class="op">+</span> dau_pred[<span class="st">'at_risk_wau'</span>]</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>    dau_pred[<span class="st">'mau'</span>] <span class="op">=</span> dau_pred[<span class="st">'dau'</span>] <span class="op">+</span> dau_pred[<span class="st">'at_risk_wau'</span>] <span class="op">+</span> dau_pred[<span class="st">'at_risk_mau'</span>]</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dau_pred</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_state0(date):</span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>    query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT state, count(*) AS cnt</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM states</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="ss">    WHERE date = '</span><span class="sc">{</span>date<span class="sc">}</span><span class="ss">'</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="ss">    GROUP BY state</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> duckdb.sql(query).df()</span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> state0.set_index(<span class="st">'state'</span>).reindex(states_order)[<span class="st">'cnt'</span>]</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> state0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="07b1d7bb" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> get_transition_matrix(transitions, <span class="st">'2022-10-25'</span>, <span class="st">'2022-10-31'</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>state0 <span class="op">=</span> get_state0(DATASET_END)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTION_END, new_users_pred)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>dau_pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="207">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">new</th>
+<th data-quarto-table-cell-role="th">current</th>
+<th data-quarto-table-cell-role="th">reactivated</th>
+<th data-quarto-table-cell-role="th">resurrected</th>
+<th data-quarto-table-cell-role="th">at_risk_wau</th>
+<th data-quarto-table-cell-role="th">at_risk_mau</th>
+<th data-quarto-table-cell-role="th">dormant</th>
+<th data-quarto-table-cell-role="th">dau</th>
+<th data-quarto-table-cell-role="th">wau</th>
+<th data-quarto-table-cell-role="th">mau</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2022-11-01</td>
+<td>49</td>
+<td>444</td>
+<td>13</td>
+<td>13</td>
+<td>451</td>
+<td>1269</td>
+<td>16795</td>
+<td>519</td>
+<td>970</td>
+<td>2239</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2022-11-02</td>
+<td>47</td>
+<td>446</td>
+<td>13</td>
+<td>13</td>
+<td>462</td>
+<td>1267</td>
+<td>16830</td>
+<td>519</td>
+<td>981</td>
+<td>2248</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2022-11-03</td>
+<td>43</td>
+<td>448</td>
+<td>13</td>
+<td>13</td>
+<td>470</td>
+<td>1267</td>
+<td>16865</td>
+<td>517</td>
+<td>987</td>
+<td>2254</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2022-11-04</td>
+<td>39</td>
+<td>448</td>
+<td>13</td>
+<td>13</td>
+<td>474</td>
+<td>1268</td>
+<td>16900</td>
+<td>513</td>
+<td>987</td>
+<td>2255</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2022-11-05</td>
+<td>41</td>
+<td>447</td>
+<td>13</td>
+<td>13</td>
+<td>475</td>
+<td>1269</td>
+<td>16935</td>
+<td>514</td>
+<td>989</td>
+<td>2258</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-12-27</td>
+<td>135</td>
+<td>1172</td>
+<td>34</td>
+<td>36</td>
+<td>1266</td>
+<td>3247</td>
+<td>45910</td>
+<td>1377</td>
+<td>2643</td>
+<td>5890</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-12-28</td>
+<td>134</td>
+<td>1187</td>
+<td>34</td>
+<td>36</td>
+<td>1282</td>
+<td>3258</td>
+<td>45999</td>
+<td>1391</td>
+<td>2673</td>
+<td>5931</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-12-29</td>
+<td>132</td>
+<td>1201</td>
+<td>34</td>
+<td>36</td>
+<td>1297</td>
+<td>3271</td>
+<td>46088</td>
+<td>1403</td>
+<td>2700</td>
+<td>5971</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-12-30</td>
+<td>137</td>
+<td>1213</td>
+<td>34</td>
+<td>36</td>
+<td>1309</td>
+<td>3285</td>
+<td>46178</td>
+<td>1420</td>
+<td>2729</td>
+<td>6014</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-12-31</td>
+<td>151</td>
+<td>1227</td>
+<td>34</td>
+<td>36</td>
+<td>1323</td>
+<td>3300</td>
+<td>46268</td>
+<td>1448</td>
+<td>2771</td>
+<td>6071</td>
+</tr>
+</tbody>
+</table>
+
+<p>426 rows × 10 columns</p>
+</div>
+</div>
+</div>
+<div id="87251bb7" class="cell" data-execution_count="208">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT date, COUNT(*) AS dau</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM states</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE state IN ('new', 'current', 'reactivated', 'resurrected')</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY date</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY date</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>dau_true <span class="op">=</span> duckdb.sql(query).df()<span class="op">\</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    .set_index(<span class="st">'date'</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>pd.concat([dau_true, dau_pred[<span class="st">'dau'</span>]]).plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="prediction-testing" class="level2">
 <h2 class="anchored" data-anchor-id="prediction-testing">Prediction testing</h2>
+<div id="5fbeab65" class="cell" data-execution_count="239">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>state0 <span class="op">=</span> get_state0(<span class="st">'2022-06-30'</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> get_transition_matrix(transitions, <span class="st">'2022-06-23'</span>, <span class="st">'2022-06-30'</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> predict_dau(M, state0, <span class="st">'2022-07-01'</span>, <span class="st">'2022-10-31'</span>, new_users)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>dau_true<span class="op">\</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    .join(dau_pred[[<span class="st">'dau'</span>]], how<span class="op">=</span><span class="st">'inner'</span>, lsuffix<span class="op">=</span><span class="st">'_true'</span>, rsuffix<span class="op">=</span><span class="st">'_pred'</span>)<span class="op">\</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    .plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="discussion" class="level2">
 <h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
