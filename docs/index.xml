@@ -12,7 +12,7 @@
 <generator>quarto-1.5.57</generator>
 <lastBuildDate>Sun, 10 Nov 2024 23:00:00 GMT</lastBuildDate>
 <item>
-  <title>Modeling DAU, WAU, MAU with Markov chain (WIP)</title>
+  <title>Modeling DAU with Markov chain (WIP)</title>
   <link>https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction.html</link>
   <description><![CDATA[ 
 
@@ -213,7 +213,7 @@ dormant
 <section id="dataset" class="level3">
 <h3 class="anchored" data-anchor-id="dataset">3.1 Dataset</h3>
 <p>We use a simulated dataset based on historical data of a SAAS app. The data is stored in the <code>dau_data.csv.gz</code> file and contains three columns: <code>user_id</code>, <code>date</code>, and <code>registration_date</code>. Each record indicates a day when a user was active.</p>
-<p>The data includes activity indicators for all users from <code>2020-11-01</code> to <code>2022-10-31</code>. An additional month, October 2020, is included to calculate user states correctly (<code>at_risk_mau</code> and <code>dormant</code> states require data from one month prior).</p>
+<p>The data includes activity indicators for all users from <code>2020-11-01</code> to <code>2023-10-31</code>. An additional month, October 2020, is included to calculate user states correctly (<code>at_risk_mau</code> and <code>dormant</code> states require data from one month prior).</p>
 <div id="d8e524c5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
@@ -304,9 +304,9 @@ background-color: null;
 font-style: inherit;">]'</span>)</span>
 <span id="cb1-10">df.head()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Shape: (447048, 3)
-Total users: 38093
-Data range: [2020-10-01 00:00:00, 2022-10-31 00:00:00]</code></pre>
+<pre><code>Shape: (667236, 3)
+Total users: 51480
+Data range: [2020-10-01 00:00:00, 2023-10-31 00:00:00]</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div>
@@ -324,33 +324,33 @@ Data range: [2020-10-01 00:00:00, 2022-10-31 00:00:00]</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>7a010840-b4d1-543d-bd4c-fbb4ae2198c5</td>
+<td>d8c465ab-e9fd-5edd-9e4e-c77094700cb5</td>
 <td>2020-10-01</td>
-<td>2020-08-26</td>
+<td>2020-08-25</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>d565a211-1996-538b-b067-11a38616c8cf</td>
+<td>269b7f13-a509-5174-85cb-95a8f7b932e8</td>
 <td>2020-10-01</td>
-<td>2020-10-01</td>
+<td>2020-08-25</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>41fb29c7-8122-59db-a690-e9d9502f3c38</td>
+<td>bfeac474-5b66-566f-8654-262bb79c873e</td>
 <td>2020-10-01</td>
-<td>2020-09-02</td>
+<td>2020-05-31</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>310c15a2-fe92-5703-be1f-80270c1b83bd</td>
+<td>d32fcac5-122c-5463-8aea-01b39b9ad0bb</td>
 <td>2020-10-01</td>
-<td>2020-08-27</td>
+<td>2020-09-30</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>234c3035-145f-5694-bd7f-bec58a5f0c5c</td>
+<td>c1ece677-e643-5bb3-8701-f1c59a0bf4cd</td>
 <td>2020-10-01</td>
-<td>2020-05-31</td>
+<td>2020-09-05</td>
 </tr>
 </tbody>
 </table>
@@ -358,7 +358,7 @@ Data range: [2020-10-01 00:00:00, 2022-10-31 00:00:00]</code></pre>
 </div>
 </div>
 </div>
-<p>This is how the DAU time-series looks like up to 2022-10-31.</p>
+<p>This is how the DAU time-series looks like up to 2023-10-31.</p>
 <div id="888aa0d7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">df.groupby(<span class="st" style="color: #20794D;
 background-color: null;
@@ -384,12 +384,12 @@ font-style: inherit;">'DAU, historical'</span>)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2022-11-01'</span></span>
+font-style: inherit;">'2023-11-01'</span></span>
 <span id="cb4-2">PREDICTION_END <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2023-12-31'</span></span></code></pre></div>
+font-style: inherit;">'2024-12-31'</span></span></code></pre></div>
 </div>
 </section>
 <section id="predicting-new-users-amount" class="level3">
@@ -426,7 +426,7 @@ font-style: inherit;">'date'</span>).size()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>date
 2020-10-01    4
-2020-10-02    3
+2020-10-02    4
 2020-10-03    3
 2020-10-04    4
 2020-10-05    8
@@ -439,53 +439,87 @@ dtype: int64</code></pre>
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="im" style="color: #00769E;
 background-color: null;
+font-style: inherit;">import</span> logging</span>
+<span id="cb8-2"><span class="im" style="color: #00769E;
+background-color: null;
 font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> plt</span>
-<span id="cb8-2"><span class="im" style="color: #00769E;
+<span id="cb8-3"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">from</span> prophet <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> Prophet</span>
-<span id="cb8-3"></span>
-<span id="cb8-4">m <span class="op" style="color: #5E5E5E;
+<span id="cb8-4"></span>
+<span id="cb8-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># suppress prophet logs</span></span>
+<span id="cb8-6">logging.getLogger(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"prophet"</span>).setLevel(logging.WARNING)</span>
+<span id="cb8-7">logging.getLogger(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cmdstanpy"</span>).disabled<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span></span>
+<span id="cb8-8"></span>
+<span id="cb8-9"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">def</span> predict_new_users(prediction_start, prediction_end, new_users_train, show_plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>):</span>
+<span id="cb8-10">    m <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> Prophet()</span>
-<span id="cb8-5">new_users_prophet <span class="op" style="color: #5E5E5E;
+<span id="cb8-11">    new_users_train <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> new_users_train.loc[new_users_train.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> prediction_start]</span>
+<span id="cb8-12">    new_users_prophet <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame({<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'ds'</span>: new_users.index, <span class="st" style="color: #20794D;
+font-style: inherit;">'ds'</span>: new_users_train.index, <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'y'</span>: new_users.values})</span>
-<span id="cb8-6">m.fit(new_users_prophet)</span>
-<span id="cb8-7"></span>
-<span id="cb8-8">periods <span class="op" style="color: #5E5E5E;
+font-style: inherit;">'y'</span>: new_users_train.values})</span>
+<span id="cb8-13">    m.fit(new_users_prophet)</span>
+<span id="cb8-14"></span>
+<span id="cb8-15">    periods <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
-font-style: inherit;">len</span>(pd.date_range(PREDICTION_START, PREDICTION_END))</span>
-<span id="cb8-9">future <span class="op" style="color: #5E5E5E;
+font-style: inherit;">len</span>(pd.date_range(prediction_start, prediction_end))</span>
+<span id="cb8-16">    future <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> m.make_future_dataframe(periods<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>periods)</span>
-<span id="cb8-10">new_users_pred <span class="op" style="color: #5E5E5E;
+<span id="cb8-17">    new_users_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> m.predict(future)</span>
-<span id="cb8-11">m.plot(new_users_pred)</span>
-<span id="cb8-12">plt.title(<span class="st" style="color: #20794D;
+<span id="cb8-18">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> show_plot:</span>
+<span id="cb8-19">        m.plot(new_users_pred)</span>
+<span id="cb8-20">        plt.title(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'New users prediction'</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb8-13"></span>
-<span id="cb8-14">new_users_pred <span class="op" style="color: #5E5E5E;
+<span id="cb8-21"></span>
+<span id="cb8-22">    new_users_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> new_users_pred<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb8-15">    .assign(yhat<span class="op" style="color: #5E5E5E;
+<span id="cb8-23">        .assign(yhat<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -497,7 +531,7 @@ background-color: null;
 font-style: inherit;">int</span>))<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb8-16">    .rename(columns<span class="op" style="color: #5E5E5E;
+<span id="cb8-24">        .rename(columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>{<span class="st" style="color: #20794D;
 background-color: null;
@@ -510,48 +544,56 @@ background-color: null;
 font-style: inherit;">'count'</span>})<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb8-17">    .set_index(<span class="st" style="color: #20794D;
+<span id="cb8-25">        .set_index(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'date'</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb8-18">    .clip(lower<span class="op" style="color: #5E5E5E;
+<span id="cb8-26">        .clip(lower<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb8-19">    [<span class="st" style="color: #20794D;
+<span id="cb8-27">        [<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'count'</span>]</span></code></pre></div>
+font-style: inherit;">'count'</span>]</span>
+<span id="cb8-28"></span>
+<span id="cb8-29">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> new_users_pred</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>/Users/v.kukushkin/Documents/private/wowone.github.io/.venv/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
-  from .autonotebook import tqdm as notebook_tqdm
-01:09:22 - cmdstanpy - INFO - Chain [1] start processing
-01:09:22 - cmdstanpy - INFO - Chain [1] done processing</code></pre>
+  from .autonotebook import tqdm as notebook_tqdm</code></pre>
 </div>
+</div>
+<div id="e0974ae6" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">new_users_pred <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> predict_new_users(PREDICTION_START, PREDICTION_END, new_users)</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>The <code>new_users_pred</code> Series keeps the predicted users amount.</p>
-<div id="dfa2a6b7" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">new_users_pred.tail(<span class="dv" style="color: #AD0000;
+<div id="dfa2a6b7" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">new_users_pred.tail(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">5</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>date
-2023-12-27    135
-2023-12-28    134
-2023-12-29    132
-2023-12-30    137
-2023-12-31    151
+2024-12-27    52
+2024-12-28    56
+2024-12-29    71
+2024-12-30    79
+2024-12-31    74
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
@@ -561,61 +603,61 @@ Name: count, dtype: int64</code></pre>
 <p>In practice, the most calculations are reasonable to execute as SQL queries to a database where the data is stored. Hereafter, we will simulate such quering with the <code>duckdb</code> library.</p>
 <p>We want to assign one of the 7 states to each day of a user’s lifetime within the app. According to the definition, for each day, we need to consider at least the past 30 days. This is where SQL window functions come in. However, since the <code>df</code> data contains only records of <em>active days</em>, we need to explicitly extend it to include the days when a user was not active. In other words, instead of this list of records:</p>
 <pre><code>user_id    date          registration_date
-1234567    2022-01-01    2022-01-01
-1234567    2022-01-03    2022-01-01</code></pre>
+1234567    2023-01-01    2023-01-01
+1234567    2023-01-03    2023-01-01</code></pre>
 <p>we’d like to get a list like this:</p>
 <pre><code>user_id    date          is_active    registration_date
-1234567    2022-01-01    TRUE         2022-01-01
-1234567    2022-01-02    FALSE        2022-01-01
-1234567    2022-01-03    TRUE         2022-01-01
-1234567    2022-01-04    FALSE        2022-01-01
-1234567    2022-01-05    FALSE        2022-01-01
+1234567    2023-01-01    TRUE         2023-01-01
+1234567    2023-01-02    FALSE        2023-01-01
+1234567    2023-01-03    TRUE         2023-01-01
+1234567    2023-01-04    FALSE        2023-01-01
+1234567    2023-01-05    FALSE        2023-01-01
 ...        ...           ...          ...
-1234567    2022-10-31    FALSE        2022-01-01</code></pre>
+1234567    2023-10-31    FALSE        2023-01-01</code></pre>
 <p>For readability purposes we split the following SQL query into multiple subqueries.</p>
 <ul>
 <li><code>full_range</code>: Create a full sequence of dates for each user.</li>
 <li><code>dau_full</code>: Get the full list of both active and inactive records.</li>
 <li><code>states</code>: Assign one of the 7 states for each day of a user’s lifetime.</li>
 </ul>
-<div id="7f67aa64" class="cell" data-execution_count="8">
+<div id="7f67aa64" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><span class="im" style="color: #00769E;
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> duckdb</span>
-<span id="cb14-2"></span>
-<span id="cb14-3">DATASET_START <span class="op" style="color: #5E5E5E;
+<span id="cb15-2"></span>
+<span id="cb15-3">DATASET_START <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'2020-11-01'</span></span>
-<span id="cb14-4">DATASET_END <span class="op" style="color: #5E5E5E;
+<span id="cb15-4">DATASET_END <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2022-10-31'</span></span>
-<span id="cb14-5">OBSERVATION_START <span class="op" style="color: #5E5E5E;
+font-style: inherit;">'2023-10-31'</span></span>
+<span id="cb15-5">OBSERVATION_START <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'2020-10-01'</span></span>
-<span id="cb14-6"></span>
-<span id="cb14-7">query <span class="op" style="color: #5E5E5E;
+<span id="cb15-6"></span>
+<span id="cb15-7">query <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">f"""</span></span>
-<span id="cb14-8"><span class="ss" style="color: #20794D;
+<span id="cb15-8"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">WITH</span></span>
-<span id="cb14-9"><span class="ss" style="color: #20794D;
+<span id="cb15-9"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">full_range AS (</span></span>
-<span id="cb14-10"><span class="ss" style="color: #20794D;
+<span id="cb15-10"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    SELECT</span></span>
-<span id="cb14-11"><span class="ss" style="color: #20794D;
+<span id="cb15-11"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        user_id, UNNEST(generate_series(greatest(registration_date, '</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -630,106 +672,106 @@ background-color: null;
 font-style: inherit;">}</span><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">', INTERVAL 1 DAY))::date AS date</span></span>
-<span id="cb14-12"><span class="ss" style="color: #20794D;
+<span id="cb15-12"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    FROM (</span></span>
-<span id="cb14-13"><span class="ss" style="color: #20794D;
+<span id="cb15-13"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        SELECT DISTINCT user_id, registration_date FROM df</span></span>
-<span id="cb14-14"><span class="ss" style="color: #20794D;
+<span id="cb15-14"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    )</span></span>
-<span id="cb14-15"><span class="ss" style="color: #20794D;
+<span id="cb15-15"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb14-16"><span class="ss" style="color: #20794D;
+<span id="cb15-16"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">dau_full AS (</span></span>
-<span id="cb14-17"><span class="ss" style="color: #20794D;
+<span id="cb15-17"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    SELECT</span></span>
-<span id="cb14-18"><span class="ss" style="color: #20794D;
+<span id="cb15-18"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        fr.user_id,</span></span>
-<span id="cb14-19"><span class="ss" style="color: #20794D;
+<span id="cb15-19"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        fr.date,</span></span>
-<span id="cb14-20"><span class="ss" style="color: #20794D;
+<span id="cb15-20"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        df.date IS NOT NULL AS is_active,</span></span>
-<span id="cb14-21"><span class="ss" style="color: #20794D;
+<span id="cb15-21"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        registration_date</span></span>
-<span id="cb14-22"><span class="ss" style="color: #20794D;
+<span id="cb15-22"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    FROM full_range AS fr</span></span>
-<span id="cb14-23"><span class="ss" style="color: #20794D;
+<span id="cb15-23"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    LEFT JOIN df USING(user_id, date)</span></span>
-<span id="cb14-24"><span class="ss" style="color: #20794D;
+<span id="cb15-24"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb14-25"><span class="ss" style="color: #20794D;
+<span id="cb15-25"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">states AS (</span></span>
-<span id="cb14-26"><span class="ss" style="color: #20794D;
+<span id="cb15-26"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    SELECT</span></span>
-<span id="cb14-27"><span class="ss" style="color: #20794D;
+<span id="cb15-27"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        user_id,</span></span>
-<span id="cb14-28"><span class="ss" style="color: #20794D;
+<span id="cb15-28"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        date,</span></span>
-<span id="cb14-29"><span class="ss" style="color: #20794D;
+<span id="cb15-29"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        is_active,</span></span>
-<span id="cb14-30"><span class="ss" style="color: #20794D;
+<span id="cb15-30"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        first_value(registration_date IGNORE NULLS) OVER (PARTITION BY user_id ORDER BY date) AS registration_date,</span></span>
-<span id="cb14-31"><span class="ss" style="color: #20794D;
+<span id="cb15-31"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        SUM(is_active::int) OVER (PARTITION BY user_id ORDER BY date ROWS BETWEEN 6 PRECEDING and 1 PRECEDING) AS active_days_back_6d,</span></span>
-<span id="cb14-32"><span class="ss" style="color: #20794D;
+<span id="cb15-32"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        SUM(is_active::int) OVER (PARTITION BY user_id ORDER BY date ROWS BETWEEN 29 PRECEDING and 1 PRECEDING) AS active_days_back_29d,</span></span>
-<span id="cb14-33"><span class="ss" style="color: #20794D;
+<span id="cb15-33"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        CASE</span></span>
-<span id="cb14-34"><span class="ss" style="color: #20794D;
+<span id="cb15-34"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            WHEN date = registration_date THEN 'new'</span></span>
-<span id="cb14-35"><span class="ss" style="color: #20794D;
+<span id="cb15-35"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            WHEN is_active = TRUE AND active_days_back_6d BETWEEN 1 and 6 THEN 'current'</span></span>
-<span id="cb14-36"><span class="ss" style="color: #20794D;
+<span id="cb15-36"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            WHEN is_active = TRUE AND active_days_back_6d = 0 AND IFNULL(active_days_back_29d, 0) &gt; 0 THEN 'reactivated'</span></span>
-<span id="cb14-37"><span class="ss" style="color: #20794D;
+<span id="cb15-37"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            WHEN is_active = TRUE AND active_days_back_6d = 0 AND IFNULL(active_days_back_29d, 0) = 0 THEN 'resurrected'</span></span>
-<span id="cb14-38"><span class="ss" style="color: #20794D;
+<span id="cb15-38"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            WHEN is_active = FALSE AND active_days_back_6d &gt; 0 THEN 'at_risk_wau'</span></span>
-<span id="cb14-39"><span class="ss" style="color: #20794D;
+<span id="cb15-39"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            WHEN is_active = FALSE AND active_days_back_6d = 0 AND ifnull(active_days_back_29d, 0) &gt; 0 THEN 'at_risk_mau'</span></span>
-<span id="cb14-40"><span class="ss" style="color: #20794D;
+<span id="cb15-40"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">            ELSE 'dormant'</span></span>
-<span id="cb14-41"><span class="ss" style="color: #20794D;
+<span id="cb15-41"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        END AS state</span></span>
-<span id="cb14-42"><span class="ss" style="color: #20794D;
+<span id="cb15-42"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    FROM dau_full</span></span>
-<span id="cb14-43"><span class="ss" style="color: #20794D;
+<span id="cb15-43"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb14-44"><span class="ss" style="color: #20794D;
+<span id="cb15-44"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">SELECT user_id, date, state FROM states</span></span>
-<span id="cb14-45"><span class="ss" style="color: #20794D;
+<span id="cb15-45"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">WHERE date BETWEEN '</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -744,21 +786,21 @@ background-color: null;
 font-style: inherit;">}</span><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'</span></span>
-<span id="cb14-46"><span class="ss" style="color: #20794D;
+<span id="cb15-46"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">ORDER BY user_id, date</span></span>
-<span id="cb14-47"><span class="ss" style="color: #20794D;
+<span id="cb15-47"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"""</span></span>
-<span id="cb14-48">states <span class="op" style="color: #5E5E5E;
+<span id="cb15-48">states <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 </details>
 </div>
 <p>The query results are kept in the <code>states</code> DataFrame:</p>
-<div id="8a488fa8" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">states.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div id="8a488fa8" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1">states.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 
 
@@ -774,32 +816,32 @@ font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>0000bdde-d6eb-5215-a3e1-50a97e4899a5</td>
-<td>2021-12-30</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-23</td>
 <td>new</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>0000bdde-d6eb-5215-a3e1-50a97e4899a5</td>
-<td>2021-12-31</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-24</td>
 <td>current</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0000bdde-d6eb-5215-a3e1-50a97e4899a5</td>
-<td>2022-01-01</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-25</td>
 <td>current</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>0000bdde-d6eb-5215-a3e1-50a97e4899a5</td>
-<td>2022-01-02</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-26</td>
 <td>current</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>0000bdde-d6eb-5215-a3e1-50a97e4899a5</td>
-<td>2022-01-03</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-27</td>
 <td>current</td>
 </tr>
 </tbody>
@@ -812,71 +854,71 @@ font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 <section id="calculating-the-transition-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="calculating-the-transition-matrix">3.4 Calculating the transition matrix</h3>
 <p>Having obtained these states, we can calculate state transition frequencies. In the real world, due to the large amount of data, it would be more effective to use a SQL query rather than a Python script. We calculate these frequencies day-wise since we’re going to study how the prediction depends on the period in which transitions are considered further.</p>
-<div id="f2385527" class="cell" data-execution_count="10">
+<div id="f2385527" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1">query <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">query <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">f"""</span></span>
-<span id="cb16-2"><span class="ss" style="color: #20794D;
+<span id="cb17-2"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">SELECT</span></span>
-<span id="cb16-3"><span class="ss" style="color: #20794D;
+<span id="cb17-3"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    date,</span></span>
-<span id="cb16-4"><span class="ss" style="color: #20794D;
+<span id="cb17-4"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    state_from,</span></span>
-<span id="cb16-5"><span class="ss" style="color: #20794D;
+<span id="cb17-5"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    state_to,</span></span>
-<span id="cb16-6"><span class="ss" style="color: #20794D;
+<span id="cb17-6"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    COUNT(*) AS cnt,</span></span>
-<span id="cb16-7"><span class="ss" style="color: #20794D;
+<span id="cb17-7"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">FROM (</span></span>
-<span id="cb16-8"><span class="ss" style="color: #20794D;
+<span id="cb17-8"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    SELECT</span></span>
-<span id="cb16-9"><span class="ss" style="color: #20794D;
+<span id="cb17-9"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        date,</span></span>
-<span id="cb16-10"><span class="ss" style="color: #20794D;
+<span id="cb17-10"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        state AS state_to,</span></span>
-<span id="cb16-11"><span class="ss" style="color: #20794D;
+<span id="cb17-11"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">        lag(state) OVER (PARTITION BY user_id ORDER BY date) AS state_from</span></span>
-<span id="cb16-12"><span class="ss" style="color: #20794D;
+<span id="cb17-12"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    FROM states</span></span>
-<span id="cb16-13"><span class="ss" style="color: #20794D;
+<span id="cb17-13"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb16-14"><span class="ss" style="color: #20794D;
+<span id="cb17-14"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">WHERE state_from IS NOT NULL</span></span>
-<span id="cb16-15"><span class="ss" style="color: #20794D;
+<span id="cb17-15"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">GROUP BY date, state_from, state_to</span></span>
-<span id="cb16-16"><span class="ss" style="color: #20794D;
+<span id="cb17-16"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">ORDER BY date, state_from, state_to;</span></span>
-<span id="cb16-17"><span class="ss" style="color: #20794D;
+<span id="cb17-17"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"""</span></span>
-<span id="cb16-18">transitions <span class="op" style="color: #5E5E5E;
+<span id="cb17-18">transitions <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 </details>
 </div>
 <p>The result is stored in the <code>transitions</code> DataFrame.</p>
-<div id="264b1d0e" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">transitions.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div id="264b1d0e" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">transitions.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 
@@ -896,7 +938,7 @@ font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 <td>2020-11-02</td>
 <td>at_risk_mau</td>
 <td>at_risk_mau</td>
-<td>271</td>
+<td>273</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
@@ -924,7 +966,7 @@ font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 <td>2020-11-02</td>
 <td>at_risk_wau</td>
 <td>at_risk_wau</td>
-<td>137</td>
+<td>138</td>
 </tr>
 </tbody>
 </table>
@@ -933,10 +975,10 @@ font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 </div>
 </div>
 <p>Now, we can calculate the transition matrix <img src="https://latex.codecogs.com/png.latex?M">. We define the <code>get_transition_matrix</code> function, which accepts the <code>transitions</code> DataFrame and a pair of dates that bounds the transitions to be considered.</p>
-<div id="529fbf8a" class="cell" data-execution_count="14">
+<div id="529fbf8a" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">states_order <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">states_order <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> [<span class="st" style="color: #20794D;
 background-color: null;
@@ -953,18 +995,18 @@ background-color: null;
 font-style: inherit;">'at_risk_mau'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dormant'</span>]</span>
-<span id="cb18-2"></span>
-<span id="cb18-3"><span class="kw" style="color: #003B4F;
+<span id="cb19-2"></span>
+<span id="cb19-3"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">def</span> get_transition_matrix(transitions, date1, date2):</span>
-<span id="cb18-4">    <span class="cf" style="color: #003B4F;
+<span id="cb19-4">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> pd.to_datetime(date1) <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&gt;</span> pd.to_datetime(DATASET_END):</span>
-<span id="cb18-5">        date1 <span class="op" style="color: #5E5E5E;
+<span id="cb19-5">        date1 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(DATASET_END) <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -973,13 +1015,13 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">30</span>)</span>
-<span id="cb18-6"></span>
-<span id="cb18-7">    probs <span class="op" style="color: #5E5E5E;
+<span id="cb19-6"></span>
+<span id="cb19-7">    probs <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> transitions<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-8">        .loc[<span class="kw" style="color: #003B4F;
+<span id="cb19-8">        .loc[<span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">lambda</span> _df: _df[<span class="st" style="color: #20794D;
@@ -987,7 +1029,7 @@ background-color: null;
 font-style: inherit;">'date'</span>].between(date1, date2)]<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-9">        .groupby([<span class="st" style="color: #20794D;
+<span id="cb19-9">        .groupby([<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'state_from'</span>, <span class="st" style="color: #20794D;
 background-color: null;
@@ -998,15 +1040,15 @@ background-color: null;
 font-style: inherit;">False</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-10">        [<span class="st" style="color: #20794D;
+<span id="cb19-10">        [<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'cnt'</span>].<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">sum</span>()<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-11">        .assign(</span>
-<span id="cb18-12">            supp<span class="op" style="color: #5E5E5E;
+<span id="cb19-11">        .assign(</span>
+<span id="cb19-12">            supp<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -1018,7 +1060,7 @@ background-color: null;
 font-style: inherit;">'cnt'</span>].transform(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'sum'</span>),</span>
-<span id="cb18-13">            prob<span class="op" style="color: #5E5E5E;
+<span id="cb19-13">            prob<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -1030,9 +1072,9 @@ background-color: null;
 font-style: inherit;">/</span> _df[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'supp'</span>]</span>
-<span id="cb18-14">        )</span>
-<span id="cb18-15"></span>
-<span id="cb18-16">    M <span class="op" style="color: #5E5E5E;
+<span id="cb19-14">        )</span>
+<span id="cb19-15"></span>
+<span id="cb19-16">    M <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> probs.pivot(index<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1049,46 +1091,46 @@ background-color: null;
 font-style: inherit;">'prob'</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-17">        .reindex(states_order, axis<span class="op" style="color: #5E5E5E;
+<span id="cb19-17">        .reindex(states_order, axis<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-18">        .reindex(states_order, axis<span class="op" style="color: #5E5E5E;
+<span id="cb19-18">        .reindex(states_order, axis<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-19">        .fillna(<span class="dv" style="color: #AD0000;
+<span id="cb19-19">        .fillna(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb18-20">        .astype(<span class="bu" style="color: null;
+<span id="cb19-20">        .astype(<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">float</span>)</span>
-<span id="cb18-21"></span>
-<span id="cb18-22">    <span class="cf" style="color: #003B4F;
+<span id="cb19-21"></span>
+<span id="cb19-22">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> M</span></code></pre></div>
 </details>
 </div>
 <p>As a baseline, let’s calculate the transition matrix for the whole year from <code>2021-11-01</code> to <code>2022-10-31</code>.</p>
-<div id="c481d451" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">M <span class="op" style="color: #5E5E5E;
+<div id="c481d451" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1">M <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> get_transition_matrix(transitions, <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2021-11-01'</span>, <span class="st" style="color: #20794D;
+font-style: inherit;">'2022-11-01'</span>, <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2022-10-31'</span>)</span>
-<span id="cb19-2">M</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
+font-style: inherit;">'2023-10-31'</span>)</span>
+<span id="cb20-2">M</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div>
 
 
@@ -1119,72 +1161,72 @@ font-style: inherit;">'2022-10-31'</span>)</span>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">new</td>
 <td>0.0</td>
-<td>0.454626</td>
+<td>0.515934</td>
 <td>0.000000</td>
 <td>0.000000</td>
-<td>0.545374</td>
+<td>0.484066</td>
 <td>0.000000</td>
 <td>0.000000</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">current</td>
 <td>0.0</td>
-<td>0.846238</td>
+<td>0.851325</td>
 <td>0.000000</td>
 <td>0.000000</td>
-<td>0.153762</td>
+<td>0.148675</td>
 <td>0.000000</td>
 <td>0.000000</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">reactivated</td>
 <td>0.0</td>
-<td>0.358974</td>
+<td>0.365867</td>
 <td>0.000000</td>
 <td>0.000000</td>
-<td>0.641026</td>
+<td>0.634133</td>
 <td>0.000000</td>
 <td>0.000000</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">resurrected</td>
 <td>0.0</td>
-<td>0.359174</td>
+<td>0.316474</td>
 <td>0.000000</td>
 <td>0.000000</td>
-<td>0.640826</td>
+<td>0.683526</td>
 <td>0.000000</td>
 <td>0.000000</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">at_risk_wau</td>
 <td>0.0</td>
-<td>0.090236</td>
-<td>0.004001</td>
+<td>0.098246</td>
+<td>0.004472</td>
 <td>0.000000</td>
-<td>0.771852</td>
-<td>0.133912</td>
+<td>0.766263</td>
+<td>0.131020</td>
 <td>0.000000</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">at_risk_mau</td>
 <td>0.0</td>
 <td>0.000000</td>
-<td>0.008521</td>
-<td>0.000157</td>
+<td>0.009598</td>
+<td>0.000173</td>
 <td>0.000000</td>
-<td>0.951050</td>
-<td>0.040273</td>
+<td>0.950109</td>
+<td>0.040120</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">dormant</td>
 <td>0.0</td>
 <td>0.000000</td>
 <td>0.000000</td>
-<td>0.000559</td>
+<td>0.000387</td>
 <td>0.000000</td>
 <td>0.000000</td>
-<td>0.999441</td>
+<td>0.999613</td>
 </tr>
 </tbody>
 </table>
@@ -1196,25 +1238,25 @@ font-style: inherit;">'2022-10-31'</span>)</span>
 <section id="getting-the-initial-state-counts" class="level3">
 <h3 class="anchored" data-anchor-id="getting-the-initial-state-counts">3.5 Getting the initial state counts</h3>
 <p>An initial state is easily retrieved from the <code>states</code> DataFrame by the <code>get_state0</code> function and the corresponding SQL query. We assign the result to the <code>state0</code> variable.</p>
-<div id="33b26b29" class="cell" data-execution_count="16">
+<div id="33b26b29" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><span class="kw" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">def</span> get_state0(date):</span>
-<span id="cb20-2">    query <span class="op" style="color: #5E5E5E;
+<span id="cb21-2">    query <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">f"""</span></span>
-<span id="cb20-3"><span class="ss" style="color: #20794D;
+<span id="cb21-3"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    SELECT state, count(*) AS cnt</span></span>
-<span id="cb20-4"><span class="ss" style="color: #20794D;
+<span id="cb21-4"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    FROM states</span></span>
-<span id="cb20-5"><span class="ss" style="color: #20794D;
+<span id="cb21-5"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    WHERE date = '</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1223,44 +1265,44 @@ background-color: null;
 font-style: inherit;">}</span><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'</span></span>
-<span id="cb20-6"><span class="ss" style="color: #20794D;
+<span id="cb21-6"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    GROUP BY state</span></span>
-<span id="cb20-7"><span class="ss" style="color: #20794D;
+<span id="cb21-7"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">    """</span></span>
-<span id="cb20-8"></span>
-<span id="cb20-9">    state0 <span class="op" style="color: #5E5E5E;
+<span id="cb21-8"></span>
+<span id="cb21-9">    state0 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> duckdb.sql(query).df()</span>
-<span id="cb20-10">    state0 <span class="op" style="color: #5E5E5E;
+<span id="cb21-10">    state0 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> state0.set_index(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'state'</span>).reindex(states_order)[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'cnt'</span>]</span>
-<span id="cb20-11">    </span>
-<span id="cb20-12">    <span class="cf" style="color: #003B4F;
+<span id="cb21-11">    </span>
+<span id="cb21-12">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> state0</span></code></pre></div>
 </details>
 </div>
-<div id="708cd4f5" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1">state0 <span class="op" style="color: #5E5E5E;
+<div id="708cd4f5" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1">state0 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> get_state0(DATASET_END)</span>
-<span id="cb21-2">state0</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<span id="cb22-2">state0</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>state
-new               43
-current          443
-reactivated       22
-resurrected       14
-at_risk_wau      433
-at_risk_mau     1273
-dormant        35865
+new               20
+current          475
+reactivated       15
+resurrected       19
+at_risk_wau      404
+at_risk_mau     1024
+dormant        49523
 Name: cnt, dtype: int64</code></pre>
 </div>
 </div>
@@ -1268,113 +1310,113 @@ Name: cnt, dtype: int64</code></pre>
 <section id="predicting-dau" class="level3">
 <h3 class="anchored" data-anchor-id="predicting-dau">3.6 Predicting DAU</h3>
 <p>The <code>predict_dau</code> function below accepts all the previous variables required for the DAU prediction and makes this prediction for a date range defined by the <code>start_date</code> and <code>end_date</code> arguments.</p>
-<div id="ffd464d7" class="cell" data-execution_count="18">
+<div id="ffd464d7" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><span class="kw" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">def</span> predict_dau(M, state0, start_date, end_date, new_users):</span>
-<span id="cb23-2">    <span class="co" style="color: #5E5E5E;
+<span id="cb24-2">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">"""</span></span>
-<span id="cb23-3"><span class="co" style="color: #5E5E5E;
+<span id="cb24-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    Predicts DAU over a given date range.</span></span>
-<span id="cb23-4"></span>
-<span id="cb23-5"><span class="co" style="color: #5E5E5E;
+<span id="cb24-4"></span>
+<span id="cb24-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    Parameters</span></span>
-<span id="cb23-6"><span class="co" style="color: #5E5E5E;
+<span id="cb24-6"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    ----------</span></span>
-<span id="cb23-7"><span class="co" style="color: #5E5E5E;
+<span id="cb24-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    M : pandas.DataFrame</span></span>
-<span id="cb23-8"><span class="co" style="color: #5E5E5E;
+<span id="cb24-8"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        Transition matrix representing user state changes.</span></span>
-<span id="cb23-9"><span class="co" style="color: #5E5E5E;
+<span id="cb24-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    state0 : pandas.Series</span></span>
-<span id="cb23-10"><span class="co" style="color: #5E5E5E;
+<span id="cb24-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        counts of initial state of users.</span></span>
-<span id="cb23-11"><span class="co" style="color: #5E5E5E;
+<span id="cb24-11"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    start_date : str</span></span>
-<span id="cb23-12"><span class="co" style="color: #5E5E5E;
+<span id="cb24-12"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        Start date of the prediction period in 'YYYY-MM-DD' format.</span></span>
-<span id="cb23-13"><span class="co" style="color: #5E5E5E;
+<span id="cb24-13"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    end_date : str</span></span>
-<span id="cb23-14"><span class="co" style="color: #5E5E5E;
+<span id="cb24-14"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        End date of the prediction period in 'YYYY-MM-DD' format.</span></span>
-<span id="cb23-15"><span class="co" style="color: #5E5E5E;
+<span id="cb24-15"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    new_users : int or pandas.Series</span></span>
-<span id="cb23-16"><span class="co" style="color: #5E5E5E;
+<span id="cb24-16"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        The expected amount of new users for each day between `start_date` and `end_date`.</span></span>
-<span id="cb23-17"><span class="co" style="color: #5E5E5E;
+<span id="cb24-17"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        If a Series, it should have dates as the index.</span></span>
-<span id="cb23-18"><span class="co" style="color: #5E5E5E;
+<span id="cb24-18"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        If an int, the same number is used for each day.</span></span>
-<span id="cb23-19"><span class="co" style="color: #5E5E5E;
+<span id="cb24-19"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        </span></span>
-<span id="cb23-20"><span class="co" style="color: #5E5E5E;
+<span id="cb24-20"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    Returns</span></span>
-<span id="cb23-21"><span class="co" style="color: #5E5E5E;
+<span id="cb24-21"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    -------</span></span>
-<span id="cb23-22"><span class="co" style="color: #5E5E5E;
+<span id="cb24-22"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    pandas.DataFrame</span></span>
-<span id="cb23-23"><span class="co" style="color: #5E5E5E;
+<span id="cb24-23"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        DataFrame containing the predicted DAU, WAU, and MAU for each day in the date range,</span></span>
-<span id="cb23-24"><span class="co" style="color: #5E5E5E;
+<span id="cb24-24"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">        with columns for different user states and tot.</span></span>
-<span id="cb23-25"><span class="co" style="color: #5E5E5E;
+<span id="cb24-25"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">    """</span></span>
-<span id="cb23-26">    </span>
-<span id="cb23-27">    dates <span class="op" style="color: #5E5E5E;
+<span id="cb24-26">    </span>
+<span id="cb24-27">    dates <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.date_range(start_date, end_date)</span>
-<span id="cb23-28">    dates.name <span class="op" style="color: #5E5E5E;
+<span id="cb24-28">    dates.name <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'date'</span></span>
-<span id="cb23-29">    dau_pred <span class="op" style="color: #5E5E5E;
+<span id="cb24-29">    dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> []</span>
-<span id="cb23-30">    new_dau <span class="op" style="color: #5E5E5E;
+<span id="cb24-30">    new_dau <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> state0.copy()</span>
-<span id="cb23-31">    <span class="cf" style="color: #003B4F;
+<span id="cb24-31">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> date <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">in</span> dates:</span>
-<span id="cb23-32">        new_dau <span class="op" style="color: #5E5E5E;
+<span id="cb24-32">        new_dau <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> (M.transpose() <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span> new_dau).astype(<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span>)</span>
-<span id="cb23-33">        <span class="cf" style="color: #003B4F;
+<span id="cb24-33">        <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="bu" style="color: null;
@@ -1382,33 +1424,33 @@ background-color: null;
 font-style: inherit;">isinstance</span>(new_users, <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span>):</span>
-<span id="cb23-34">            new_users_today <span class="op" style="color: #5E5E5E;
+<span id="cb24-34">            new_users_today <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> new_users</span>
-<span id="cb23-35">        <span class="cf" style="color: #003B4F;
+<span id="cb24-35">        <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span>:</span>
-<span id="cb23-36">            new_users_today <span class="op" style="color: #5E5E5E;
+<span id="cb24-36">            new_users_today <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> new_users.astype(<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span>).loc[date] </span>
-<span id="cb23-37">        new_dau.loc[<span class="st" style="color: #20794D;
+<span id="cb24-37">        new_dau.loc[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'new'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> new_users_today</span>
-<span id="cb23-38">        dau_pred.append(new_dau.tolist())</span>
-<span id="cb23-39"></span>
-<span id="cb23-40">    dau_pred <span class="op" style="color: #5E5E5E;
+<span id="cb24-38">        dau_pred.append(new_dau.tolist())</span>
+<span id="cb24-39"></span>
+<span id="cb24-40">    dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame(dau_pred, index<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>dates, columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>states_order)</span>
-<span id="cb23-41">    dau_pred[<span class="st" style="color: #20794D;
+<span id="cb24-41">    dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1427,7 +1469,7 @@ background-color: null;
 font-style: inherit;">+</span> dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'resurrected'</span>]</span>
-<span id="cb23-42">    dau_pred[<span class="st" style="color: #20794D;
+<span id="cb24-42">    dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'wau'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1438,7 +1480,7 @@ background-color: null;
 font-style: inherit;">+</span> dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'at_risk_wau'</span>]</span>
-<span id="cb23-43">    dau_pred[<span class="st" style="color: #20794D;
+<span id="cb24-43">    dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'mau'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1453,19 +1495,19 @@ background-color: null;
 font-style: inherit;">+</span> dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'at_risk_mau'</span>]</span>
-<span id="cb23-44">    </span>
-<span id="cb23-45">    <span class="cf" style="color: #003B4F;
+<span id="cb24-44">    </span>
+<span id="cb24-45">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> dau_pred</span></code></pre></div>
 </details>
 </div>
-<div id="07b1d7bb" class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1">dau_pred <span class="op" style="color: #5E5E5E;
+<div id="07b1d7bb" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTION_END, new_users_pred)</span>
-<span id="cb24-2">dau_pred</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
+<span id="cb25-2">dau_pred</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
 <div>
 
 
@@ -1500,69 +1542,69 @@ font-style: inherit;">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTI
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2022-11-01</td>
-<td>49</td>
-<td>446</td>
-<td>12</td>
-<td>20</td>
-<td>448</td>
-<td>1268</td>
-<td>35896</td>
-<td>527</td>
-<td>975</td>
-<td>2243</td>
+<td data-quarto-table-cell-role="th">2023-11-01</td>
+<td>29</td>
+<td>465</td>
+<td>11</td>
+<td>19</td>
+<td>412</td>
+<td>1025</td>
+<td>49544</td>
+<td>524</td>
+<td>936</td>
+<td>1961</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2022-11-02</td>
-<td>47</td>
-<td>451</td>
-<td>12</td>
-<td>20</td>
+<td data-quarto-table-cell-role="th">2023-11-02</td>
+<td>25</td>
 <td>461</td>
-<td>1265</td>
-<td>35927</td>
-<td>530</td>
-<td>991</td>
-<td>2256</td>
+<td>11</td>
+<td>19</td>
+<td>418</td>
+<td>1027</td>
+<td>49565</td>
+<td>516</td>
+<td>934</td>
+<td>1961</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2022-11-03</td>
-<td>43</td>
+<td data-quarto-table-cell-role="th">2023-11-03</td>
+<td>21</td>
 <td>456</td>
-<td>12</td>
-<td>20</td>
-<td>471</td>
-<td>1264</td>
-<td>35957</td>
-<td>531</td>
-<td>1002</td>
-<td>2266</td>
+<td>11</td>
+<td>19</td>
+<td>420</td>
+<td>1030</td>
+<td>49587</td>
+<td>507</td>
+<td>927</td>
+<td>1957</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2022-11-04</td>
-<td>39</td>
-<td>459</td>
-<td>12</td>
-<td>20</td>
-<td>477</td>
-<td>1265</td>
-<td>35987</td>
-<td>530</td>
-<td>1007</td>
-<td>2272</td>
+<td data-quarto-table-cell-role="th">2023-11-04</td>
+<td>22</td>
+<td>450</td>
+<td>11</td>
+<td>19</td>
+<td>419</td>
+<td>1033</td>
+<td>49609</td>
+<td>502</td>
+<td>921</td>
+<td>1954</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2022-11-05</td>
-<td>41</td>
-<td>460</td>
-<td>12</td>
-<td>20</td>
-<td>480</td>
-<td>1266</td>
-<td>36017</td>
-<td>533</td>
-<td>1013</td>
-<td>2279</td>
+<td data-quarto-table-cell-role="th">2023-11-05</td>
+<td>34</td>
+<td>445</td>
+<td>11</td>
+<td>19</td>
+<td>418</td>
+<td>1036</td>
+<td>49631</td>
+<td>509</td>
+<td>927</td>
+<td>1963</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">...</td>
@@ -1578,114 +1620,114 @@ font-style: inherit;">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTI
 <td>...</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-12-27</td>
-<td>135</td>
-<td>1180</td>
-<td>31</td>
-<td>36</td>
-<td>1236</td>
-<td>3144</td>
-<td>65077</td>
-<td>1382</td>
-<td>2618</td>
-<td>5762</td>
+<td data-quarto-table-cell-role="th">2024-12-27</td>
+<td>52</td>
+<td>505</td>
+<td>12</td>
+<td>24</td>
+<td>487</td>
+<td>1129</td>
+<td>61599</td>
+<td>593</td>
+<td>1080</td>
+<td>2209</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2023-12-28</td>
-<td>134</td>
-<td>1195</td>
-<td>31</td>
-<td>36</td>
-<td>1252</td>
-<td>3155</td>
-<td>65167</td>
-<td>1396</td>
-<td>2648</td>
-<td>5803</td>
+<td data-quarto-table-cell-role="th">2024-12-28</td>
+<td>56</td>
+<td>516</td>
+<td>13</td>
+<td>24</td>
+<td>497</td>
+<td>1136</td>
+<td>61620</td>
+<td>609</td>
+<td>1106</td>
+<td>2242</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-12-29</td>
-<td>132</td>
-<td>1209</td>
-<td>31</td>
-<td>36</td>
-<td>1266</td>
-<td>3168</td>
-<td>65257</td>
-<td>1408</td>
-<td>2674</td>
-<td>5842</td>
+<td data-quarto-table-cell-role="th">2024-12-29</td>
+<td>71</td>
+<td>529</td>
+<td>13</td>
+<td>24</td>
+<td>509</td>
+<td>1144</td>
+<td>61641</td>
+<td>637</td>
+<td>1146</td>
+<td>2290</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2023-12-30</td>
-<td>137</td>
-<td>1221</td>
-<td>32</td>
-<td>36</td>
-<td>1277</td>
-<td>3182</td>
-<td>65348</td>
-<td>1426</td>
-<td>2703</td>
-<td>5885</td>
+<td data-quarto-table-cell-role="th">2024-12-30</td>
+<td>79</td>
+<td>549</td>
+<td>13</td>
+<td>24</td>
+<td>527</td>
+<td>1153</td>
+<td>61663</td>
+<td>665</td>
+<td>1192</td>
+<td>2345</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2023-12-31</td>
-<td>151</td>
-<td>1235</td>
-<td>32</td>
-<td>37</td>
-<td>1291</td>
-<td>3197</td>
-<td>65439</td>
-<td>1455</td>
-<td>2746</td>
-<td>5943</td>
+<td data-quarto-table-cell-role="th">2024-12-31</td>
+<td>74</td>
+<td>572</td>
+<td>13</td>
+<td>24</td>
+<td>548</td>
+<td>1164</td>
+<td>61685</td>
+<td>683</td>
+<td>1231</td>
+<td>2395</td>
 </tr>
 </tbody>
 </table>
 
-<p>426 rows × 10 columns</p>
+<p>427 rows × 10 columns</p>
 </div>
 </div>
 </div>
 <p>Besides the expected <code>dau</code>, <code>wau</code>, and <code>mau</code> columns, the output contains the number of users in each state for each prediction date.</p>
 <p>Finally, we calculate the ground-truth values of DAU, WAU, and MAU (along with the corresponding state decomposition), keep them in the <code>dau_true</code> DataFrame, and plot the predicted and true values altogether.</p>
-<div id="c7223b81" class="cell" data-execution_count="20">
+<div id="c7223b81" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">query <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1">query <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">f"""</span></span>
-<span id="cb25-2"><span class="ss" style="color: #20794D;
+<span id="cb26-2"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">SELECT date, state, COUNT(*) AS cnt</span></span>
-<span id="cb25-3"><span class="ss" style="color: #20794D;
+<span id="cb26-3"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">FROM states</span></span>
-<span id="cb25-4"><span class="ss" style="color: #20794D;
+<span id="cb26-4"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">GROUP BY date, state</span></span>
-<span id="cb25-5"><span class="ss" style="color: #20794D;
+<span id="cb26-5"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">ORDER BY date, state;</span></span>
-<span id="cb25-6"><span class="ss" style="color: #20794D;
+<span id="cb26-6"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"""</span></span>
-<span id="cb25-7"></span>
-<span id="cb25-8">dau_true <span class="op" style="color: #5E5E5E;
+<span id="cb26-7"></span>
+<span id="cb26-8">dau_true <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> duckdb.sql(query).df()</span>
-<span id="cb25-9">dau_true[<span class="st" style="color: #20794D;
+<span id="cb26-9">dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'date'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'date'</span>])</span>
-<span id="cb25-10">dau_true <span class="op" style="color: #5E5E5E;
+<span id="cb26-10">dau_true <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dau_true.pivot(index<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1700,7 +1742,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'cnt'</span>)</span>
-<span id="cb25-11">dau_true[<span class="st" style="color: #20794D;
+<span id="cb26-11">dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1719,7 +1761,7 @@ background-color: null;
 font-style: inherit;">+</span> dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'resurrected'</span>]</span>
-<span id="cb25-12">dau_true[<span class="st" style="color: #20794D;
+<span id="cb26-12">dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'wau'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1730,7 +1772,7 @@ background-color: null;
 font-style: inherit;">+</span> dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'at_risk_wau'</span>]</span>
-<span id="cb25-13">dau_true[<span class="st" style="color: #20794D;
+<span id="cb26-13">dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'mau'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1747,9 +1789,9 @@ background-color: null;
 font-style: inherit;">'at_risk_mau'</span>]</span></code></pre></div>
 </details>
 </div>
-<div id="30a750f7" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1">dau_true.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="30a750f7" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1">dau_true.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
 <div>
 
 
@@ -1785,68 +1827,68 @@ font-style: inherit;">'at_risk_mau'</span>]</span></code></pre></div>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2020-11-01</td>
-<td>289.0</td>
-<td>206.0</td>
+<td>291.0</td>
+<td>207.0</td>
 <td>293.0</td>
-<td>801.0</td>
+<td>840.0</td>
 <td>36.0</td>
 <td>14.0</td>
 <td>3.0</td>
 <td>346.0</td>
-<td>552.0</td>
-<td>841.0</td>
+<td>553.0</td>
+<td>844.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">2020-11-02</td>
-<td>289.0</td>
-<td>207.0</td>
+<td>291.0</td>
+<td>208.0</td>
 <td>327.0</td>
-<td>797.0</td>
+<td>836.0</td>
 <td>53.0</td>
 <td>14.0</td>
 <td>8.0</td>
 <td>402.0</td>
-<td>609.0</td>
-<td>898.0</td>
+<td>610.0</td>
+<td>901.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2020-11-03</td>
-<td>294.0</td>
-<td>204.0</td>
+<td>296.0</td>
+<td>205.0</td>
 <td>383.0</td>
-<td>801.0</td>
+<td>840.0</td>
 <td>41.0</td>
 <td>10.0</td>
 <td>3.0</td>
 <td>437.0</td>
-<td>641.0</td>
-<td>935.0</td>
+<td>642.0</td>
+<td>938.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">2020-11-04</td>
-<td>294.0</td>
-<td>245.0</td>
+<td>296.0</td>
+<td>246.0</td>
 <td>375.0</td>
-<td>803.0</td>
+<td>842.0</td>
 <td>27.0</td>
 <td>13.0</td>
 <td>6.0</td>
 <td>421.0</td>
-<td>666.0</td>
-<td>960.0</td>
+<td>667.0</td>
+<td>963.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2020-11-05</td>
-<td>298.0</td>
-<td>274.0</td>
+<td>300.0</td>
+<td>275.0</td>
 <td>373.0</td>
-<td>806.0</td>
+<td>845.0</td>
 <td>33.0</td>
 <td>8.0</td>
 <td>4.0</td>
 <td>418.0</td>
-<td>692.0</td>
-<td>990.0</td>
+<td>693.0</td>
+<td>993.0</td>
 </tr>
 </tbody>
 </table>
@@ -1854,17 +1896,17 @@ font-style: inherit;">'at_risk_mau'</span>]</span></code></pre></div>
 </div>
 </div>
 </div>
-<div id="87251bb7" class="cell" data-execution_count="22">
+<div id="87251bb7" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1">pd.concat([dau_true[<span class="st" style="color: #20794D;
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">pd.concat([dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>], dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>]])<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb27-2">    .plot(title<span class="op" style="color: #5E5E5E;
+<span id="cb28-2">    .plot(title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -1875,84 +1917,120 @@ font-style: inherit;">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>And here we see that the prediction seems quite suspicious. It’s not clear why the DAU is going up that high while the historical data didn’t show the uptrend. We’ll discuss it in the next section.</p>
 </section>
 </section>
 <section id="model-evaluation" class="level2">
 <h2 class="anchored" data-anchor-id="model-evaluation">4. Model evaluation</h2>
 <section id="general-evaluation" class="level3">
 <h3 class="anchored" data-anchor-id="general-evaluation">4.1 General evaluation</h3>
-<p>First of all, let’s test our model on historical data choosing two prediction periods: <code>2022-03-01</code> - <code>2022-10-31</code> and <code>2022-07-01</code> - <code>2022-10-31</code>. As for the transitions period, so far we consider full history from <code>DATASET_START</code> to <code>DATASET_END</code>.</p>
-<div id="2a7c7a08" class="cell" data-execution_count="31">
+<p>First of all, let’s test our model on historical data choosing 3 prediction periods of different length:</p>
+<ul>
+<li><code>2022-11-01</code> - <code>2023-10-31</code>,</li>
+<li><code>2023-05-01</code> - <code>2022-10-31</code>,</li>
+<li><code>2022-08-01</code> - <code>2022-10-31</code>.</li>
+</ul>
+<p>As for the transitions period, so far we consider 1 year behind a prediction start. In order to check how the new users prediction affects the model, we run the model on the predicted and true new users data.</p>
+<div id="2a7c7a08" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><span class="im" style="color: #00769E;
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> re</span>
-<span id="cb28-2"><span class="im" style="color: #00769E;
+<span id="cb29-2"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">from</span> sklearn.metrics <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> mean_absolute_percentage_error</span>
-<span id="cb28-3"></span>
-<span id="cb28-4"></span>
-<span id="cb28-5"><span class="kw" style="color: #003B4F;
+<span id="cb29-3"></span>
+<span id="cb29-4"></span>
+<span id="cb29-5"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">def</span> make_prediction(prediction_start, prediction_end, new_users, mode<span class="op" style="color: #5E5E5E;
+font-style: inherit;">def</span> make_prediction(prediction_start, prediction_end, new_users_mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'predict'</span>, transition_period<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'last_30d'</span>):</span>
-<span id="cb28-6">    prediction_start_minus_1d <span class="op" style="color: #5E5E5E;
+<span id="cb29-6">    prediction_start_minus_1d <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(prediction_start) <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span> pd.Timedelta(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'1d'</span>)</span>
-<span id="cb28-7">    state0 <span class="op" style="color: #5E5E5E;
+<span id="cb29-7">    state0 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> get_state0(prediction_start_minus_1d)</span>
-<span id="cb28-8"></span>
-<span id="cb28-9">    <span class="cf" style="color: #003B4F;
+<span id="cb29-8">    </span>
+<span id="cb29-9">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">if</span> mode.startswith(<span class="st" style="color: #20794D;
+font-style: inherit;">if</span> new_users_mode <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'predict'</span>:</span>
+<span id="cb29-10">        new_users_pred <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> predict_new_users(prediction_start, prediction_end, new_users, show_plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb29-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">elif</span> new_users_mode <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'true'</span>:</span>
+<span id="cb29-12">        new_users_pred <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> new_users.copy()</span>
+<span id="cb29-13"></span>
+<span id="cb29-14">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> transition_period.startswith(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'last_'</span>):</span>
-<span id="cb28-10">        shift <span class="op" style="color: #5E5E5E;
+<span id="cb29-15">        shift <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span>(re.search(<span class="vs" style="color: #20794D;
 background-color: null;
-font-style: inherit;">r'last_(\d+)d'</span>, mode).group(<span class="dv" style="color: #AD0000;
+font-style: inherit;">r'last_(\d+)d'</span>, transition_period).group(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>))</span>
-<span id="cb28-11">        transitions_start <span class="op" style="color: #5E5E5E;
+<span id="cb29-16">        transitions_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(prediction_start) <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span> pd.Timedelta(shift, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'d'</span>)</span>
-<span id="cb28-12">        M <span class="op" style="color: #5E5E5E;
+<span id="cb29-17">        M <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
-<span id="cb28-13">        dau_pred <span class="op" style="color: #5E5E5E;
+<span id="cb29-18">        dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> predict_dau(M, state0, prediction_start, prediction_end, new_users)</span>
-<span id="cb28-14">    <span class="cf" style="color: #003B4F;
+font-style: inherit;">=</span> predict_dau(M, state0, prediction_start, prediction_end, new_users_pred)</span>
+<span id="cb29-19">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span>:</span>
-<span id="cb28-15">        transitions_start <span class="op" style="color: #5E5E5E;
+<span id="cb29-20">        transitions_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(prediction_start) <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1961,27 +2039,27 @@ background-color: null;
 font-style: inherit;">30</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'d'</span>)</span>
-<span id="cb28-16">        M_last_month <span class="op" style="color: #5E5E5E;
+<span id="cb29-21">        M_last_month <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
-<span id="cb28-17">        dau_pred <span class="op" style="color: #5E5E5E;
+<span id="cb29-22">        dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb28-18"></span>
-<span id="cb28-19">        month_starts <span class="op" style="color: #5E5E5E;
+<span id="cb29-23"></span>
+<span id="cb29-24">        month_starts <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.date_range(prediction_start, prediction_end, freq<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'1MS'</span>)</span>
-<span id="cb28-20">        N <span class="op" style="color: #5E5E5E;
+<span id="cb29-25">        N <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">len</span>(month_starts)</span>
-<span id="cb28-21"></span>
-<span id="cb28-22">        <span class="cf" style="color: #003B4F;
+<span id="cb29-26"></span>
+<span id="cb29-27">        <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> i, prediction_month_start <span class="kw" style="color: #003B4F;
@@ -1990,43 +2068,43 @@ font-weight: bold;
 font-style: inherit;">in</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">enumerate</span>(month_starts):</span>
-<span id="cb28-23">            prediction_month_end <span class="op" style="color: #5E5E5E;
+<span id="cb29-28">            prediction_month_end <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.offsets.MonthEnd().rollforward(prediction_month_start)</span>
-<span id="cb28-24">            transitions_month_start <span class="op" style="color: #5E5E5E;
+<span id="cb29-29">            transitions_month_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> prediction_month_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span> pd.Timedelta(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'365D'</span>)</span>
-<span id="cb28-25">            transitions_month_end <span class="op" style="color: #5E5E5E;
+<span id="cb29-30">            transitions_month_end <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> prediction_month_end <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span> pd.Timedelta(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'365D'</span>)</span>
-<span id="cb28-26"></span>
-<span id="cb28-27">            M_seasonal <span class="op" style="color: #5E5E5E;
+<span id="cb29-31"></span>
+<span id="cb29-32">            M_seasonal <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> get_transition_matrix(transitions, transitions_month_start, transitions_month_end)</span>
-<span id="cb28-28">            <span class="cf" style="color: #003B4F;
+<span id="cb29-33">            <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">if</span> mode <span class="op" style="color: #5E5E5E;
+font-style: inherit;">if</span> transition_period <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'smoothing'</span>:</span>
-<span id="cb28-29">                i <span class="op" style="color: #5E5E5E;
+<span id="cb29-34">                i <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">min</span>(i, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">12</span>)</span>
-<span id="cb28-30">                M <span class="op" style="color: #5E5E5E;
+<span id="cb29-35">                M <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> M_seasonal <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2051,15 +2129,15 @@ background-color: null;
 font-style: inherit;">1</span>)) <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span> M_last_month</span>
-<span id="cb28-31">            <span class="cf" style="color: #003B4F;
+<span id="cb29-36">            <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">elif</span> mode <span class="op" style="color: #5E5E5E;
+font-style: inherit;">elif</span> transition_period <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'seasonal_0.1'</span>:</span>
-<span id="cb28-32">                M <span class="op" style="color: #5E5E5E;
+<span id="cb29-37">                M <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -2072,74 +2150,87 @@ background-color: null;
 font-style: inherit;">0.9</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span> M_last_month</span>
-<span id="cb28-33">            </span>
-<span id="cb28-34">            dau_tmp <span class="op" style="color: #5E5E5E;
+<span id="cb29-38">            </span>
+<span id="cb29-39">            dau_tmp <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> predict_dau(M, state0, prediction_month_start, prediction_month_end, new_users_pred)</span>
-<span id="cb28-35">            dau_pred <span class="op" style="color: #5E5E5E;
+<span id="cb29-40">            dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.concat([dau_pred, dau_tmp])</span>
-<span id="cb28-36"></span>
-<span id="cb28-37">            state0 <span class="op" style="color: #5E5E5E;
+<span id="cb29-41"></span>
+<span id="cb29-42">            state0 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dau_tmp.loc[prediction_month_end][states_order]</span>
-<span id="cb28-38"></span>
-<span id="cb28-39">    <span class="cf" style="color: #003B4F;
+<span id="cb29-43"></span>
+<span id="cb29-44">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> dau_pred</span>
-<span id="cb28-40"></span>
-<span id="cb28-41"><span class="kw" style="color: #003B4F;
+<span id="cb29-45"></span>
+<span id="cb29-46"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">def</span> prediction_details(dau_true, dau_pred, show_plot<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="va" style="color: #111111;
 background-color: null;
-font-style: inherit;">True</span>):</span>
-<span id="cb28-42">    y_true <span class="op" style="color: #5E5E5E;
+font-style: inherit;">True</span>, ax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>):</span>
+<span id="cb29-47">    y_true <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dau_true.reindex(dau_pred.index)[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>]</span>
-<span id="cb28-43">    y_pred <span class="op" style="color: #5E5E5E;
+<span id="cb29-48">    y_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dau_pred[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>]</span>
-<span id="cb28-44">    mape <span class="op" style="color: #5E5E5E;
+<span id="cb29-49">    mape <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> mean_absolute_percentage_error(y_true, y_pred) </span>
-<span id="cb28-45"></span>
-<span id="cb28-46">    <span class="cf" style="color: #003B4F;
+<span id="cb29-50"></span>
+<span id="cb29-51">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> show_plot:</span>
-<span id="cb28-47">        y_true.plot(label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DAU true'</span>)</span>
-<span id="cb28-48">        y_pred.plot(label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DAU pred'</span>)</span>
-<span id="cb28-49">        prediction_start <span class="op" style="color: #5E5E5E;
+<span id="cb29-52">        prediction_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">str</span>(y_true.index.<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">min</span>().date())</span>
-<span id="cb28-50">        prediction_end <span class="op" style="color: #5E5E5E;
+<span id="cb29-53">        prediction_end <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">str</span>(y_true.index.<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">max</span>().date())</span>
-<span id="cb28-51">        plt.title(<span class="ss" style="color: #20794D;
+<span id="cb29-54">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> ax <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">is</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>:</span>
+<span id="cb29-55">            y_true.plot(label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'DAU true'</span>)</span>
+<span id="cb29-56">            y_pred.plot(label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'DAU pred'</span>)</span>
+<span id="cb29-57">            plt.title(<span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">f'DAU prediction, </span><span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2154,156 +2245,235 @@ background-color: null;
 font-style: inherit;">}</span><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'</span>)</span>
-<span id="cb28-52">        plt.legend()</span>
-<span id="cb28-53"></span>
-<span id="cb28-54">    <span class="cf" style="color: #003B4F;
+<span id="cb29-58">            plt.legend()</span>
+<span id="cb29-59">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb29-60">            y_true.plot(label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'DAU true'</span>, ax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>ax)</span>
+<span id="cb29-61">            y_pred.plot(label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'DAU pred'</span>, ax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>ax)</span>
+<span id="cb29-62">            ax.set_title(<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f'DAU prediction, </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>prediction_start<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;"> - </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>prediction_end<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span>
+<span id="cb29-63">            ax.legend()</span>
+<span id="cb29-64">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> mape</span></code></pre></div>
 </details>
 </div>
-<div id="ed127921" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1">dau_pred <span class="op" style="color: #5E5E5E;
+<div id="2def0809" class="cell" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1">fig, axs <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> make_prediction(<span class="st" style="color: #20794D;
+font-style: inherit;">=</span> plt.subplots(<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">'2022-07-01'</span>, <span class="st" style="color: #20794D;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">'2022-10-31'</span>, new_users_pred, mode<span class="op" style="color: #5E5E5E;
+font-style: inherit;">2</span>, figsize<span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">'last_365d'</span>)</span>
-<span id="cb29-2">mape <span class="op" style="color: #5E5E5E;
+font-style: inherit;">15</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">=</span> prediction_details(dau_true, dau_pred)</span>
-<span id="cb29-3"><span class="bu" style="color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb30-2">mapes <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
+font-style: inherit;">=</span> []</span>
+<span id="cb30-3">prediction_end <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">f'MAPE: </span><span class="sc" style="color: #5E5E5E;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">{</span>mape<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">'2023-10-31'</span></span>
+<span id="cb30-4">prediction_offsets <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">:.4f}</span><span class="ss" style="color: #20794D;
+font-style: inherit;">=</span> [<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">'</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MAPE: 0.0681</code></pre>
-</div>
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>]</span>
+<span id="cb30-5"></span>
+<span id="cb30-6"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i, offset <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">enumerate</span>(prediction_offsets):</span>
+<span id="cb30-7">    prediction_start <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.to_datetime(prediction_end) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> pd.DateOffset(months<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>offset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb30-8">    prediction_start <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> prediction_start.replace(day<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb30-9">    args <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {</span>
+<span id="cb30-10">        <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prediction_start'</span>: prediction_start,</span>
+<span id="cb30-11">        <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prediction_end'</span>: prediction_end,</span>
+<span id="cb30-12">        <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'transition_period'</span>: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'last_365d'</span></span>
+<span id="cb30-13">    }</span>
+<span id="cb30-14">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> j, new_users_mode <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">enumerate</span>([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'predict'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'true'</span>]):</span>
+<span id="cb30-15">        args[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'new_users_mode'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> new_users_mode</span>
+<span id="cb30-16">        dau_pred <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> make_prediction(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span>args)</span>
+<span id="cb30-17">        mape <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> prediction_details(dau_true, dau_pred, ax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>axs[i, j])</span>
+<span id="cb30-18">        mapes.append([offset, new_users_mode, mape])</span>
+<span id="cb30-19"></span>
+<span id="cb30-20">mapes <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame(mapes, columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'offset'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'new_users'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'MAPE'</span>])</span>
+<span id="cb30-21">plt.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-23-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="3a66c606" class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">dau_pred <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> make_prediction(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-03-01'</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-10-31'</span>, new_users_pred, mode<span class="op" style="color: #5E5E5E;
+<div id="c457ce87" class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">mapes.pivot(index<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'last_365d'</span>)</span>
-<span id="cb31-2">mape <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> prediction_details(dau_true, dau_pred)</span>
-<span id="cb31-3"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">f'MAPE: </span><span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span>mape<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:.4f}</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MAPE: 0.0874</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-24-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="f93d010f" class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">dau_pred <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> make_prediction(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2021-11-01'</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-10-31'</span>, new_users_pred, mode<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'offset'</span>, columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'last_365d'</span>)</span>
-<span id="cb33-2">mape <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> prediction_details(dau_true, dau_pred)</span>
-<span id="cb33-3"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">f'MAPE: </span><span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span>mape<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:.4f}</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MAPE: 0.1764</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-25-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>We notice multiple things. - While the MAPE values in both cases are reasonable (6-10%), the model doesn’t capture trends well. - The transition period matters. In the second case we see that from the beginning the predicted values are substantially lowen than the true values. It means that the transition matrix supposes that the users are less likely to retain that they are in reality. - The trend changes are caused by the new users prediction. - The predicted values are of less variance than the real DAU values. It’s explained by the fact that the model doesn’t consider weekly seasonality at all (i.e.&nbsp;day of week). - A huge spike in the beginning of June obviously relates to some unexpected activity – probably marketing. We’ll explore it further.</p>
-<p>Since the transition matrix is fixed for the whole prediction period, the only thing that can affect the trend changes is the variation in the new users prediction. Let’s plot the <code>new_users_pred</code> time-series for the corresponding period.</p>
-<div id="3d092ec8" class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1">new_users_pred.loc[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-03-01'</span>:<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-10-31'</span>]<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">\</span></span>
-<span id="cb35-2">    .plot(title<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'new_users'</span>, values<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'New users prediction'</span>)<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span></code></pre></div>
-<div class="cell-output cell-output-display">
+font-style: inherit;">'MAPE'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="52">
 <div>
-<figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
-</figure>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">new_users</th>
+<th data-quarto-table-cell-role="th">predict</th>
+<th data-quarto-table-cell-role="th">true</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">offset</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.079538</td>
+<td>0.103631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>0.125035</td>
+<td>0.084652</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>0.651502</td>
+<td>0.086885</td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>
-<p>It’s clear now that the predicted DAU trend changes coincide with the new users prediction trend changes.</p>
-<p>Now, let’s decompose the prediction error and see which states contribure the most.</p>
-<div id="8384a2ee" class="cell" data-execution_count="28">
+<p>We notice multiple things.</p>
+<ul>
+<li>The new users prediction might have a huge impact on the model, especially for long-term predictions. For the 1-year prediction the MAPE value is 7 times higher for the predicted new users data (0.65 VS 0.08)! For the shorter periods the difference is less dramatic. The major difference for such a difference is that 1-year period includes Christmas with its extreme values. As a result, i) it’s hard to predict such high new user values, ii) the period heavily impacts user behavior, the transition matrix and, consequently, DAU values. Hence, we strongly recommend to implement the new user prediction carefully.</li>
+<li>When the new users prediction is accurate, the model captures trends well. It means that using last 365 days for the transition matrix calculation is a reasonable choice.</li>
+<li>Interestingly, the true new users data provides worse results for the 3-months prediction. This is nothing but a coincidence. The wrong new users prediction in October 2023 reversed the predicted DAU trend and made MAPE a bit lower.</li>
+</ul>
+<p>Now, let’s decompose the prediction error and see which states contribure the most. Since we already know that the new users prediction has a huge impact on the model, we focus on a shorter prediction period in order to study the other factors.</p>
+<div id="8384a2ee" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">dau_component_cols <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">dau_component_cols <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> [<span class="st" style="color: #20794D;
 background-color: null;
@@ -2314,8 +2484,23 @@ background-color: null;
 font-style: inherit;">'reactivated'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'resurrected'</span>]</span>
-<span id="cb36-2"></span>
-<span id="cb36-3">figure, (ax1, ax2) <span class="op" style="color: #5E5E5E;
+<span id="cb32-2"></span>
+<span id="cb32-3">dau_pred <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> make_prediction(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'2023-08-01'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'2023-10-31'</span>, new_users_mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'predict'</span>, transition_period<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'last_365d'</span>)</span>
+<span id="cb32-4">figure, (ax1, ax2) <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> plt.subplots(<span class="dv" style="color: #AD0000;
 background-color: null;
@@ -2328,43 +2513,43 @@ background-color: null;
 font-style: inherit;">12</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">4</span>))</span>
-<span id="cb36-4"></span>
-<span id="cb36-5">dau_pred[dau_component_cols]<span class="op" style="color: #5E5E5E;
+<span id="cb32-5"></span>
+<span id="cb32-6">dau_pred[dau_component_cols]<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-6">    .subtract(dau_true[dau_component_cols])<span class="op" style="color: #5E5E5E;
+<span id="cb32-7">    .subtract(dau_true[dau_component_cols])<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-7">    .reindex(dau_pred.index)<span class="op" style="color: #5E5E5E;
+<span id="cb32-8">    .reindex(dau_pred.index)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-8">    .plot(title<span class="op" style="color: #5E5E5E;
+<span id="cb32-9">    .plot(title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'Prediction error by state'</span>, ax<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>ax1)</span>
-<span id="cb36-9"></span>
-<span id="cb36-10">dau_pred[[<span class="st" style="color: #20794D;
+<span id="cb32-10"></span>
+<span id="cb32-11">dau_pred[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'current'</span>]]<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-11">    .subtract(dau_true[[<span class="st" style="color: #20794D;
+<span id="cb32-12">    .subtract(dau_true[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'current'</span>]])<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-12">    .div(dau_true[[<span class="st" style="color: #20794D;
+<span id="cb32-13">    .div(dau_true[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'current'</span>]])<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-13">    .reindex(dau_pred.index)<span class="op" style="color: #5E5E5E;
+<span id="cb32-14">    .reindex(dau_pred.index)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb36-14">    .plot(title<span class="op" style="color: #5E5E5E;
+<span id="cb32-15">    .plot(title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -2377,121 +2562,158 @@ font-style: inherit;">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>First, we note that the error for new, reactivated, and resurrected states is quite low while for the current state is high. Unsurprisingly, this is because the current state contributes to DAU the most. As for the spike in July, we see now that it was caused my some CRM activity bacuse the corresponding spike occured particularly in the resurrected state.</p>
-<p>Analysing relative errors for all the states seems to be not too informative, especially for the <code>reactivated</code> and <code>resurrected</code> states: their daily values are quite low, so the error appears to be to high and noisy. On the right diagram we see the relative error for the current state only. This error varies between -20% and 20% which we personally consider as high. And since the error of the <code>new</code> state is low, it can be explained only by the fact that the fixed transition matrix poorly describes user activity in the prediction period.</p>
+<p>From the left chart we notice that the error is basically contributed by the <code>current</code> state. It’s not surprising since this state contributes to DAU the most. The error for the <code>new</code>, <code>reactivated</code>, and <code>resurrected</code> states is quite low. Another interesting thing is that this error is mostly negative. Perhaps it mean that the new users who appeared in the prediction period are more engaged that the users from the past.</p>
+<p>As for the relative error on the right chart, it makes sense to analyze it for the <code>current</code> state only. This is because the daily amount of the reactivated and resurrected states are low so the relative error is high and noisy. The relative error for the <code>current</code> state varies between -20% and 5% which is quite high. And since the <code>current</code> state amount is mostly regulated by the <code>current</code> -&gt; <code>current</code> conversion rate (it’s roughly 0.8), this error is explained by the transition matrix inaccuracy.</p>
 </section>
 <section id="transitions-period-impact" class="level3">
 <h3 class="anchored" data-anchor-id="transitions-period-impact">4.2 Transitions period impact</h3>
-<p>Here we’re going to estimate how long a period before the prediction date should be considered to calculate the transition matrix values. We fix the same prediction period <code>2022-03-01</code> - <code>2022-10-31</code> and vary the transitions period: from 1 week to 1 year. In order to mitigate the noice from the new users prediction, we use the real values of the new users amount.</p>
-<div id="1c6fb3f8" class="cell" data-execution_count="29">
+<p>In the previous section we kept the transitions period fixed – 1 year. Now we’re going to estimate how long a period before the prediction date should be chosen to calculate the transition matrix values. We consider the same prediction periods of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount.</p>
+<div id="1d5fc43c" class="cell" data-execution_count="63">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">prediction_period_start <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-03-01'</span></span>
-<span id="cb37-2">prediction_period_end <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'2022-10-31'</span></span>
-<span id="cb37-3"></span>
-<span id="cb37-4">result <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">result <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> []</span>
-<span id="cb37-5"><span class="cf" style="color: #003B4F;
+<span id="cb33-2"></span>
+<span id="cb33-3"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">for</span> shift <span class="kw" style="color: #003B4F;
+font-style: inherit;">for</span> prediction_offset <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> prediction_offsets:</span>
+<span id="cb33-4">    prediction_start <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.to_datetime(prediction_end) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> pd.DateOffset(months<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>prediction_offset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb33-5">    prediction_start <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> prediction_start.replace(day<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb33-6"></span>
+<span id="cb33-7">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> transition_offset <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">in</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">180</span>, <span class="dv" style="color: #AD0000;
+font-style: inherit;">13</span>):</span>
+<span id="cb33-8">        dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">7</span>):</span>
-<span id="cb37-6">    dau_pred <span class="op" style="color: #5E5E5E;
+font-style: inherit;">=</span> make_prediction(</span>
+<span id="cb33-9">            prediction_start, prediction_end, new_users_mode<span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> make_prediction(prediction_period_start, prediction_period_end, new_users, mode<span class="op" style="color: #5E5E5E;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'true'</span>,</span>
+<span id="cb33-10">            transition_period<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">f'last_</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">{</span>shift<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">{</span>transition_offset<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span><span class="ss" style="color: #20794D;
 background-color: null;
-font-style: inherit;">d'</span>)</span>
-<span id="cb37-7">    mape <span class="op" style="color: #5E5E5E;
+font-style: inherit;">d'</span></span>
+<span id="cb33-11">        )</span>
+<span id="cb33-12">        mape <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> prediction_details(dau_true, dau_pred, show_plot<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">False</span>)</span>
-<span id="cb37-8">    result.append([shift, mape])</span>
-<span id="cb37-9">result <span class="op" style="color: #5E5E5E;
+<span id="cb33-13">        result.append([prediction_offset, transition_offset, mape])</span>
+<span id="cb33-14">result <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame(result, columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'shift'</span>, <span class="st" style="color: #20794D;
+font-style: inherit;">'prediction_period'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'transition_period'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'mape'</span>])</span>
-<span id="cb37-10"></span>
-<span id="cb37-11">result.set_index(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'shift'</span>)[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mape'</span>]<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">\</span></span>
-<span id="cb37-12">    .plot(title<span class="op" style="color: #5E5E5E;
+<span id="cb33-15"></span>
+<span id="cb33-16">result.pivot(index<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'MAPE by shift'</span>)</span></code></pre></div>
+font-style: inherit;">'transition_period'</span>, columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prediction_period'</span>, values<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mape'</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb33-17">    .plot(title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'MAPE by prediction and transition period'</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>As we see, the MAPE curve has U-shape. This is quite clear: too short period can’t capture signal from the most recent users while too long period is too genral and captures signal that is not valid anymore. Hence, the optimal transitions period is 4-7 weeks.</p>
+<p>It turns out that the optimal transition period depends on the prediction period. Shorter prediction periods require shorter transition periods: the minimal MAPE value is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. It seems this is because the longer prediction periods contain some seasonal effects that could be captured only by the longer transition periods.</p>
 </section>
-<section id="obsolence-and-sesonality" class="level3">
-<h3 class="anchored" data-anchor-id="obsolence-and-sesonality">4.3 Obsolence and sesonality</h3>
-<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, the user behavior varies depending on a season when a user comes in for the first time. For example, the users who appear after Christmas are of a different type: they could be more motivated to use an app or whatever else. In this section, to predict DAU in some prediction period we will also consider a transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> from the corresponding period in the past. We consider three configurations:</p>
+<section id="obsolence-and-seasonality" class="level3">
+<h3 class="anchored" data-anchor-id="obsolence-and-seasonality">4.3 Obsolence and seasonality</h3>
+<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, the user behavior varies depending on a season when a user comes in for the first time. For example, users who appear after Christmas are of a different type: they could be more motivated to use an app or whatever else. In this section, to predict DAU in some prediction period we will also consider a transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> from the corresponding period in the past. We consider three configurations:</p>
 <ul>
 <li><code>last_30d</code>: the transition matrix is calculated from the last 30 days of the training data.</li>
 <li><code>seasonal_0.1</code>: <img src="https://latex.codecogs.com/png.latex?M%20=%200.1%20%5Ccdot%20M_%7Bseasonal%7D%20+%200.9%20%5Ccdot%20M_%7Blast%5C_30d%7D">.</li>
 <li><code>smoothing</code>: <img src="https://latex.codecogs.com/png.latex?M%20=%20%5Cfrac%7Bi%7D%7BN%20-%201%7D%20M_%7Bseasonal%7D%20+%20(1%20-%20%5Cfrac%7Bi%7D%7BN%20-%201%7D)%20M_%7Blast%5C_30d%7D"> where <img src="https://latex.codecogs.com/png.latex?N"> is the number of months in the predicting period, <img src="https://latex.codecogs.com/png.latex?i%20=%200,%20%5Cldots,%20N%20-%201"> – the month index. The idea of this configuration is to gradually switch from the most recent transition matrix to the seasonal one.</li>
 </ul>
-<div id="6bf81796" class="cell" data-execution_count="32">
+<div id="6bf81796" class="cell" data-execution_count="68">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1">result <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1">result <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb38-2"><span class="cf" style="color: #003B4F;
+<span id="cb34-2"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">for</span> mode <span class="kw" style="color: #003B4F;
+font-style: inherit;">for</span> transition_period <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">in</span> [<span class="st" style="color: #20794D;
@@ -2501,23 +2723,25 @@ background-color: null;
 font-style: inherit;">'seasonal_0.1'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'smoothing'</span>]:</span>
-<span id="cb38-3">    result[mode] <span class="op" style="color: #5E5E5E;
+<span id="cb34-3">    result[transition_period] <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> make_prediction(<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2021-11-01'</span>, <span class="st" style="color: #20794D;
+font-style: inherit;">'2022-11-01'</span>, <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'2022-10-31'</span>, new_users_pred, mode)[<span class="st" style="color: #20794D;
+font-style: inherit;">'2023-10-31'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'true'</span>, transition_period)[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>]</span>
-<span id="cb38-4">result[<span class="st" style="color: #20794D;
+<span id="cb34-4">result[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'true'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dau_true[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>]</span>
-<span id="cb38-5">result[<span class="st" style="color: #20794D;
+<span id="cb34-5">result[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'true'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2526,7 +2750,7 @@ background-color: null;
 font-style: inherit;">'true'</span>].astype(<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span>)</span>
-<span id="cb38-6">result.plot(title<span class="op" style="color: #5E5E5E;
+<span id="cb34-6">result.plot(title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -2537,25 +2761,25 @@ font-style: inherit;">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="fe73fae5" class="cell" data-execution_count="33">
+<div id="fe73fae5" class="cell" data-execution_count="69">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1">mape <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1">mape <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb39-2"><span class="cf" style="color: #003B4F;
+<span id="cb35-2"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> col <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">in</span> result.columns:</span>
-<span id="cb39-3">    <span class="cf" style="color: #003B4F;
+<span id="cb35-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> col <span class="op" style="color: #5E5E5E;
@@ -2563,16 +2787,16 @@ background-color: null;
 font-style: inherit;">!=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'true'</span>:</span>
-<span id="cb39-4">        mape.loc[col, <span class="st" style="color: #20794D;
+<span id="cb35-4">        mape.loc[col, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'mape'</span>] <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> mean_absolute_percentage_error(result[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'true'</span>], result[col])</span>
-<span id="cb39-5">mape</span></code></pre></div>
+<span id="cb35-5">mape</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="33">
+<div class="cell-output cell-output-display" data-execution_count="69">
 <div>
 
 
@@ -2586,15 +2810,15 @@ font-style: inherit;">'true'</span>], result[col])</span>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">last_30d</td>
-<td>0.136540</td>
+<td>0.138272</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">seasonal_0.1</td>
-<td>0.127246</td>
+<td>0.127011</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">smoothing</td>
-<td>0.093658</td>
+<td>0.105653</td>
 </tr>
 </tbody>
 </table>
@@ -2604,47 +2828,63 @@ font-style: inherit;">'true'</span>], result[col])</span>
 </div>
 <p>According to the MAPE values, <code>smoothing</code> configuration provides the best results. The <code>seasonal_0.1</code> option demonstrates a bit better results than the <code>last_30d</code> one. Perhaps, it could be improved by chossing weight other than 0.1.</p>
 <p>Interestingly, we notice how the difference between the predicted time-series of different configurations decays as the prediction period increases. It means that the impulse from the most recent <img src="https://latex.codecogs.com/png.latex?M_%7Blast%5C_30d%7D"> matrix fades away and by the year, so that the DAU prediction is detrimented by the new users prediction and the transition matrix, converged and outdated.</p>
-<div id="8fb64c7e" class="cell" data-execution_count="38">
+<div id="8fb64c7e" class="cell" data-execution_count="74">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb40" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1">dau_pred <span class="op" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">dau_pred <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_pred, mode<span class="op" style="color: #5E5E5E;
+font-style: inherit;">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'predict'</span>, transition_period<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'smoothing'</span>)</span>
-<span id="cb40-2">dau_pred2 <span class="op" style="color: #5E5E5E;
+<span id="cb36-2">dau_pred2 <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_pred, mode<span class="op" style="color: #5E5E5E;
+font-style: inherit;">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'predict'</span>, transition_period<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'last_365d'</span>)</span>
-<span id="cb40-3">pd.concat([dau_true[<span class="st" style="color: #20794D;
+<span id="cb36-3">dau_true[<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'dau'</span>], dau_pred[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'dau'</span>]]).plot(title<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'dau'</span>].plot(label<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'DAU, historical &amp; predicted'</span>)</span>
-<span id="cb40-4">dau_pred2[<span class="st" style="color: #20794D;
+font-style: inherit;">'true'</span>)</span>
+<span id="cb36-4">dau_pred[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'dau'</span>].plot(label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'smoothing'</span>)</span>
+<span id="cb36-5">dau_pred2[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'dau'</span>].plot(label<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'365d'</span>)</span>
-<span id="cb40-5">plt.legend()<span class="op" style="color: #5E5E5E;
+<span id="cb36-6">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'DAU, historical &amp; predicted'</span>)</span>
+<span id="cb36-7">plt.legend()<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="https://wowone.github.io/posts/2024-11-01_dau_prediction/dau_prediction_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
