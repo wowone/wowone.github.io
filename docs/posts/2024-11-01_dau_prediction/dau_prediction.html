@@ -258,16 +258,16 @@ new
 ✅
 </td>
 <td>
-❓
+?
 </td>
 <td>
-❌
+NA
 </td>
 <td>
-❌
+NA
 </td>
 <td>
-❌
+NA
 </td>
 </tr>
 <tr>
@@ -307,7 +307,7 @@ reactivated
 ✅
 </td>
 <td>
-❓
+?
 </td>
 </tr>
 <tr>
@@ -344,10 +344,10 @@ at_risk_wau
 ✅
 </td>
 <td>
-❓
+?
 </td>
 <td>
-❓
+?
 </td>
 </tr>
 <tr>
@@ -367,7 +367,7 @@ at_risk_mau
 ✅
 </td>
 <td>
-❓
+?
 </td>
 </tr>
 <tr>
@@ -1030,10 +1030,10 @@ Name: cnt, dtype: int64</code></pre>
 <span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dau_pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="07b1d7bb" class="cell" data-execution_count="20">
+<div id="07b1d7bb" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTION_END, new_users_pred)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>dau_pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="18">
 <div>
 
 
@@ -1219,7 +1219,7 @@ Name: cnt, dtype: int64</code></pre>
 </div>
 <p>Besides the expected <code>dau</code>, <code>wau</code>, and <code>mau</code> columns, the output contains the number of users in each state for each prediction date.</p>
 <p>Finally, we calculate the ground-truth values of DAU, WAU, and MAU (along with the corresponding state decomposition), keep them in the <code>dau_true</code> DataFrame, and plot the predicted and true values altogether.</p>
-<div id="c7223b81" class="cell" data-execution_count="21">
+<div id="c7223b81" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span></span>
@@ -1237,9 +1237,9 @@ Name: cnt, dtype: int64</code></pre>
 <span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'mau'</span>] <span class="op">=</span> dau_true[<span class="st">'dau'</span>] <span class="op">+</span> dau_true[<span class="st">'at_risk_wau'</span>] <span class="op">+</span> dau_true[<span class="st">'at_risk_mau'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="30a750f7" class="cell" data-execution_count="22">
+<div id="30a750f7" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dau_true.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
+<div class="cell-output cell-output-display" data-execution_count="20">
 <div>
 
 
@@ -1344,7 +1344,7 @@ Name: cnt, dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div id="87251bb7" class="cell" data-execution_count="23">
+<div id="87251bb7" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>pd.concat([dau_true[<span class="st">'dau'</span>], dau_pred[<span class="st">'dau'</span>]])<span class="op">\</span></span>
@@ -1362,117 +1362,237 @@ Name: cnt, dtype: int64</code></pre>
 </section>
 <section id="model-evaluation" class="level2">
 <h2 class="anchored" data-anchor-id="model-evaluation">4. Model evaluation</h2>
-<section id="general-evaluation" class="level3">
-<h3 class="anchored" data-anchor-id="general-evaluation">4.1 General evaluation</h3>
-<p>First of all, let’s test our model on historical data choosing 3 prediction periods of different length:</p>
+<section id="baseline-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="baseline-comparison">4.1 Baseline comparison</h3>
+<p>First of all, let’s check whether we really need to build a complex model to predict DAU. Wouldn’t it be better to predict DAU as a general time-series using the mentioned <code>prophet</code> library? The function <code>predict_dau_simple</code> implements this. We try to use some tweaks available in the library in order to make the prediction more accurate:</p>
 <ul>
-<li><code>2022-11-01</code> - <code>2023-10-31</code>,</li>
-<li><code>2023-05-01</code> - <code>2022-10-31</code>,</li>
-<li><code>2022-08-01</code> - <code>2022-10-31</code>.</li>
+<li>we use logistic model instead of linear in order to avoid negative values;</li>
+<li>we add explicitly monthly and yearly seasonality;</li>
+<li>we remove the outliers.</li>
+<li>we set explicitly define peak values for January and February as “holidays”.</li>
 </ul>
-<p>As for the transitions period, so far we consider 1 year behind a prediction start. In order to check how the new users prediction affects the model, we run the model on the predicted and true new users data.</p>
+<p>The fact that the code turns out to be quite sophisticated indicates that one can’t simply apply <code>prophet</code> to the DAU time-series.</p>
+<div id="be3bc544" class="cell" data-execution_count="22">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_dau_prophet(prediction_start, prediction_end, dau_true, show_plot<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    holidays <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'holiday'</span>: <span class="st">'january_spike'</span>,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'ds'</span>: pd.date_range(<span class="st">'2022-01-01'</span>, <span class="st">'2022-01-31'</span>, freq<span class="op">=</span><span class="st">'D'</span>).tolist() <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>              pd.date_range(<span class="st">'2023-01-01'</span>, <span class="st">'2023-01-31'</span>, freq<span class="op">=</span><span class="st">'D'</span>).tolist(),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'lower_window'</span>: <span class="dv">0</span>,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'upper_window'</span>: <span class="dv">40</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> Prophet(growth<span class="op">=</span><span class="st">'logistic'</span>, holidays<span class="op">=</span>holidays)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    m.add_seasonality(name<span class="op">=</span><span class="st">'monthly'</span>, period<span class="op">=</span><span class="fl">30.5</span>, fourier_order<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    m.add_seasonality(name<span class="op">=</span><span class="st">'yearly'</span>, period<span class="op">=</span><span class="dv">365</span>, fourier_order<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    train <span class="op">=</span> dau_true.loc[(dau_true.index <span class="op">&lt;</span> prediction_start) <span class="op">&amp;</span> (dau_true.index <span class="op">&gt;=</span> <span class="st">'2021-08-01'</span>)]</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    train_prophet <span class="op">=</span> pd.DataFrame({<span class="st">'ds'</span>: train.index, <span class="st">'y'</span>: train.values})</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    train_prophet.loc[train_prophet[<span class="st">'ds'</span>].between(<span class="st">'2022-06-07'</span>, <span class="st">'2022-06-09'</span>), <span class="st">'y'</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    train_prophet[<span class="st">'new_year_peak'</span>] <span class="op">=</span> (train_prophet[<span class="st">'ds'</span>] <span class="op">&gt;=</span> <span class="st">'2022-01-01'</span>) <span class="op">&amp;\</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>                                     (train_prophet[<span class="st">'ds'</span>] <span class="op">&lt;=</span> <span class="st">'2022-02-14'</span>)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    m.add_regressor(<span class="st">'new_year_peak'</span>)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    train_prophet[<span class="st">'cap'</span>] <span class="op">=</span> dau_true.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.1</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    train_prophet[<span class="st">'floor'</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    m.fit(train_prophet)</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>    periods <span class="op">=</span> <span class="bu">len</span>(pd.date_range(prediction_start, prediction_end))</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>    future <span class="op">=</span> m.make_future_dataframe(periods<span class="op">=</span>periods)</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>    future[<span class="st">'new_year_peak'</span>] <span class="op">=</span> (future[<span class="st">'ds'</span>] <span class="op">&gt;=</span> <span class="st">'2022-01-01'</span>) <span class="op">&amp;</span> (future[<span class="st">'ds'</span>] <span class="op">&lt;=</span> <span class="st">'2022-02-14'</span>)</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    future[<span class="st">'cap'</span>] <span class="op">=</span> dau_true.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.1</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    future[<span class="st">'floor'</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> m.predict(future)</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_plot:</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>        m.plot(pred)<span class="op">;</span></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> pred<span class="op">\</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>        .assign(yhat<span class="op">=</span><span class="kw">lambda</span> _df: _df[<span class="st">'yhat'</span>].astype(<span class="bu">int</span>))<span class="op">\</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>        .rename(columns<span class="op">=</span>{<span class="st">'ds'</span>: <span class="st">'date'</span>, <span class="st">'yhat'</span>: <span class="st">'count'</span>})<span class="op">\</span></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>        .set_index(<span class="st">'date'</span>)<span class="op">\</span></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>        .clip(lower<span class="op">=</span><span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'count'</span>]<span class="op">\</span></span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>        .loc[<span class="kw">lambda</span> s: (s.index <span class="op">&gt;=</span> prediction_start) <span class="op">&amp;</span> (s.index <span class="op">&lt;=</span> prediction_end)]</span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Hereafter we test a prediction for multiple predicting horizonts: 3, 6, and 12 months. As a result, we get 3 test sets:</p>
+<ul>
+<li>3-months horizont: <code>2023-08-01</code> - <code>2023-10-31</code>,</li>
+<li>6-months horizont: <code>2023-05-01</code> - <code>2023-10-31</code>,</li>
+<li>1-year horizont: <code>2022-11-01</code> - <code>2023-10-31</code>.</li>
+</ul>
+<p>For each test set we calculate the <a href="https://en.wikipedia.org/wiki/Mean_absolute_percentage_error">MAPE</a> loss function.</p>
+<div id="5a0e673e" class="cell" data-execution_count="23">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_percentage_error</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> []</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>prediction_horizont <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">12</span>]</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> offset <span class="kw">in</span> prediction_horizont:</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>offset <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> predict_dau_prophet(prediction_start, prediction_end, dau_true[<span class="st">'dau'</span>], show_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    mape <span class="op">=</span> mean_absolute_percentage_error(dau_true[<span class="st">'dau'</span>].reindex(pred.index), pred)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    mapes.append(mape)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> pd.DataFrame({<span class="st">'horizont'</span>: prediction_horizont, <span class="st">'MAPE'</span>: mapes})</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>mapes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">horizont</th>
+<th data-quarto-table-cell-role="th">MAPE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>3</td>
+<td>0.350167</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>6</td>
+<td>0.185246</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>12</td>
+<td>0.215338</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The MAPE error turns out to be high: 18% - 35%. The fact that the shortest horizont has the highest error means that the model is tuned for the long-term predictions. This is another inconvenience of such an approach: we have to tune the model for each prediction horizont. So this is our baseline. In the next section we’ll compare it with the more advanced models.</p>
+</section>
+<section id="general-evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="general-evaluation">4.2 General evaluation</h3>
+<p>In this section we evaluate the model implemented in the section 3. So far we set the transition period as 1 year before the prediction start. We’ll study how the prediction depends on the transition period in the next section. As for the new users, we run the model using two options: the real values and the predicted ones. Similarly, we fix the same 3 prediction horizonts and test the model on them.</p>
+<p>The <code>make_predicion</code> function below implements the described opttions. It accepts <code>prediction_start</code>, <code>prediction_end</code> arguments defining the prediction period for a given horizont, <code>new_users_mode</code> which can be either <code>true</code> or <code>predict</code>, and <code>transition_period</code>.</p>
 <div id="2a7c7a08" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_percentage_error</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_prediction(prediction_start, prediction_end, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'last_30d'</span>):</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    prediction_start_minus_1d <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(<span class="st">'1d'</span>)</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> get_state0(prediction_start_minus_1d)</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> new_users_mode <span class="op">==</span> <span class="st">'predict'</span>:</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>        new_users_pred <span class="op">=</span> predict_new_users(prediction_start, prediction_end, new_users, show_plot<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> new_users_mode <span class="op">==</span> <span class="st">'true'</span>:</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>        new_users_pred <span class="op">=</span> new_users.copy()</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> transition_period.startswith(<span class="st">'last_'</span>):</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        shift <span class="op">=</span> <span class="bu">int</span>(re.search(<span class="vs">r'last_(\d+)d'</span>, transition_period).group(<span class="dv">1</span>))</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        transitions_start <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(shift, <span class="st">'d'</span>)</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>        M <span class="op">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> predict_dau(M, state0, prediction_start, prediction_end, new_users_pred)</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>        transitions_start <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(<span class="dv">30</span>, <span class="st">'d'</span>)</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>        M_last_month <span class="op">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>        month_starts <span class="op">=</span> pd.date_range(prediction_start, prediction_end, freq<span class="op">=</span><span class="st">'1MS'</span>)</span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>        N <span class="op">=</span> <span class="bu">len</span>(month_starts)</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, prediction_month_start <span class="kw">in</span> <span class="bu">enumerate</span>(month_starts):</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>            prediction_month_end <span class="op">=</span> pd.offsets.MonthEnd().rollforward(prediction_month_start)</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>            transitions_month_start <span class="op">=</span> prediction_month_start <span class="op">-</span> pd.Timedelta(<span class="st">'365D'</span>)</span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>            transitions_month_end <span class="op">=</span> prediction_month_end <span class="op">-</span> pd.Timedelta(<span class="st">'365D'</span>)</span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>            M_seasonal <span class="op">=</span> get_transition_matrix(transitions, transitions_month_start, transitions_month_end)</span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> transition_period <span class="op">==</span> <span class="st">'smoothing'</span>:</span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>                i <span class="op">=</span> <span class="bu">min</span>(i, <span class="dv">12</span>)</span>
-<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>                M <span class="op">=</span> M_seasonal <span class="op">*</span> i <span class="op">/</span> (N <span class="op">-</span> <span class="dv">1</span>)  <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> i <span class="op">/</span> (N <span class="op">-</span> <span class="dv">1</span>)) <span class="op">*</span> M_last_month</span>
-<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> transition_period <span class="op">==</span> <span class="st">'seasonal_0.1'</span>:</span>
-<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>                M <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> M_seasonal <span class="op">+</span> <span class="fl">0.9</span> <span class="op">*</span> M_last_month</span>
-<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>            dau_tmp <span class="op">=</span> predict_dau(M, state0, prediction_month_start, prediction_month_end, new_users_pred)</span>
-<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>            dau_pred <span class="op">=</span> pd.concat([dau_pred, dau_tmp])</span>
-<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>            state0 <span class="op">=</span> dau_tmp.loc[prediction_month_end][states_order]</span>
-<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dau_pred</span>
-<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prediction_details(dau_true, dau_pred, show_plot<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>    y_true <span class="op">=</span> dau_true.reindex(dau_pred.index)[<span class="st">'dau'</span>]</span>
-<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> dau_pred[<span class="st">'dau'</span>]</span>
-<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>    mape <span class="op">=</span> mean_absolute_percentage_error(y_true, y_pred) </span>
-<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_plot:</span>
-<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>        prediction_start <span class="op">=</span> <span class="bu">str</span>(y_true.index.<span class="bu">min</span>().date())</span>
-<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>        prediction_end <span class="op">=</span> <span class="bu">str</span>(y_true.index.<span class="bu">max</span>().date())</span>
-<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ax <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a>            y_true.plot(label<span class="op">=</span><span class="st">'DAU true'</span>)</span>
-<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>            y_pred.plot(label<span class="op">=</span><span class="st">'DAU pred'</span>)</span>
-<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="ss">f'DAU prediction, </span><span class="sc">{</span>prediction_start<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>prediction_end<span class="sc">}</span><span class="ss">'</span>)</span>
-<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a>            plt.legend()</span>
-<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>            y_true.plot(label<span class="op">=</span><span class="st">'DAU true'</span>, ax<span class="op">=</span>ax)</span>
-<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>            y_pred.plot(label<span class="op">=</span><span class="st">'DAU pred'</span>, ax<span class="op">=</span>ax)</span>
-<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>            ax.set_title(<span class="ss">f'DAU prediction, </span><span class="sc">{</span>prediction_start<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>prediction_end<span class="sc">}</span><span class="ss">'</span>)</span>
-<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>            ax.legend()</span>
-<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_prediction(prediction_start, prediction_end, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'last_30d'</span>):</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    prediction_start_minus_1d <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(<span class="st">'1d'</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> get_state0(prediction_start_minus_1d)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> new_users_mode <span class="op">==</span> <span class="st">'predict'</span>:</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>        new_users_pred <span class="op">=</span> predict_new_users(prediction_start, prediction_end, new_users, show_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> new_users_mode <span class="op">==</span> <span class="st">'true'</span>:</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        new_users_pred <span class="op">=</span> new_users.copy()</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> transition_period.startswith(<span class="st">'last_'</span>):</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        shift <span class="op">=</span> <span class="bu">int</span>(re.search(<span class="vs">r'last_(\d+)d'</span>, transition_period).group(<span class="dv">1</span>))</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        transitions_start <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(shift, <span class="st">'d'</span>)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>        M <span class="op">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> predict_dau(M, state0, prediction_start, prediction_end, new_users_pred)</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>        transitions_start <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(<span class="dv">240</span>, <span class="st">'d'</span>)</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>        M_base <span class="op">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>        month_starts <span class="op">=</span> pd.date_range(prediction_start, prediction_end, freq<span class="op">=</span><span class="st">'1MS'</span>)</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>        N <span class="op">=</span> <span class="bu">len</span>(month_starts)</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, prediction_month_start <span class="kw">in</span> <span class="bu">enumerate</span>(month_starts):</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>            prediction_month_end <span class="op">=</span> pd.offsets.MonthEnd().rollforward(prediction_month_start)</span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>            transitions_month_start <span class="op">=</span> prediction_month_start <span class="op">-</span> pd.Timedelta(<span class="st">'365D'</span>)</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>            transitions_month_end <span class="op">=</span> prediction_month_end <span class="op">-</span> pd.Timedelta(<span class="st">'365D'</span>)</span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>            M_seasonal <span class="op">=</span> get_transition_matrix(transitions, transitions_month_start, transitions_month_end)</span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> transition_period <span class="op">==</span> <span class="st">'smoothing'</span>:</span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>                i <span class="op">=</span> <span class="bu">min</span>(i, <span class="dv">12</span>)</span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>                M <span class="op">=</span> M_seasonal <span class="op">*</span> i <span class="op">/</span> (N <span class="op">-</span> <span class="dv">1</span>)  <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> i <span class="op">/</span> (N <span class="op">-</span> <span class="dv">1</span>)) <span class="op">*</span> M_base</span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> transition_period.startswith(<span class="st">'seasonal_'</span>):</span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>                seasonal_coef <span class="op">=</span> <span class="bu">float</span>(re.search(<span class="vs">r'seasonal_(0\.\d+)'</span>, transition_period).group(<span class="dv">1</span>))</span>
+<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>                M <span class="op">=</span> seasonal_coef <span class="op">*</span> M_seasonal <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> seasonal_coef) <span class="op">*</span> M_base</span>
+<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>            dau_tmp <span class="op">=</span> predict_dau(M, state0, prediction_month_start, prediction_month_end, new_users_pred)</span>
+<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>            dau_pred <span class="op">=</span> pd.concat([dau_pred, dau_tmp])</span>
+<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a>            state0 <span class="op">=</span> dau_tmp.loc[prediction_month_end][states_order]</span>
+<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dau_pred</span>
+<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prediction_details(dau_true, dau_pred, show_plot<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>    y_true <span class="op">=</span> dau_true.reindex(dau_pred.index)[<span class="st">'dau'</span>]</span>
+<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> dau_pred[<span class="st">'dau'</span>]</span>
+<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>    mape <span class="op">=</span> mean_absolute_percentage_error(y_true, y_pred) </span>
+<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_plot:</span>
+<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a>        prediction_start <span class="op">=</span> <span class="bu">str</span>(y_true.index.<span class="bu">min</span>().date())</span>
+<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>        prediction_end <span class="op">=</span> <span class="bu">str</span>(y_true.index.<span class="bu">max</span>().date())</span>
+<span id="cb31-54"><a href="#cb31-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ax <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb31-55"><a href="#cb31-55" aria-hidden="true" tabindex="-1"></a>            y_true.plot(label<span class="op">=</span><span class="st">'DAU true'</span>)</span>
+<span id="cb31-56"><a href="#cb31-56" aria-hidden="true" tabindex="-1"></a>            y_pred.plot(label<span class="op">=</span><span class="st">'DAU pred'</span>)</span>
+<span id="cb31-57"><a href="#cb31-57" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="ss">f'DAU prediction, </span><span class="sc">{</span>prediction_start<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>prediction_end<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb31-58"><a href="#cb31-58" aria-hidden="true" tabindex="-1"></a>            plt.legend()</span>
+<span id="cb31-59"><a href="#cb31-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb31-60"><a href="#cb31-60" aria-hidden="true" tabindex="-1"></a>            y_true.plot(label<span class="op">=</span><span class="st">'DAU true'</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb31-61"><a href="#cb31-61" aria-hidden="true" tabindex="-1"></a>            y_pred.plot(label<span class="op">=</span><span class="st">'DAU pred'</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb31-62"><a href="#cb31-62" aria-hidden="true" tabindex="-1"></a>            ax.set_title(<span class="ss">f'DAU prediction, </span><span class="sc">{</span>prediction_start<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>prediction_end<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb31-63"><a href="#cb31-63" aria-hidden="true" tabindex="-1"></a>            ax.legend()</span>
+<span id="cb31-64"><a href="#cb31-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="2def0809" class="cell" data-execution_count="51">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> []</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>prediction_offsets <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">12</span>]</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, offset <span class="kw">in</span> <span class="bu">enumerate</span>(prediction_offsets):</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>offset <span class="op">-</span> <span class="dv">1</span>)</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> {</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'prediction_start'</span>: prediction_start,</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'prediction_end'</span>: prediction_end,</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'transition_period'</span>: <span class="st">'last_365d'</span></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j, new_users_mode <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">'predict'</span>, <span class="st">'true'</span>]):</span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        args[<span class="st">'new_users_mode'</span>] <span class="op">=</span> new_users_mode</span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> make_prediction(<span class="op">**</span>args)</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>        mape <span class="op">=</span> prediction_details(dau_true, dau_pred, ax<span class="op">=</span>axs[i, j])</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>        mapes.append([offset, new_users_mode, mape])</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> pd.DataFrame(mapes, columns<span class="op">=</span>[<span class="st">'offset'</span>, <span class="st">'new_users'</span>, <span class="st">'MAPE'</span>])</span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The charts on the left relate to the <code>new_users_mode = 'true'</code> option, while the right ones relate to the <code>new_users_mode = 'predict'</code> option.</p>
+<div id="2def0809" class="cell" data-execution_count="25">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> []</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>prediction_horizont <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">12</span>]</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, offset <span class="kw">in</span> <span class="bu">enumerate</span>(prediction_horizont):</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>offset <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> {</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'prediction_start'</span>: prediction_start,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'prediction_end'</span>: prediction_end,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'transition_period'</span>: <span class="st">'last_365d'</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j, new_users_mode <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">'predict'</span>, <span class="st">'true'</span>]):</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>        args[<span class="st">'new_users_mode'</span>] <span class="op">=</span> new_users_mode</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> make_prediction(<span class="op">**</span>args)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>        mape <span class="op">=</span> prediction_details(dau_true, dau_pred, ax<span class="op">=</span>axs[i, j])</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>        mapes.append([offset, new_users_mode, mape])</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> pd.DataFrame(mapes, columns<span class="op">=</span>[<span class="st">'horizont'</span>, <span class="st">'new_users'</span>, <span class="st">'MAPE'</span>])</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="dau_prediction_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="dau_prediction_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="c457ce87" class="cell" data-execution_count="52">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>mapes.pivot(index<span class="op">=</span><span class="st">'offset'</span>, columns<span class="op">=</span><span class="st">'new_users'</span>, values<span class="op">=</span><span class="st">'MAPE'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="52">
+<div id="c457ce87" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mapes.pivot(index<span class="op">=</span><span class="st">'horizont'</span>, columns<span class="op">=</span><span class="st">'new_users'</span>, values<span class="op">=</span><span class="st">'MAPE'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
 <div>
 
 
@@ -1484,7 +1604,7 @@ Name: cnt, dtype: int64</code></pre>
 <th data-quarto-table-cell-role="th">true</th>
 </tr>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">offset</th>
+<th data-quarto-table-cell-role="th">horizont</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
 </tr>
@@ -1513,7 +1633,8 @@ Name: cnt, dtype: int64</code></pre>
 </div>
 <p>We notice multiple things.</p>
 <ul>
-<li>The new users prediction might have a huge impact on the model, especially for long-term predictions. For the 1-year prediction the MAPE value is 7 times higher for the predicted new users data (0.65 VS 0.08)! For the shorter periods the difference is less dramatic. The major difference for such a difference is that 1-year period includes Christmas with its extreme values. As a result, i) it’s hard to predict such high new user values, ii) the period heavily impacts user behavior, the transition matrix and, consequently, DAU values. Hence, we strongly recommend to implement the new user prediction carefully.</li>
+<li>In general, the model demonstrates much better results than the baseline. Indeed, the baseline is based on the historical DAU data only, while the model uses the user states information.</li>
+<li>However, for the 1-year horizont and <code>new_users_mode='predict'</code> the MAPE error is huge: 65%. This is 3 times higher than the corresponding baseline error (21%). On the other hand, <code>new_users_mode='true'</code> option gives a much better result: 8%. It means that the new users prediction has a huge impact on the model, especially for long-term predictions. For the shorter periods the difference is less dramatic. The major difference for such a difference is that 1-year period includes Christmas with its extreme values. As a result, i) it’s hard to predict such high new user values, ii) the period heavily impacts user behavior, the transition matrix and, consequently, DAU values. Hence, we strongly recommend to implement the new user prediction carefully. The baseline model was specially tuned for this Christmas period, so it’s not surprising that it outperforms the Markov model.</li>
 <li>When the new users prediction is accurate, the model captures trends well. It means that using last 365 days for the transition matrix calculation is a reasonable choice.</li>
 <li>Interestingly, the true new users data provides worse results for the 3-months prediction. This is nothing but a coincidence. The wrong new users prediction in October 2023 reversed the predicted DAU trend and made MAPE a bit lower.</li>
 </ul>
@@ -1521,84 +1642,21 @@ Name: cnt, dtype: int64</code></pre>
 <div id="8384a2ee" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dau_component_cols <span class="op">=</span> [<span class="st">'new'</span>, <span class="st">'current'</span>, <span class="st">'reactivated'</span>, <span class="st">'resurrected'</span>]</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> make_prediction(<span class="st">'2023-08-01'</span>, <span class="st">'2023-10-31'</span>, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'last_365d'</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>figure, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>dau_pred[dau_component_cols]<span class="op">\</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    .subtract(dau_true[dau_component_cols])<span class="op">\</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    .reindex(dau_pred.index)<span class="op">\</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'Prediction error by state'</span>, ax<span class="op">=</span>ax1)</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>dau_pred[[<span class="st">'current'</span>]]<span class="op">\</span></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    .subtract(dau_true[[<span class="st">'current'</span>]])<span class="op">\</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    .div(dau_true[[<span class="st">'current'</span>]])<span class="op">\</span></span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    .reindex(dau_pred.index)<span class="op">\</span></span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'Relative prediction error (current state)'</span>, ax<span class="op">=</span>ax2)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="dau_prediction_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>From the left chart we notice that the error is basically contributed by the <code>current</code> state. It’s not surprising since this state contributes to DAU the most. The error for the <code>new</code>, <code>reactivated</code>, and <code>resurrected</code> states is quite low. Another interesting thing is that this error is mostly negative. Perhaps it mean that the new users who appeared in the prediction period are more engaged that the users from the past.</p>
-<p>As for the relative error on the right chart, it makes sense to analyze it for the <code>current</code> state only. This is because the daily amount of the reactivated and resurrected states are low so the relative error is high and noisy. The relative error for the <code>current</code> state varies between -20% and 5% which is quite high. And since the <code>current</code> state amount is mostly regulated by the <code>current</code> -&gt; <code>current</code> conversion rate (it’s roughly 0.8), this error is explained by the transition matrix inaccuracy.</p>
-</section>
-<section id="transitions-period-impact" class="level3">
-<h3 class="anchored" data-anchor-id="transitions-period-impact">4.2 Transitions period impact</h3>
-<p>In the previous section we kept the transitions period fixed – 1 year. Now we’re going to estimate how long a period before the prediction date should be chosen to calculate the transition matrix values. We consider the same prediction periods of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount.</p>
-<div id="1d5fc43c" class="cell" data-execution_count="63">
-<details class="code-fold">
-<summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> []</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prediction_offset <span class="kw">in</span> prediction_offsets:</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>prediction_offset <span class="op">-</span> <span class="dv">1</span>)</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> transition_offset <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">13</span>):</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> make_prediction(</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>            prediction_start, prediction_end, new_users_mode<span class="op">=</span><span class="st">'true'</span>,</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>            transition_period<span class="op">=</span><span class="ss">f'last_</span><span class="sc">{</span>transition_offset<span class="op">*</span><span class="dv">30</span><span class="sc">}</span><span class="ss">d'</span></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>        mape <span class="op">=</span> prediction_details(dau_true, dau_pred, show_plot<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>        result.append([prediction_offset, transition_offset, mape])</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pd.DataFrame(result, columns<span class="op">=</span>[<span class="st">'prediction_period'</span>, <span class="st">'transition_period'</span>, <span class="st">'mape'</span>])</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>result.pivot(index<span class="op">=</span><span class="st">'transition_period'</span>, columns<span class="op">=</span><span class="st">'prediction_period'</span>, values<span class="op">=</span><span class="st">'mape'</span>)<span class="op">\</span></span>
-<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'MAPE by prediction and transition period'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="dau_prediction_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>It turns out that the optimal transition period depends on the prediction period. Shorter prediction periods require shorter transition periods: the minimal MAPE value is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. It seems this is because the longer prediction periods contain some seasonal effects that could be captured only by the longer transition periods.</p>
-</section>
-<section id="obsolence-and-seasonality" class="level3">
-<h3 class="anchored" data-anchor-id="obsolence-and-seasonality">4.3 Obsolence and seasonality</h3>
-<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, the user behavior varies depending on a season when a user comes in for the first time. For example, users who appear after Christmas are of a different type: they could be more motivated to use an app or whatever else. In this section, to predict DAU in some prediction period we will also consider a transition matrix <span class="math inline">\(M_{seasonal}\)</span> from the corresponding period in the past. We consider three configurations:</p>
-<ul>
-<li><code>last_30d</code>: the transition matrix is calculated from the last 30 days of the training data.</li>
-<li><code>seasonal_0.1</code>: <span class="math inline">\(M = 0.1 \cdot M_{seasonal} + 0.9 \cdot M_{last\_30d}\)</span>.</li>
-<li><code>smoothing</code>: <span class="math inline">\(M = \frac{i}{N - 1} M_{seasonal} + (1 - \frac{i}{N - 1}) M_{last\_30d}\)</span> where <span class="math inline">\(N\)</span> is the number of months in the predicting period, <span class="math inline">\(i = 0, \ldots, N - 1\)</span> – the month index. The idea of this configuration is to gradually switch from the most recent transition matrix to the seasonal one.</li>
-</ul>
-<div id="6bf81796" class="cell" data-execution_count="68">
-<details class="code-fold">
-<summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> transition_period <span class="kw">in</span> [<span class="st">'last_30d'</span>, <span class="st">'seasonal_0.1'</span>, <span class="st">'smoothing'</span>]:</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    result[transition_period] <span class="op">=</span> make_prediction(<span class="st">'2022-11-01'</span>, <span class="st">'2023-10-31'</span>, <span class="st">'true'</span>, transition_period)[<span class="st">'dau'</span>]</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>result[<span class="st">'true'</span>] <span class="op">=</span> dau_true[<span class="st">'dau'</span>]</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>result[<span class="st">'true'</span>] <span class="op">=</span> result[<span class="st">'true'</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>result.plot(title<span class="op">=</span><span class="st">'DAU prediction by different transition matrices'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dau_component_cols <span class="op">=</span> [<span class="st">'new'</span>, <span class="st">'current'</span>, <span class="st">'reactivated'</span>, <span class="st">'resurrected'</span>]</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> make_prediction(<span class="st">'2023-08-01'</span>, <span class="st">'2023-10-31'</span>, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'last_365d'</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>figure, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>dau_pred[dau_component_cols]<span class="op">\</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    .subtract(dau_true[dau_component_cols])<span class="op">\</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    .reindex(dau_pred.index)<span class="op">\</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'Prediction error by state'</span>, ax<span class="op">=</span>ax1)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>dau_pred[[<span class="st">'current'</span>]]<span class="op">\</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    .subtract(dau_true[[<span class="st">'current'</span>]])<span class="op">\</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    .div(dau_true[[<span class="st">'current'</span>]])<span class="op">\</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    .reindex(dau_pred.index)<span class="op">\</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'Relative prediction error (current state)'</span>, ax<span class="op">=</span>ax2)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1608,16 +1666,80 @@ Name: cnt, dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div id="fe73fae5" class="cell" data-execution_count="69">
+<p>From the left chart we notice that the error is basically contributed by the <code>current</code> state. It’s not surprising since this state contributes to DAU the most. The error for the <code>new</code>, <code>reactivated</code>, and <code>resurrected</code> states is quite low. Another interesting thing is that this error is mostly negative. Perhaps it mean that the new users who appeared in the prediction period are more engaged that the users from the past.</p>
+<p>As for the relative error on the right chart, it makes sense to analyze it for the <code>current</code> state only. This is because the daily amount of the reactivated and resurrected states are low so the relative error is high and noisy. The relative error for the <code>current</code> state varies between -20% and 5% which is quite high. And since the <code>current</code> state amount is mostly regulated by the <code>current</code> -&gt; <code>current</code> conversion rate (it’s roughly 0.8), this error is explained by the transition matrix inaccuracy.</p>
+</section>
+<section id="transitions-period-impact" class="level3">
+<h3 class="anchored" data-anchor-id="transitions-period-impact">4.3 Transitions period impact</h3>
+<p>In the previous section we kept the transitions period fixed – 1 year before a prediction start. Now we’re going to study how long this period should be to get more accurate prediction. We consider the same prediction horizonts of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount.</p>
+<div id="1d5fc43c" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>mape <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> result.columns:</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="op">!=</span> <span class="st">'true'</span>:</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>        mape.loc[col, <span class="st">'mape'</span>] <span class="op">=</span> mean_absolute_percentage_error(result[<span class="st">'true'</span>], result[col])</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>mape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> []</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prediction_offset <span class="kw">in</span> prediction_horizont:</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>prediction_offset <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> transition_offset <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">13</span>):</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> make_prediction(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>            prediction_start, prediction_end, new_users_mode<span class="op">=</span><span class="st">'true'</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>            transition_period<span class="op">=</span><span class="ss">f'last_</span><span class="sc">{</span>transition_offset<span class="op">*</span><span class="dv">30</span><span class="sc">}</span><span class="ss">d'</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>        mape <span class="op">=</span> prediction_details(dau_true, dau_pred, show_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>        result.append([prediction_offset, transition_offset, mape])</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pd.DataFrame(result, columns<span class="op">=</span>[<span class="st">'prediction_period'</span>, <span class="st">'transition_period'</span>, <span class="st">'mape'</span>])</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>result.pivot(index<span class="op">=</span><span class="st">'transition_period'</span>, columns<span class="op">=</span><span class="st">'prediction_period'</span>, values<span class="op">=</span><span class="st">'mape'</span>)<span class="op">\</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'MAPE by prediction and transition period'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="69">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It turns out that the optimal transitions period depends on the prediction horizont. Shorter horizonts require shorter transitions periods: the minimal MAPE error is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. It seems this is because the longer horizonts contain some seasonal effects that could be captured only by the longer transitions periods.</p>
+</section>
+<section id="obsolence-and-seasonality" class="level3">
+<h3 class="anchored" data-anchor-id="obsolence-and-seasonality">4.4 Obsolence and seasonality</h3>
+<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, the user behavior varies depending on a season. For example, users who appear after Christmas might have some shifts in behavior. Another typical situation is when users change their behavior in summer. In this section, we’ll try to take into account these seasonal effects.</p>
+<p>So we want to predict DAU for the 1 year ahead starting from November 2022. Instead of using a single transition matrix <span class="math inline">\(M_{base}\)</span> which is calculated for the last 8 months before the prediction start (as an optimal transitions period derived from the previous section, labeled as <code>last_240d</code> option), we’ll consider a mixture of this matrix and a seasonal one <span class="math inline">\(M_{seasonal}\)</span>. The latter is calculated on monthly basis lagging 1 year behind. For example, to predict DAU for November 2022 we define <span class="math inline">\(M_{seasonal}\)</span> as the transition matrix for November 2021. Then we shift the prediction horizon to December 2022 and calculate <span class="math inline">\(M_{seasonal}\)</span> for December 2021, etc.</p>
+<p>In order to mix <span class="math inline">\(M_{base}\)</span> and <span class="math inline">\(M_{seasonal}\)</span> we define the following two options.</p>
+<ul>
+<li><code>seasonal_0.3</code>: <span class="math inline">\(M = 0.3 \cdot M_{seasonal} + 0.7 \cdot M_{base}\)</span>. 0.3 weight was chosen as a local minimum after some experiments.</li>
+<li><code>smoothing</code>: <span class="math inline">\(M = \frac{i}{N - 1} M_{seasonal} + (1 - \frac{i}{N - 1}) M_{base}\)</span> where <span class="math inline">\(N\)</span> is the number of months within the predicting period, <span class="math inline">\(i = 0, \ldots, N - 1\)</span> – the month index. The idea of this configuration is to gradually switch from the most recent transition matrix <span class="math inline">\(M_{base}\)</span> to seasonal ones as the prediction month moves forward from the prediction start.</li>
+</ul>
+<div id="6bf81796" class="cell" data-execution_count="29">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> transition_period <span class="kw">in</span> [<span class="st">'last_240d'</span>, <span class="st">'seasonal_0.3'</span>, <span class="st">'smoothing'</span>]:</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    result[transition_period] <span class="op">=</span> make_prediction(<span class="st">'2022-11-01'</span>, <span class="st">'2023-10-31'</span>, <span class="st">'true'</span>, transition_period)[<span class="st">'dau'</span>]</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>result[<span class="st">'true'</span>] <span class="op">=</span> dau_true[<span class="st">'dau'</span>]</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>result[<span class="st">'true'</span>] <span class="op">=</span> result[<span class="st">'true'</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>result.plot(title<span class="op">=</span><span class="st">'DAU prediction by different transition matrices'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="fe73fae5" class="cell" data-execution_count="30">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>mape <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> result.columns:</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="op">!=</span> <span class="st">'true'</span>:</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>        mape.loc[col, <span class="st">'mape'</span>] <span class="op">=</span> mean_absolute_percentage_error(result[<span class="st">'true'</span>], result[col])</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>mape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="30">
 <div>
 
 
@@ -1630,16 +1752,16 @@ Name: cnt, dtype: int64</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">last_30d</td>
-<td>0.138272</td>
+<td data-quarto-table-cell-role="th">last_240d</td>
+<td>0.080804</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">seasonal_0.1</td>
-<td>0.127011</td>
+<td data-quarto-table-cell-role="th">seasonal_0.3</td>
+<td>0.077545</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">smoothing</td>
-<td>0.105653</td>
+<td>0.097802</td>
 </tr>
 </tbody>
 </table>
@@ -1647,23 +1769,24 @@ Name: cnt, dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<p>According to the MAPE values, <code>smoothing</code> configuration provides the best results. The <code>seasonal_0.1</code> option demonstrates a bit better results than the <code>last_30d</code> one. Perhaps, it could be improved by chossing weight other than 0.1.</p>
-<p>Interestingly, we notice how the difference between the predicted time-series of different configurations decays as the prediction period increases. It means that the impulse from the most recent <span class="math inline">\(M_{last\_30d}\)</span> matrix fades away and by the year, so that the DAU prediction is detrimented by the new users prediction and the transition matrix, converged and outdated.</p>
-<div id="8fb64c7e" class="cell" data-execution_count="74">
+<p>According to the MAPE errors, <code>seasonal_0.3</code> configuration provides the best results. Interestingly, <code>smoothing</code> approach has appeared to be even worse than the <code>last_240d</code>. From the diagram above we see that all three models start to underestimate the DAU values from July 2023, especially the <code>smoothing</code> model. It seems that the new users who started appearing from July 2023 are more engaged than the users from 2022. Probably, the app was improved sufficiently or the marketing team did a great job. As a result, the <code>smoothing</code> model that much relies on the outdated transitions data from July 2022 - October 2022 fails more than the other models.</p>
+</section>
+<section id="final-solution" class="level3">
+<h3 class="anchored" data-anchor-id="final-solution">4.5 Final solution</h3>
+<p>To sum things up, let’s make a final prediction for the 2024 year. We use the <code>seasonal_0.3</code> configuration and the predicted values for new users.</p>
+<div id="8fb64c7e" class="cell" data-execution_count="31">
 <details class="code-fold">
 <summary>Toggle the code</summary>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'smoothing'</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>dau_pred2 <span class="op">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'last_365d'</span>)</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'true'</span>)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>dau_pred[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'smoothing'</span>)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>dau_pred2[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'365d'</span>)</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DAU, historical &amp; predicted'</span>)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>plt.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> make_prediction(PREDICTION_START, PREDICTION_END, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'seasonal_0.3'</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'true'</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>dau_pred[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'seasonal_0.3'</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DAU, historical &amp; predicted'</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>plt.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="dau_prediction_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="dau_prediction_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1671,11 +1794,17 @@ Name: cnt, dtype: int64</code></pre>
 </section>
 </section>
 <section id="discussion" class="level2">
-<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
-<p>Modeling DAU with Markov chain model seems</p>
-</section>
-<section id="conclusions" class="level2">
-<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<h2 class="anchored" data-anchor-id="discussion">5. Discussion</h2>
+<p>In the section 4 we studied the model performance from the prediction accuracy perspective. Now let’s discuss the model from the practical point of view. We compare it with the baseline model (see the section 4.1).</p>
+<p>Besides poor accuracy, predicting DAU as a time-series makes this approach very stiff. The only thing we can control here is the historical data. In practice, when making plans for the next year we have some certain expectations about the future. For example,</p>
+<ul>
+<li>the marketing team is going to launch some new more effective campaings,</li>
+<li>the activation team is planning to improve the onboarding process,</li>
+<li>the product team will release some new features that would engage and retain users more.</li>
+</ul>
+<p>Our model can take into account such expectations. For the examples above we can adjust the new users prediction, the <code>new</code>→<code>current</code> and the <code>current</code>→<code>current</code> conversion rates respectively. As a result we can get a prediction that is doesn’t match with the past data but would be more realistic. This model’s property is not just flexible – it’s interpretable. You can easily discuss all these adjustments with the stakeholders, and they can understand how the prediction works.</p>
+<p>Another advantage of the model is that it doesn’t require to predict whether a user will be active on a certain day. Sometimes binary classifiers are used for this purpose. The downside of this approach is that we need to apply such a classifier to each user including all the dormant users and each day. This is a tremedous computational cost. Unlike this, the Markov model requires only the initial amount of states (<code>state0</code>). Moreover, such classiffiers are often black-box models: they are poorly interpretable and hard to adjust.</p>
+<p>The Markov model also has some limitations. As we already have seen, it’s sensitive to the new users prediction. It’s easy to totally ruin the prediction by the wrong new users amount. Another problem is that the Markov model is memoryless meaning that it doesn’t take into account the user’s history. For example, it doesn’t distinguish whether a <code>current</code> user is a newbie, experienced, or just <code>reactivated</code>/<code>resurrected</code>. The retention rate of these user types should be certainly different. Also, as we discussed earlier the user bahavior might be of different nature depending on the season, marketing sources, countries, etc. So far our model is not able to capture these differences. However, this might be a subject for further research.</p>
 
 
 </section>
