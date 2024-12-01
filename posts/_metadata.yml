@@ -10,3 +10,7 @@ title-block-banner: true
 comments:
   utterances:
     repo: wowone/wowone.github.io
+
+format:
+  html:
+    highlight-style: pygments

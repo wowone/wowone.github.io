@@ -15,3 +15,7 @@ body {
     text-align: left;
 }
 
+.dataframe tr, th, td {
+    font-size: 13px;
+}
+
