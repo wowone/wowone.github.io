@@ -20,16 +20,16 @@
 
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">1. Introduction</h2>
-<p>Doubtlessly, DAU, WAU, and MAU are critical business metrics. An article <a href="https://www.lennysnewsletter.com/p/how-duolingo-reignited-user-growth">“How Duolingo reignited user growth”</a> by <a href="https://www.linkedin.com/in/jorgemazal/">Jorge Mazal</a>, former CPO of Duolingo, is #1 in the Growth section of Lenny’s Newsletter blog. In this article, Jorge paid special attention to the methodology Duolingo used to model DAU metrics (see another article <a href="https://blog.duolingo.com/growth-model-duolingo/">“Meaningful metrics: how data sharpened the focus of product teams”</a> by <a href="https://blog.duolingo.com/author/erin/">Erin Gustafson</a>). This methodology has multiple strengths, but I’d like to focus on how one can use this approach for DAU forecasting.</p>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Doubtlessly, DAU, WAU, and MAU are critical business metrics. An article <a href="https://www.lennysnewsletter.com/p/how-duolingo-reignited-user-growth">“How Duolingo reignited user growth”</a> by <a href="https://www.linkedin.com/in/jorgemazal/">Jorge Mazal</a>, former CPO of Duolingo, is #1 in the Growth section of Lenny’s Newsletter blog. In this article, Jorge paid special attention to the methodology Duolingo used to model the DAU metric (see another article <a href="https://blog.duolingo.com/growth-model-duolingo/">“Meaningful metrics: how data sharpened the focus of product teams”</a> by <a href="https://blog.duolingo.com/author/erin/">Erin Gustafson</a>). This methodology has multiple strengths, but I’d like to focus on how one can use this approach for DAU forecasting.</p>
 <p>The new year is coming soon, so many companies are planning their budgets for the next year these days. Cost estimations often require DAU forecasts. In this article, I’ll show how you can get this prediction using Duolingo’s growth model. I’ll explain why this approach is better compared to standard time-series forecasting methods and how you can adjust the prediction according to your teams’ plans (e.g., marketing, activation, product teams).</p>
-<p>The article text goes along with the code, and a simulated dataset is attached so the research is fully reproducible. The Jupyter notebook version is available <a href="https://github.com/wowone/wowone.github.io/blob/master/notebooks/2024-12-02_dau_prediction/dau_prediction.ipynb">here</a>. In the end, I’ll share a DAU “calculator” designed in Google Spreadsheet format.</p>
+<p>The article text goes along with the code, and a simulated dataset is attached so the research is fully reproducible. The Jupyter notebook version is available <a href="https://github.com/wowone/wowone.github.io/blob/master/posts/2024-12-02_dau_prediction/dau_prediction.ipynb">here</a>. In the end, I’ll share a DAU “calculator” designed in Google Spreadsheet format.</p>
 <p>I’ll be narrating on behalf of the collective “we”. I’m used to it because I usually write articles with co-authors.</p>
 </section>
-<section id="methodology" class="level2">
-<h2 class="anchored" data-anchor-id="methodology">2. Methodology</h2>
-<p>A quick recap on how the <a href="https://blog.duolingo.com/growth-model-duolingo/">Duolingo’s growth model</a> works. At day <img src="https://latex.codecogs.com/png.latex?d"> (<img src="https://latex.codecogs.com/png.latex?d=1,2,%5Cldots,">) of a user’s lifetime, the user can be in one of the following 7 (mutually-exclusive) states: <code>new</code>, <code>current</code>, <code>reactivated</code>, <code>resurrected</code>, <code>at_risk_wau</code>, <code>at_risk_mau</code>, <code>dormant</code>. The states are defined according to indicators of whether a user was active today, in the last 7 days, or in the last 30 days. The definition is given in the table below:</p>
+<section id="methodology" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="methodology"><span class="header-section-number">2</span> Methodology</h2>
+<p>A quick recap on how the <a href="https://blog.duolingo.com/growth-model-duolingo/">Duolingo’s growth model</a> works. At day <img src="https://latex.codecogs.com/png.latex?d"> (<img src="https://latex.codecogs.com/png.latex?d=1,2,%5Cldots,">) of a user’s lifetime, the user can be in one of the following 7 (mutually-exclusive) states: <code>new</code>, <code>current</code>, <code>reactivated</code>, <code>resurrected</code>, <code>at_risk_wau</code>, <code>at_risk_mau</code>, <code>dormant</code>. The states are defined according to indicators of whether a user was active today, in the last 7 days, or in the last 30 days. The definition summary is given in the table below:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -195,10 +195,10 @@ dormant
 </tr>
 </tbody></table>
 <p>Having these states defined (as a set <img src="https://latex.codecogs.com/png.latex?S">), we can consider user behavior as a <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov chain</a>. Here’s an example of a user’s trajectory: <code>new</code>→<code>current</code>→<code>current</code>→<code>at_risk_wau</code>→…→<code>at_risk_mau</code>→…→<code>dormant</code>. Let <img src="https://latex.codecogs.com/png.latex?M"> be a transition matrix associated with this Markov process: <img src="https://latex.codecogs.com/png.latex?m_%7Bi,%20j%7D%20=%20P(s_j%20%7C%20s_i)"> are the probabilities that a user moves to state <img src="https://latex.codecogs.com/png.latex?s_j"> right after being at state <img src="https://latex.codecogs.com/png.latex?s_i">, where <img src="https://latex.codecogs.com/png.latex?s_i,%20s_j%20%5Cin%20S">. Such a matrix is inferred from the historical data.</p>
-<p>If we assume that user behavior is stationary (independent of time), the matrix <img src="https://latex.codecogs.com/png.latex?M"> fully describes the states of all users in the future. Suppose that the vector <img src="https://latex.codecogs.com/png.latex?u_0"> of length 7 contains the counts of users in certain states on a given day, denoted as day 0. According to the Markov model, on the next day 1, we expect to have the following number of users <img src="https://latex.codecogs.com/png.latex?u_1">:</p>
+<p>If we assume that user behavior is stationary (independent of time), the matrix <img src="https://latex.codecogs.com/png.latex?M"> fully describes the states of all users in the future. Suppose that the vector <img src="https://latex.codecogs.com/png.latex?u_0"> of length 7 contains the counts of users in certain states on a given day, denoted as day 0. According to the Markov model, on the next day 1, we expect to have the following number of users states <img src="https://latex.codecogs.com/png.latex?u_1">:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cunderbrace%7B%0A%5Cbegin%7Bpmatrix%7D%20%20%5C#New_1%20%5C%5C%20%5C#Current_1%20%5C%5C%20%5C#Reactivated_1%20%5C%5C%20%5C#Resurrected_1%20%5C%5C%20%5C#AtRiskWau_1%20%5C%5C%20%5C#AtRiskMau_1%20%5C%5C%20%5C#Dormant_1%20%5Cend%7Bpmatrix%7D%0A%7D_%7Bu_1%7D%20=%20M%5ET%20%5Ccdot%0A%5Cunderbrace%7B%0A%5Cbegin%7Bpmatrix%7D%20%20%5C#New_0%20%5C%5C%20%5C#Current_0%20%5C%5C%20%5C#Reactivated_0%20%5C%5C%20%5C#Resurrected_0%20%5C%5C%20%5C#AtRiskWau_0%20%5C%5C%20%5C#AtRiskMau_0%20%5C%5C%20%5C#Dormant_0%20%5Cend%7Bpmatrix%7D%0A%7D_%7Bu_0%7D%0A"></p>
-<p>Applying this formula recursively, we derive the number of users at any arbitrary day <img src="https://latex.codecogs.com/png.latex?t%20%3E%200"> in the future. Besides the initial distribution <img src="https://latex.codecogs.com/png.latex?u_0">, we need to provide the number of new users that will appear in the product each day in the future. We’ll get this by using historical data on new users and applying the <a href="http://facebook.github.io/prophet/">prophet</a> library.</p>
-<p>Now, having <img src="https://latex.codecogs.com/png.latex?u_t"> calculated, we can determine DAU values at day <img src="https://latex.codecogs.com/png.latex?t">: <img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Bequation%7D%20DAU_t%20=%20%5C#New_t%20+%20%5C#Current_t%20+%20%5C#Reactivated_t%20+%20%5C#Resurrected_t%20%5Cend%7Bequation%7D."></p>
+<p>Applying this formula recursively, we derive the number of users in certain states on any arbitrary day <img src="https://latex.codecogs.com/png.latex?t%20%3E%200"> in the future. Besides the initial distribution <img src="https://latex.codecogs.com/png.latex?u_0">, we need to provide the number of new users that will appear in the product each day in the future. We’ll address this problem as a general time-series forecasting.</p>
+<p>Now, having <img src="https://latex.codecogs.com/png.latex?u_t"> calculated, we can determine DAU values on day <img src="https://latex.codecogs.com/png.latex?t">: <img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Bequation%7D%20DAU_t%20=%20%5C#New_t%20+%20%5C#Current_t%20+%20%5C#Reactivated_t%20+%20%5C#Resurrected_t%20%5Cend%7Bequation%7D."></p>
 <p>Additionally, we can easily calculate WAU and MAU metrics: <img src="https://latex.codecogs.com/png.latex?WAU_t%20=%20DAU_t%20+%20%5C#AtRiskWau_t,"> <img src="https://latex.codecogs.com/png.latex?MAU_t%20=%20DAU_t%20+%20%5C#AtRiskWau_t%20+%20%5C#AtRiskMau_t."></p>
 <p>Finally, here’s the algorithm outline:</p>
 <ol type="1">
@@ -210,11 +210,11 @@ dormant
 <li>Calculate DAU, WAU, and MAU for each prediction day <img src="https://latex.codecogs.com/png.latex?t=1,%20%5Cldots,%20T">.</li>
 </ol>
 </section>
-<section id="implementation" class="level2">
-<h2 class="anchored" data-anchor-id="implementation">3. Implementation</h2>
-<p>This section is devoted to technical aspects of the implementation. If you’re interested in studying the model properties rather than in code, you may skip this section and go to the next one.</p>
-<section id="dataset" class="level3">
-<h3 class="anchored" data-anchor-id="dataset">3.1 Dataset</h3>
+<section id="implementation" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="implementation"><span class="header-section-number">3</span> Implementation</h2>
+<p>This section is devoted to technical aspects of the implementation. If you’re interested in studying the model properties rather than code, you may skip this section and go to the Section&nbsp;4.</p>
+<section id="dataset" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="dataset"><span class="header-section-number">3.1</span> Dataset</h3>
 <p>We use a simulated dataset based on historical data of a SaaS app. The data is stored in the <a href="https://drive.google.com/file/d/16kd8rJBvcgmw95jY42MedRfIxcO4LpPd/view?usp=sharing">dau_data.csv.gz</a> file and contains three columns: <code>user_id</code>, <code>date</code>, and <code>registration_date</code>. Each record indicates a day when a user was active. The dataset includes activity indicators for 51480 users from <code>2020-11-01</code> to <code>2023-10-31</code>. Additionally, data from October 2020 is included to calculate user states properly, as the <code>at_risk_mau</code> and <code>dormant</code> states require data from one month prior.</p>
 <div id="d8e524c5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
@@ -380,7 +380,7 @@ font-style: inherit;">'DAU, historical'</span>)</span></code></pre></div>
 </div>
 </div>
 </div>
-<p>Suppose that today is 2022-10-31 and we want to predict the DAU metric for the next 2023 year. We define a couple of constants <code>PREDICTION_START</code> and <code>PREDICTION_END</code> which encompass the prediction period.</p>
+<p>Suppose that today is 2023-10-31 and we want to predict the DAU metric for the next 2024 year. We define a couple of global constants <code>PREDICTION_START</code> and <code>PREDICTION_END</code> which encompass the prediction period.</p>
 <div id="8cc8c106" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">PREDICTION_START <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -394,10 +394,10 @@ background-color: null;
 font-style: inherit;">'2024-12-31'</span></span></code></pre></div>
 </div>
 </section>
-<section id="predicting-new-users-amount" class="level3">
-<h3 class="anchored" data-anchor-id="predicting-new-users-amount">3.2 Predicting new users amount</h3>
-<p>Let’s start from the new users prediction. We use the <code>prophet</code> library as one of the easiest ways to forecast time-series data. The <code>new_users</code> Series contains such data. We extract it from the original <code>df</code> dataset selecting the rows where the registration date is equal to the date.</p>
-<div id="8d953a72" class="cell" data-execution_count="4">
+<section id="predicting-new-users-amount" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="predicting-new-users-amount"><span class="header-section-number">3.2</span> Predicting new users amount</h3>
+<p>Let’s start from the new users prediction. We use the <a href="http://facebook.github.io/prophet/">prophet</a> library as one of the easiest ways to forecast time-series data. The <code>new_users</code> Series contains such data. We extract it from the original <code>df</code> dataset selecting the rows where the <code>registration date</code> is equal to the <code>date</code>.</p>
+<div id="8d953a72" class="cell" data-execution_count="34">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">new_users <span class="op" style="color: #5E5E5E;
@@ -411,14 +411,7 @@ background-color: null;
 font-style: inherit;">'registration_date'</span>]]<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">\</span></span>
-<span id="cb5-2">    .assign(date<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>pd.to_datetime(df[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'date'</span>]))<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">\</span></span>
-<span id="cb5-3">    .groupby(<span class="st" style="color: #20794D;
+<span id="cb5-2">    .groupby(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'date'</span>).size()</span></code></pre></div>
 </details>
@@ -435,7 +428,7 @@ font-style: inherit;">'date'</span>).size()</span></code></pre></div>
 dtype: int64</code></pre>
 </div>
 </div>
-<p><code>prophet</code> requires a time-series as a DataFrame containing two columns <code>ds</code> and <code>y</code>, so we reformat the <code>new_users</code> Series to the <code>new_users_prophet</code> DataFrame. Another thing we need to prepare is to create the <code>future</code> variable containing certain days for prediction: from <code>prediction_start</code> to <code>prediction_start</code>. The plot illustrates predictions for both past and future periods. Tis logic is implemented in the <code>predict_new_users</code> function.</p>
+<p><code>prophet</code> requires a time-series as a DataFrame containing two columns <code>ds</code> and <code>y</code>, so we reformat the <code>new_users</code> Series to the <code>new_users_prophet</code> DataFrame. Another thing we need to prepare is to create the <code>future</code> variable containing certain days for prediction: from <code>prediction_start</code> to <code>prediction_end</code>. This logic is implemented in the <code>predict_new_users</code> function. The plot below illustrates predictions for both past and future periods.</p>
 <div id="cc95c915" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Toggle the code</summary>
@@ -654,10 +647,10 @@ Name: count, dtype: int64</code></pre>
 </div>
 </div>
 </section>
-<section id="getting-the-states" class="level3">
-<h3 class="anchored" data-anchor-id="getting-the-states">3.3 Getting the states</h3>
-<p>In practice, the most calculations are reasonable to execute as SQL queries to a database where the data is stored. Hereafter, we will simulate such querying using the <code>duckdb</code> library.</p>
-<p>We want to assign one of the 7 states to each day of a user’s lifetime within the app. According to the definition, for each day, we need to consider at least the past 30 days. This is where SQL window functions come in. However, since the <code>df</code> data contains only records of <em>active days</em>, we need to explicitly extend it and include the days when a user was not active. In other words, instead of this list of records:</p>
+<section id="getting-the-states" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="getting-the-states"><span class="header-section-number">3.3</span> Getting the states</h3>
+<p>In practice, the most calculations are reasonable to execute as SQL queries to a database where the data is stored. Hereafter, we will simulate such querying using the <a href="https://duckdb.org">duckdb</a> library.</p>
+<p>We want to assign one of the 7 states to each day of a user’s lifetime within the app. According to the definition, for each day, we need to consider at least the past 30 days. This is where SQL window functions come in. However, since the <code>df</code> data contains only records of <em>active days</em>, we need to explicitly extend them and include the days when a user was not active. In other words, instead of this list of records:</p>
 <pre><code>user_id    date          registration_date
 1234567    2023-01-01    2023-01-01
 1234567    2023-01-03    2023-01-01</code></pre>
@@ -907,9 +900,9 @@ font-style: inherit;">=</span> duckdb.sql(query).df()</span></code></pre></div>
 </div>
 </div>
 </section>
-<section id="calculating-the-transition-matrix" class="level3">
-<h3 class="anchored" data-anchor-id="calculating-the-transition-matrix">3.4 Calculating the transition matrix</h3>
-<p>Having obtained these states, we can calculate state transition frequencies. In the next section we’ll study how the prediction depends on a period in which transitions are considered, so it’s reasonable to pre-aggregate this data on daily basis. Thus the output <code>transitions</code> DataFrame contains <code>date</code>, <code>state_from</code>, <code>state_to</code>, and <code>cnt</code> columns.</p>
+<section id="calculating-the-transition-matrix" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="calculating-the-transition-matrix"><span class="header-section-number">3.4</span> Calculating the transition matrix</h3>
+<p>Having obtained these states, we can calculate state transition frequencies. In the Section&nbsp;4.3 we’ll study how the prediction depends on a period in which transitions are considered, so it’s reasonable to pre-aggregate this data on daily basis. The resulting <code>transitions</code> DataFrame contains <code>date</code>, <code>state_from</code>, <code>state_to</code>, and <code>cnt</code> columns.</p>
 <div id="f2385527" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Toggle the code</summary>
@@ -1175,7 +1168,7 @@ font-weight: bold;
 font-style: inherit;">return</span> M</span></code></pre></div>
 </details>
 </div>
-<p>As a baseline, let’s calculate the transition matrix for the whole year from <code>2021-11-01</code> to <code>2022-10-31</code>.</p>
+<p>As a baseline, let’s calculate the transition matrix for the whole year from <code>2022-11-01</code> to <code>2023-10-31</code>.</p>
 <div id="c481d451" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1">M <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1291,8 +1284,8 @@ font-style: inherit;">'2023-10-31'</span>)</span>
 </div>
 <p>The sum of each row of any transition matrix equals 1 since it represents the probabilities of moving from one state to any other state.</p>
 </section>
-<section id="getting-the-initial-state-counts" class="level3">
-<h3 class="anchored" data-anchor-id="getting-the-initial-state-counts">3.5 Getting the initial state counts</h3>
+<section id="getting-the-initial-state-counts" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="getting-the-initial-state-counts"><span class="header-section-number">3.5</span> Getting the initial state counts</h3>
 <p>An initial state is retrieved from the <code>states</code> DataFrame by the <code>get_state0</code> function and the corresponding SQL query. The only argument of the function is the date for which we want to get the initial state. We assign the result to the <code>state0</code> variable.</p>
 <div id="33b26b29" class="cell" data-execution_count="15">
 <details class="code-fold">
@@ -1363,8 +1356,8 @@ Name: cnt, dtype: int64</code></pre>
 </div>
 </div>
 </section>
-<section id="predicting-dau" class="level3">
-<h3 class="anchored" data-anchor-id="predicting-dau">3.6 Predicting DAU</h3>
+<section id="sec-predicting-dau" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="sec-predicting-dau"><span class="header-section-number">3.6</span> Predicting DAU</h3>
 <p>The <code>predict_dau</code> function below accepts all the previous variables required for the DAU prediction and makes this prediction for a date range defined by the <code>start_date</code> and <code>end_date</code> arguments.</p>
 <div id="ffd464d7" class="cell" data-execution_count="17">
 <details class="code-fold">
@@ -1748,7 +1741,7 @@ font-style: inherit;">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTI
 </div>
 </div>
 <p>This is how the DAU prediction <code>dau_pred</code> looks like for the <code>PREDICTION_START</code> - <code>PREDICTION_END</code> period. Besides the expected <code>dau</code>, <code>wau</code>, and <code>mau</code> columns, the output contains the number of users in each state for each prediction date.</p>
-<p>Finally, we calculate the ground-truth values of DAU, WAU, and MAU (along with the corresponding state decomposition), keep them in the <code>dau_true</code> DataFrame, and plot the predicted and true values altogether.</p>
+<p>Finally, we calculate the ground-truth values of DAU, WAU, and MAU (along with the user state counts), keep them in the <code>dau_true</code> DataFrame, and plot the predicted and true values altogether.</p>
 <div id="c7223b81" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Toggle the code</summary>
@@ -1952,7 +1945,7 @@ font-style: inherit;">'at_risk_mau'</span>]</span></code></pre></div>
 </div>
 </div>
 </div>
-<div id="87251bb7" class="cell" data-execution_count="32">
+<div id="87251bb7" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">pd.concat([dau_true[<span class="st" style="color: #20794D;
@@ -1992,19 +1985,18 @@ font-style: inherit;">;</span></span></code></pre></div>
 <p>We’ve obtained the prediction but so far it’s not clear whether it’s fair or not. In the next section, we’ll evaluate the model.</p>
 </section>
 </section>
-<section id="model-evaluation" class="level2">
-<h2 class="anchored" data-anchor-id="model-evaluation">4. Model evaluation</h2>
-<section id="baseline-comparison" class="level3">
-<h3 class="anchored" data-anchor-id="baseline-comparison">4.1 Baseline comparison</h3>
-<p>First of all, let’s check whether we really need to build a complex model to predict DAU. Wouldn’t it be better to predict DAU as a general time-series using the mentioned <code>prophet</code> library? The function <code>predict_dau_simple</code> implements this. We try to use some tweaks available in the library in order to make the prediction more accurate:</p>
+<section id="sec-model-evaluation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-model-evaluation"><span class="header-section-number">4</span> Model evaluation</h2>
+<section id="sec-baseline-model" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="sec-baseline-model"><span class="header-section-number">4.1</span> Baseline model</h3>
+<p>First of all, let’s check whether we really need to build a complex model to predict DAU. Wouldn’t it be better to predict DAU as a general time-series using the mentioned <code>prophet</code> library? The function <code>predict_dau_prophet</code> below implements this. We try to use some tweaks available in the library in order to make the prediction more accurate. In particular:</p>
 <ul>
-<li>we use logistic model instead of linear in order to avoid negative values;</li>
+<li>we use logistic model instead of linear to avoid negative values;</li>
 <li>we add explicitly monthly and yearly seasonality;</li>
-<li>we remove the outliers.</li>
-<li>we set explicitly define peak values for January and February as “holidays”.</li>
+<li>we remove the outliers;</li>
+<li>we explicitly define a peak period in January and February as “holidays”.</li>
 </ul>
-<p>The fact that the code turns out to be quite sophisticated indicates that one can’t simply apply <code>prophet</code> to the DAU time-series.</p>
-<div id="be3bc544" class="cell">
+<div id="be3bc544" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><span class="kw" style="color: #003B4F;
@@ -2305,6 +2297,7 @@ font-weight: bold;
 font-style: inherit;">return</span> pred</span></code></pre></div>
 </details>
 </div>
+<p>The fact that the code turns out to be quite sophisticated indicates that one can’t simply apply <code>prophet</code> to the DAU time-series.</p>
 <p>Hereafter we test a prediction for multiple predicting horizonts: 3, 6, and 12 months. As a result, we get 3 test sets:</p>
 <ul>
 <li>3-months horizont: <code>2023-08-01</code> - <code>2023-10-31</code>,</li>
@@ -2312,7 +2305,7 @@ font-style: inherit;">return</span> pred</span></code></pre></div>
 <li>1-year horizont: <code>2022-11-01</code> - <code>2023-10-31</code>.</li>
 </ul>
 <p>For each test set we calculate the <a href="https://en.wikipedia.org/wiki/Mean_absolute_percentage_error">MAPE</a> loss function.</p>
-<div id="5a0e673e" class="cell">
+<div id="5a0e673e" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><span class="im" style="color: #00769E;
@@ -2428,14 +2421,13 @@ font-style: inherit;">'MAPE'</span>: mapes})</span>
 </div>
 </div>
 </div>
-<p>The MAPE error turns out to be high: 18% - 35%. The fact that the shortest horizont has the highest error means that the model is tuned for the long-term predictions. This is another inconvenience of such an approach: we have to tune the model for each prediction horizont.</p>
-<p>Anyway, this is our baseline. In the next section we’ll compare it with more advanced models.</p>
+<p>The MAPE error turns out to be high: 18% - 35%. The fact that the shortest horizont has the highest error means that the model is tuned for the long-term predictions. This is another inconvenience of such an approach: we have to tune the model for each prediction horizont. Anyway, this is our baseline. In the next section we’ll compare it with more advanced models.</p>
 </section>
-<section id="general-evaluation" class="level3">
-<h3 class="anchored" data-anchor-id="general-evaluation">4.2 General evaluation</h3>
-<p>In this section we evaluate the model implemented in the section 3. So far we set the transition period as 1 year before the prediction start. We’ll study how the prediction depends on the transition period in the next section. As for the new users, we run the model using two options: the real values and the predicted ones. Similarly, we fix the same 3 prediction horizonts and test the model on them.</p>
-<p>The <code>make_predicion</code> helper function below implements the described opttions. It accepts <code>prediction_start</code>, <code>prediction_end</code> arguments defining the prediction period for a given horizont, <code>new_users_mode</code> which can be either <code>true</code> or <code>predict</code>, and <code>transition_period</code>. The options of the latter argument will be explained further.</p>
-<div id="2a7c7a08" class="cell">
+<section id="sec-general-evaluation" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="sec-general-evaluation"><span class="header-section-number">4.2</span> General evaluation</h3>
+<p>In this section we evaluate the model implemented in the Section&nbsp;3.6. So far we set the transition period as 1 year before the prediction start. We’ll study how the prediction depends on the transition period in the Section&nbsp;4.3. As for the new users, we run the model using two options: the real values and the predicted ones. Similarly, we fix the same 3 prediction horizonts and test the model on them.</p>
+<p>The <code>make_predicion</code> helper function below implements the described options. It accepts <code>prediction_start</code>, <code>prediction_end</code> arguments defining the prediction period for a given horizont, <code>new_users_mode</code> which can be either <code>true</code> or <code>predict</code>, and <code>transition_period</code>. The options of the latter argument will be explained further.</p>
+<div id="2a7c7a08" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><span class="im" style="color: #00769E;
@@ -2788,8 +2780,8 @@ font-weight: bold;
 font-style: inherit;">return</span> mape</span></code></pre></div>
 </details>
 </div>
-<p>In total, we have 6 prediction scenarios: 2 options for new users and 3 prediction horizonts. The diagram below illustrate the results. The charts on the left relate to the <code>new_users_mode = 'true'</code> option, while the right ones relate to the <code>new_users_mode = 'predict'</code> option.</p>
-<div id="2def0809" class="cell">
+<p>In total, we have 6 prediction scenarios: 2 options for new users and 3 prediction horizonts. The diagram below illustrates the results. The charts on the left relate to the <code>new_users_mode = 'predict'</code> option, while the right ones relate to the <code>new_users_mode = 'true'</code> option.</p>
+<div id="2def0809" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">fig, axs <span class="op" style="color: #5E5E5E;
@@ -2917,7 +2909,7 @@ font-style: inherit;">'MAPE'</span>])</span>
 </div>
 </div>
 <p>And here are the MAPE values summarizing the prediction quality:</p>
-<div id="c457ce87" class="cell" data-execution_count="26">
+<div id="c457ce87" class="cell">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">mapes.pivot(index<span class="op" style="color: #5E5E5E;
@@ -2928,7 +2920,7 @@ font-style: inherit;">'horizont'</span>, columns<span class="op" style="color: #
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'new_users'</span>, values<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'new_users_mode'</span>, values<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -2981,7 +2973,7 @@ font-style: inherit;">'MAPE'</span>)</span></code></pre></div>
 <li>Interestingly, the true new users data provides worse results for the 3-months prediction. This is nothing but a coincidence. The wrong new users prediction in October 2023 reversed the predicted DAU trend and made MAPE a bit lower.</li>
 </ul>
 <p>Now, let’s decompose the prediction error and see which states contribure the most. By error we mean here <code>dau_pred</code> - <code>dau_true</code> values, by relative error – (<code>dau_pred</code> - <code>dau_true</code>) / <code>dau_true</code> – see left and right diagrams below correspondingly. In order to focus on this aspect, we’ll narrow the configuration to the 3-months prediction horizont and the <code>new_users_mode='true'</code> option.</p>
-<div id="8384a2ee" class="cell" data-execution_count="33">
+<div id="8384a2ee" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1">dau_component_cols <span class="op" style="color: #5E5E5E;
@@ -3078,14 +3070,14 @@ font-style: inherit;">;</span></span></code></pre></div>
 </div>
 </div>
 </div>
-<p>From the left chart we notice that the error is basically contributed by the <code>current</code> state. It’s not surprising since this state contributes to DAU the most. The error for the <code>reactivated</code>, and <code>resurrected</code> states is quite low. Another interesting thing is that this error is mostly negative for the <code>current</code> state and mostly positive for the <code>resurrected state</code>. The former might be explained by the fact that the new users who appeared in the prediction period are more engaged that the users from the past. The latter indicates that the <code>resurrected</code> users in reality contribute to DAU less than the transition matrix expects.</p>
-<p>As for the relative error on the right chart, it makes sense to analyze it for the <code>current</code> state only. This is because the daily amount of the reactivated and resurrected states are low so the relative error is high and noisy. The relative error for the <code>current</code> state varies between -25% and 4% which is quite high. And since we’ve fixed the new users prediction, this error is explained by the transition matrix inaccuracy only. In particular, the <code>current</code> -&gt; <code>current</code> conversion rate is roughly 0.8 which is high and, as a result, it contributes to the error a lot. So if we want to improve the prediction we need to consider tuning primarily this conversion rate.</p>
+<p>From the left chart we notice that the error is basically contributed by the <code>current</code> state. It’s not surprising since this state contributes to DAU the most. The error for the <code>reactivated</code>, and <code>resurrected</code> states is quite low. Another interesting thing is that this error is mostly negative for the <code>current</code> state and mostly positive for the <code>resurrected</code> state. The former might be explained by the fact that the new users who appeared in the prediction period are more engaged that the users from the past. The latter indicates that the <code>resurrected</code> users in reality contribute to DAU less than the transition matrix expects, so the <code>dormant</code>→<code>resurrected</code> conversion rate is overestimated.</p>
+<p>As for the relative error, it makes sense to analyze it for the <code>current</code> state only. This is because the daily amount of the reactivated and resurrected states are low so the relative error is high and noisy. The relative error for the <code>current</code> state varies between -25% and 4% which is quite high. And since we’ve fixed the new users prediction, this error is explained by the transition matrix inaccuracy only. In particular, the <code>current</code>→<code>current</code> conversion rate is roughly 0.8 which is high and, as a result, it contributes to the error a lot. So if we want to improve the prediction we need to consider tuning this conversion rate foremost.</p>
 </section>
-<section id="transitions-period-impact" class="level3">
-<h3 class="anchored" data-anchor-id="transitions-period-impact">4.3 Transitions period impact</h3>
-<p>In the previous section we kept the transitions period fixed – 1 year before a prediction start. Now we’re going to study how long this period should be to get more accurate prediction. We consider the same prediction horizonts of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount: <code>new_users_mode='true'</code>.</p>
-<p>Here comes varying of the <code>transition_period</code> argument. Its values are masked with the <code>last_&lt;N&gt;d</code> pattern where <code>N</code> stands for the number of days in a transitions period. For each prediction horizont we calculate 12 different transition periods of 1, 2, …, 12 months. Then we calculate the MAPE error for each of the option and plot the results.</p>
-<div id="1d5fc43c" class="cell">
+<section id="sec-transitions-period-impact" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="sec-transitions-period-impact"><span class="header-section-number">4.3</span> Transitions period impact</h3>
+<p>In the previous section we kept the transitions period fixed: 1 year before a prediction start. Now we’re going to study how long this period should be to get more accurate prediction. We consider the same prediction horizonts of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount: <code>new_users_mode='true'</code>.</p>
+<p>Here comes varying of the <code>transition_period</code> argument. Its values are masked with the <code>last_&lt;N&gt;d</code> pattern where <code>N</code> stands for the number of days in a transitions period. For each prediction horizont we calculate 12 different transition periods of 1, 2, …, 12 months. Then we calculate the MAPE error for each of the options and plot the results.</p>
+<div id="1d5fc43c" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1">result <span class="op" style="color: #5E5E5E;
@@ -3208,16 +3200,16 @@ font-style: inherit;">;</span></span></code></pre></div>
 </div>
 <p>It turns out that the optimal transitions period depends on the prediction horizont. Shorter horizonts require shorter transitions periods: the minimal MAPE error is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. Apparently, this is because the longer horizonts contain some seasonal effects that could be captured only by the longer transitions periods. Also, it seems that for the longer prediction horizonts the MAPE curve is U-shaped meaning that too long and too short transitions periods are both not good for the prediction. We’ll develop this idea in the next section.</p>
 </section>
-<section id="obsolence-and-seasonality" class="level3">
-<h3 class="anchored" data-anchor-id="obsolence-and-seasonality">4.4 Obsolence and seasonality</h3>
-<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, the user behavior varies depending on a season. For example, users who appear after Christmas might have some shifts in behavior. Another typical situation is when users change their behavior in summer. In this section, we’ll try to take into account these seasonal effects.</p>
-<p>So we want to predict DAU for the 1 year ahead starting from November 2022. Instead of using a single transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> which is calculated for the last 8 months before the prediction start, according to the previous subsection results (and labeled as the <code>last_240d</code> option below), we’ll consider a mixture of this matrix and a seasonal one <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D">. The latter is calculated on monthly basis lagging 1 year behind. For example, to predict DAU for November 2022 we define <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> as the transition matrix for November 2021. Then we shift the prediction horizont to December 2022 and calculate <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> for December 2021, etc.</p>
+<section id="obsolence-and-seasonality" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="obsolence-and-seasonality"><span class="header-section-number">4.4</span> Obsolence and seasonality</h3>
+<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, user behavior varies depending on a season. For example, users who appear after Christmas might have some shifts in behavior. Another typical situation is when users change their behavior in summer. In this section, we’ll try to take into account these seasonal effects.</p>
+<p>So we want to predict DAU for 1 year ahead starting from November 2022. Instead of using a single transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> which is calculated for the last 8 months before the prediction start, according to the previous subsection results (and labeled as the <code>last_240d</code> option below), we’ll consider a mixture of this matrix and a seasonal one <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D">. The latter is calculated on monthly basis lagging 1 year behind. For example, to predict DAU for November 2022 we define <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> as the transition matrix for November 2021. Then we shift the prediction horizont to December 2022 and calculate <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> for December 2021, etc.</p>
 <p>In order to mix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> and <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> we define the following two options.</p>
 <ul>
 <li><code>seasonal_0.3</code>: <img src="https://latex.codecogs.com/png.latex?M%20=%200.3%20%5Ccdot%20M_%7Bseasonal%7D%20+%200.7%20%5Ccdot%20M_%7Bbase%7D">. 0.3 is a weight that was chosen as a local minimum after some experiments.</li>
 <li><code>smoothing</code>: <img src="https://latex.codecogs.com/png.latex?M%20=%20%5Cfrac%7Bi%7D%7BN%20-%201%7D%20M_%7Bseasonal%7D%20+%20(1%20-%20%5Cfrac%7Bi%7D%7BN%20-%201%7D)%20M_%7Bbase%7D"> where <img src="https://latex.codecogs.com/png.latex?N"> is the number of months within the predicting period, <img src="https://latex.codecogs.com/png.latex?i%20=%200,%20%5Cldots,%20N%20-%201"> – the month index. The idea of this configuration is to gradually switch from the most recent transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> to seasonal ones as the prediction month moves forward from the prediction start.</li>
 </ul>
-<div id="6bf81796" class="cell">
+<div id="6bf81796" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">result <span class="op" style="color: #5E5E5E;
@@ -3279,7 +3271,7 @@ font-style: inherit;">;</span></span></code></pre></div>
 </div>
 </div>
 </div>
-<div id="fe73fae5" class="cell">
+<div id="fe73fae5" class="cell" data-execution_count="30">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">mape <span class="op" style="color: #5E5E5E;
@@ -3339,12 +3331,12 @@ font-style: inherit;">'true'</span>], result[col])</span>
 </div>
 </div>
 </div>
-<p>According to the MAPE errors, <code>seasonal_0.3</code> configuration provides the best results. Interestingly, <code>smoothing</code> approach has appeared to be even worse than the <code>last_240d</code>. From the diagram above we see that all three models start to underestimate the DAU values from July 2023, especially the <code>smoothing</code> model. It seems that the new users who started appearing from July 2023 are more engaged than the users from 2022. Probably, the app was improved sufficiently or the marketing team did a great job. As a result, the <code>smoothing</code> model that much relies on the outdated transitions data from July 2022 - October 2022 fails more than the other models.</p>
+<p>According to the MAPE errors, <code>seasonal_0.3</code> configuration provides the best results. Interestingly, <code>smoothing</code> approach has appeared to be even worse than the <code>last_240d</code>. From the diagram above we see that all three models start to underestimate the DAU values in July 2023, especially the <code>smoothing</code> model. It seems that the new users who started appearing in July 2023 are more engaged than the users from 2022. Probably, the app was improved sufficiently or the marketing team did a great job. As a result, the <code>smoothing</code> model that much relies on the outdated transitions data from July 2022 - October 2022 fails more than the other models.</p>
 </section>
-<section id="final-solution" class="level3">
-<h3 class="anchored" data-anchor-id="final-solution">4.5 Final solution</h3>
+<section id="final-solution" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="final-solution"><span class="header-section-number">4.5</span> Final solution</h3>
 <p>To sum things up, let’s make a final prediction for the 2024 year. We use the <code>seasonal_0.3</code> configuration and the predicted values for new users.</p>
-<div id="8fb64c7e" class="cell" data-execution_count="34">
+<div id="8fb64c7e" class="cell" data-execution_count="31">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1">dau_pred <span class="op" style="color: #5E5E5E;
@@ -3402,19 +3394,19 @@ font-style: inherit;">;</span></span></code></pre></div>
 </div>
 </section>
 </section>
-<section id="discussion" class="level2">
-<h2 class="anchored" data-anchor-id="discussion">5. Discussion</h2>
-<p>In the section 4 we studied the model performance from the prediction accuracy perspective. Now let’s discuss the model from the practical point of view. We compare it with the baseline model (see the section 4.1).</p>
-<p>Besides poor accuracy, predicting DAU as a time-series makes this approach very stiff. Essentially, it makes a prediction so it would fit the <em>historical</em> data best. In practice, when making plans for the next year we usually have some certain expectations about the future. For example,</p>
+<section id="discussion" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="discussion"><span class="header-section-number">5</span> Discussion</h2>
+<p>In the Section&nbsp;4 we studied the model performance from the prediction accuracy perspective. Now let’s discuss the model from the practical point of view.</p>
+<p>Besides poor accuracy, predicting DAU as a time-series (see the Section&nbsp;4.1) makes this approach very stiff. Essentially, it makes a prediction in such a manner so it would fit <em>historical</em> data best. In practice, when making plans for a next year we usually have some certain expectations about the future. For example,</p>
 <ul>
 <li>the marketing team is going to launch some new more effective campaings,</li>
 <li>the activation team is planning to improve the onboarding process,</li>
 <li>the product team will release some new features that would engage and retain users more.</li>
 </ul>
 <p>Our model can take into account such expectations. For the examples above we can adjust the new users prediction, the <code>new</code>→<code>current</code> and the <code>current</code>→<code>current</code> conversion rates respectively. As a result, we can get a prediction that doesn’t match with the historical data but nevertheless would be more realistic. This model’s property is not just flexible – it’s interpretable. You can easily discuss all these adjustments with the stakeholders, and they can understand how the prediction works.</p>
-<p>Another advantage of the model is that it doesn’t require predicting whether a user will be active on a certain day. Sometimes binary classifiers are used for this purpose. The downside of this approach is that we need to apply such a classifier to each user including all the dormant users and each day from a prediction horizont. This is a tremedous computational cost. In contrast, the Markov model requires only the initial amount of states (<code>state0</code>). Moreover, such classiffiers are often black-box models: they are poorly interpretable and hard to adjust.</p>
-<p>The Markov model also has some limitations. As we already have seen, it’s sensitive to the new users prediction. It’s easy to totally ruin the prediction by the wrong new users amount. Another problem is that the Markov model is memoryless meaning that it doesn’t take into account the user’s history. For example, it doesn’t distinguish whether a <code>current</code> user is a newbie, experienced, or <code>reactivated</code>/<code>resurrected</code> one. The retention rate of these user types should be certainly different. Also, as we discussed earlier, the user behavior might be of different nature depending on the season, marketing sources, countries, etc. So far our model is not able to capture these differences. However, this might be a subject for further research: we could extend the model by fitting more transition matrices for different user segments.</p>
-<p>Finally, as we promised in the introduction, we provide a <a href="https://docs.google.com/spreadsheets/d/1DxbjrkSy_wvU1lzlNWhrEfWO-Kq1tJrQw0izEHu5ULU/edit?usp=sharing">DAU spreadsheet calculator</a>. In the <code>Prediction</code> sheet you’ll need to fill the initial states distribution row (marked with blue) and the new users prediction column (marked with purple). In the <code>Conversions</code> sheet you can adjust the transition matrix values. Remember that the sum of each row should be equal to 1.</p>
+<p>Another advantage of the model is that it doesn’t require predicting whether a certain user will be active on a certain day. Sometimes binary classifiers are used for this purpose. The downside of this approach is that we need to apply such a classifier to each user including all the dormant users and each day from a prediction horizont. This is a tremedous computational cost. In contrast, the Markov model requires only the initial amount of states (<code>state0</code>). Moreover, such classiffiers are often black-box models: they are poorly interpretable and hard to adjust.</p>
+<p>The Markov model also has some limitations. As we already have seen, it’s sensitive to the new users prediction. It’s easy to totally ruin the prediction by a wrong new users amount. Another problem is that the Markov model is memoryless meaning that it doesn’t take into account the user’s history. For example, it doesn’t distinguish whether a <code>current</code> user is a newbie, experienced, or <code>reactivated</code>/<code>resurrected</code> one. The retention rate of these user types should be certainly different. Also, as we discussed earlier, the user behavior might be of different nature depending on the season, marketing sources, countries, etc. So far our model is not able to capture these differences. However, this might be a subject for further research: we could extend the model by fitting more transition matrices for different user segments.</p>
+<p>Finally, as we promised in the introduction, we provide a <a href="https://docs.google.com/spreadsheets/d/1DxbjrkSy_wvU1lzlNWhrEfWO-Kq1tJrQw0izEHu5ULU/edit?usp=sharing">DAU spreadsheet calculator</a>. In the <code>Prediction</code> sheet you’ll need to fill the initial states distribution row (marked with blue) and the new users prediction column (marked with purple). In the <code>Conversions</code> sheet you can adjust the transition matrix values. Remember that the sum of each row of the matrix should be equal to 1.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://wowone.github.io/posts/2024-12-02_dau_prediction/dau_prediction_files/figure-html/2b5c1f9a-1-image.png" class="img-fluid figure-img"></p>
