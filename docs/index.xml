@@ -397,7 +397,7 @@ font-style: inherit;">'2024-12-31'</span></span></code></pre></div>
 <section id="predicting-new-users-amount" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="predicting-new-users-amount"><span class="header-section-number">3.2</span> Predicting new users amount</h3>
 <p>Let’s start from the new users prediction. We use the <a href="http://facebook.github.io/prophet/">prophet</a> library as one of the easiest ways to forecast time-series data. The <code>new_users</code> Series contains such data. We extract it from the original <code>df</code> dataset selecting the rows where the <code>registration date</code> is equal to the <code>date</code>.</p>
-<div id="8d953a72" class="cell" data-execution_count="34">
+<div id="8d953a72" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">new_users <span class="op" style="color: #5E5E5E;
@@ -2298,11 +2298,11 @@ font-style: inherit;">return</span> pred</span></code></pre></div>
 </details>
 </div>
 <p>The fact that the code turns out to be quite sophisticated indicates that one can’t simply apply <code>prophet</code> to the DAU time-series.</p>
-<p>Hereafter we test a prediction for multiple predicting horizonts: 3, 6, and 12 months. As a result, we get 3 test sets:</p>
+<p>Hereafter we test a prediction for multiple predicting horizons: 3, 6, and 12 months. As a result, we get 3 test sets:</p>
 <ul>
-<li>3-months horizont: <code>2023-08-01</code> - <code>2023-10-31</code>,</li>
-<li>6-months horizont: <code>2023-05-01</code> - <code>2023-10-31</code>,</li>
-<li>1-year horizont: <code>2022-11-01</code> - <code>2023-10-31</code>.</li>
+<li>3-months horizon: <code>2023-08-01</code> - <code>2023-10-31</code>,</li>
+<li>6-months horizon: <code>2023-05-01</code> - <code>2023-10-31</code>,</li>
+<li>1-year horizon: <code>2022-11-01</code> - <code>2023-10-31</code>.</li>
 </ul>
 <p>For each test set we calculate the <a href="https://en.wikipedia.org/wiki/Mean_absolute_percentage_error">MAPE</a> loss function.</p>
 <div id="5a0e673e" class="cell" data-execution_count="23">
@@ -2322,7 +2322,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'2023-10-31'</span></span>
-<span id="cb30-5">prediction_horizont <span class="op" style="color: #5E5E5E;
+<span id="cb30-5">prediction_horizon <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> [<span class="dv" style="color: #AD0000;
 background-color: null;
@@ -2338,7 +2338,7 @@ font-weight: bold;
 font-style: inherit;">for</span> offset <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">in</span> prediction_horizont:</span>
+font-style: inherit;">in</span> prediction_horizon:</span>
 <span id="cb30-8">    prediction_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(prediction_end) <span class="op" style="color: #5E5E5E;
@@ -2382,7 +2382,7 @@ font-style: inherit;">'dau'</span>].reindex(pred.index), pred)</span>
 background-color: null;
 font-style: inherit;">=</span> pd.DataFrame({<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'horizont'</span>: prediction_horizont, <span class="st" style="color: #20794D;
+font-style: inherit;">'horizon'</span>: prediction_horizon, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'MAPE'</span>: mapes})</span>
 <span id="cb30-16">mapes</span></code></pre></div>
@@ -2395,7 +2395,7 @@ font-style: inherit;">'MAPE'</span>: mapes})</span>
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">horizont</th>
+<th data-quarto-table-cell-role="th">horizon</th>
 <th data-quarto-table-cell-role="th">MAPE</th>
 </tr>
 </thead>
@@ -2421,12 +2421,12 @@ font-style: inherit;">'MAPE'</span>: mapes})</span>
 </div>
 </div>
 </div>
-<p>The MAPE error turns out to be high: 18% - 35%. The fact that the shortest horizont has the highest error means that the model is tuned for the long-term predictions. This is another inconvenience of such an approach: we have to tune the model for each prediction horizont. Anyway, this is our baseline. In the next section we’ll compare it with more advanced models.</p>
+<p>The MAPE error turns out to be high: 18% - 35%. The fact that the shortest horizon has the highest error means that the model is tuned for the long-term predictions. This is another inconvenience of such an approach: we have to tune the model for each prediction horizon. Anyway, this is our baseline. In the next section we’ll compare it with more advanced models.</p>
 </section>
 <section id="sec-general-evaluation" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="sec-general-evaluation"><span class="header-section-number">4.2</span> General evaluation</h3>
-<p>In this section we evaluate the model implemented in the Section&nbsp;3.6. So far we set the transition period as 1 year before the prediction start. We’ll study how the prediction depends on the transition period in the Section&nbsp;4.3. As for the new users, we run the model using two options: the real values and the predicted ones. Similarly, we fix the same 3 prediction horizonts and test the model on them.</p>
-<p>The <code>make_predicion</code> helper function below implements the described options. It accepts <code>prediction_start</code>, <code>prediction_end</code> arguments defining the prediction period for a given horizont, <code>new_users_mode</code> which can be either <code>true</code> or <code>predict</code>, and <code>transition_period</code>. The options of the latter argument will be explained further.</p>
+<p>In this section we evaluate the model implemented in the Section&nbsp;3.6. So far we set the transition period as 1 year before the prediction start. We’ll study how the prediction depends on the transition period in the Section&nbsp;4.3. As for the new users, we run the model using two options: the real values and the predicted ones. Similarly, we fix the same 3 prediction horizon and test the model on them.</p>
+<p>The <code>make_predicion</code> helper function below implements the described options. It accepts <code>prediction_start</code>, <code>prediction_end</code> arguments defining the prediction period for a given horizon, <code>new_users_mode</code> which can be either <code>true</code> or <code>predict</code>, and <code>transition_period</code>. The options of the latter argument will be explained further.</p>
 <div id="2a7c7a08" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>Toggle the code</summary>
@@ -2780,7 +2780,7 @@ font-weight: bold;
 font-style: inherit;">return</span> mape</span></code></pre></div>
 </details>
 </div>
-<p>In total, we have 6 prediction scenarios: 2 options for new users and 3 prediction horizonts. The diagram below illustrates the results. The charts on the left relate to the <code>new_users_mode = 'predict'</code> option, while the right ones relate to the <code>new_users_mode = 'true'</code> option.</p>
+<p>In total, we have 6 prediction scenarios: 2 options for new users and 3 prediction horizons. The diagram below illustrates the results. The charts on the left relate to the <code>new_users_mode = 'predict'</code> option, while the right ones relate to the <code>new_users_mode = 'true'</code> option.</p>
 <div id="2def0809" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>Toggle the code</summary>
@@ -2805,7 +2805,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'2023-10-31'</span></span>
-<span id="cb32-4">prediction_horizont <span class="op" style="color: #5E5E5E;
+<span id="cb32-4">prediction_horizon <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> [<span class="dv" style="color: #AD0000;
 background-color: null;
@@ -2823,7 +2823,7 @@ background-color: null;
 font-weight: bold;
 font-style: inherit;">in</span> <span class="bu" style="color: null;
 background-color: null;
-font-style: inherit;">enumerate</span>(prediction_horizont):</span>
+font-style: inherit;">enumerate</span>(prediction_horizon):</span>
 <span id="cb32-7">    prediction_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(prediction_end) <span class="op" style="color: #5E5E5E;
@@ -2893,7 +2893,7 @@ font-style: inherit;">=</span> pd.DataFrame(mapes, columns<span class="op" style
 background-color: null;
 font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'horizont'</span>, <span class="st" style="color: #20794D;
+font-style: inherit;">'horizon'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'new_users'</span>, <span class="st" style="color: #20794D;
 background-color: null;
@@ -2909,24 +2909,24 @@ font-style: inherit;">'MAPE'</span>])</span>
 </div>
 </div>
 <p>And here are the MAPE values summarizing the prediction quality:</p>
-<div id="c457ce87" class="cell">
+<div id="c457ce87" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">mapes.pivot(index<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'horizont'</span>, columns<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'horizon'</span>, columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'new_users_mode'</span>, values<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'new_users'</span>, values<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'MAPE'</span>)</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="26">
+<div class="cell-output cell-output-display" data-execution_count="27">
 <div>
 
 
@@ -2938,7 +2938,7 @@ font-style: inherit;">'MAPE'</span>)</span></code></pre></div>
 <th data-quarto-table-cell-role="th">true</th>
 </tr>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">horizont</th>
+<th data-quarto-table-cell-role="th">horizon</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
 </tr>
@@ -2968,12 +2968,12 @@ font-style: inherit;">'MAPE'</span>)</span></code></pre></div>
 <p>We notice multiple things.</p>
 <ul>
 <li>In general, the model demonstrates much better results than the baseline. Indeed, the baseline is based on the historical DAU data only, while the model uses the user states information.</li>
-<li>However, for the 1-year horizont and <code>new_users_mode='predict'</code> the MAPE error is huge: 65%. This is 3 times higher than the corresponding baseline error (21%). On the other hand, <code>new_users_mode='true'</code> option gives a much better result: 8%. It means that the new users prediction has a huge impact on the model, especially for long-term predictions. For the shorter periods the difference is less dramatic. The major reason for such a difference is that 1-year period includes Christmas with its extreme values. As a result, i) it’s hard to predict such high new user values, ii) the period heavily impacts user behavior, the transition matrix and, consequently, DAU values. Hence, we strongly recommend to implement the new user prediction carefully. The baseline model was specially tuned for this Christmas period, so it’s not surprising that it outperforms the Markov model.</li>
+<li>However, for the 1-year horizon and <code>new_users_mode='predict'</code> the MAPE error is huge: 65%. This is 3 times higher than the corresponding baseline error (21%). On the other hand, <code>new_users_mode='true'</code> option gives a much better result: 8%. It means that the new users prediction has a huge impact on the model, especially for long-term predictions. For the shorter periods the difference is less dramatic. The major reason for such a difference is that 1-year period includes Christmas with its extreme values. As a result, i) it’s hard to predict such high new user values, ii) the period heavily impacts user behavior, the transition matrix and, consequently, DAU values. Hence, we strongly recommend to implement the new user prediction carefully. The baseline model was specially tuned for this Christmas period, so it’s not surprising that it outperforms the Markov model.</li>
 <li>When the new users prediction is accurate, the model captures trends well. It means that using last 365 days for the transition matrix calculation is a reasonable choice.</li>
 <li>Interestingly, the true new users data provides worse results for the 3-months prediction. This is nothing but a coincidence. The wrong new users prediction in October 2023 reversed the predicted DAU trend and made MAPE a bit lower.</li>
 </ul>
-<p>Now, let’s decompose the prediction error and see which states contribure the most. By error we mean here <code>dau_pred</code> - <code>dau_true</code> values, by relative error – (<code>dau_pred</code> - <code>dau_true</code>) / <code>dau_true</code> – see left and right diagrams below correspondingly. In order to focus on this aspect, we’ll narrow the configuration to the 3-months prediction horizont and the <code>new_users_mode='true'</code> option.</p>
-<div id="8384a2ee" class="cell" data-execution_count="27">
+<p>Now, let’s decompose the prediction error and see which states contribure the most. By error we mean here <code>dau_pred</code> - <code>dau_true</code> values, by relative error – (<code>dau_pred</code> - <code>dau_true</code>) / <code>dau_true</code> – see left and right diagrams below correspondingly. In order to focus on this aspect, we’ll narrow the configuration to the 3-months prediction horizon and the <code>new_users_mode='true'</code> option.</p>
+<div id="8384a2ee" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1">dau_component_cols <span class="op" style="color: #5E5E5E;
@@ -3075,9 +3075,9 @@ font-style: inherit;">;</span></span></code></pre></div>
 </section>
 <section id="sec-transitions-period-impact" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="sec-transitions-period-impact"><span class="header-section-number">4.3</span> Transitions period impact</h3>
-<p>In the previous section we kept the transitions period fixed: 1 year before a prediction start. Now we’re going to study how long this period should be to get more accurate prediction. We consider the same prediction horizonts of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount: <code>new_users_mode='true'</code>.</p>
-<p>Here comes varying of the <code>transition_period</code> argument. Its values are masked with the <code>last_&lt;N&gt;d</code> pattern where <code>N</code> stands for the number of days in a transitions period. For each prediction horizont we calculate 12 different transition periods of 1, 2, …, 12 months. Then we calculate the MAPE error for each of the options and plot the results.</p>
-<div id="1d5fc43c" class="cell" data-execution_count="28">
+<p>In the previous section we kept the transitions period fixed: 1 year before a prediction start. Now we’re going to study how long this period should be to get more accurate prediction. We consider the same prediction horizon of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount: <code>new_users_mode='true'</code>.</p>
+<p>Here comes varying of the <code>transition_period</code> argument. Its values are masked with the <code>last_&lt;N&gt;d</code> pattern where <code>N</code> stands for the number of days in a transitions period. For each prediction horizon we calculate 12 different transition periods of 1, 2, …, 12 months. Then we calculate the MAPE error for each of the options and plot the results.</p>
+<div id="1d5fc43c" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1">result <span class="op" style="color: #5E5E5E;
@@ -3090,7 +3090,7 @@ font-weight: bold;
 font-style: inherit;">for</span> prediction_offset <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">in</span> prediction_horizont:</span>
+font-style: inherit;">in</span> prediction_horizon:</span>
 <span id="cb35-4">    prediction_start <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.to_datetime(prediction_end) <span class="op" style="color: #5E5E5E;
@@ -3198,18 +3198,18 @@ font-style: inherit;">;</span></span></code></pre></div>
 </div>
 </div>
 </div>
-<p>It turns out that the optimal transitions period depends on the prediction horizont. Shorter horizonts require shorter transitions periods: the minimal MAPE error is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. Apparently, this is because the longer horizonts contain some seasonal effects that could be captured only by the longer transitions periods. Also, it seems that for the longer prediction horizonts the MAPE curve is U-shaped meaning that too long and too short transitions periods are both not good for the prediction. We’ll develop this idea in the next section.</p>
+<p>It turns out that the optimal transitions period depends on the prediction horizon. Shorter horizons require shorter transitions periods: the minimal MAPE error is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. Apparently, this is because the longer horizons contain some seasonal effects that could be captured only by the longer transitions periods. Also, it seems that for the longer prediction horizons the MAPE curve is U-shaped meaning that too long and too short transitions periods are both not good for the prediction. We’ll develop this idea in the next section.</p>
 </section>
 <section id="obsolence-and-seasonality" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="obsolence-and-seasonality"><span class="header-section-number">4.4</span> Obsolence and seasonality</h3>
 <p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, user behavior varies depending on a season. For example, users who appear after Christmas might have some shifts in behavior. Another typical situation is when users change their behavior in summer. In this section, we’ll try to take into account these seasonal effects.</p>
-<p>So we want to predict DAU for 1 year ahead starting from November 2022. Instead of using a single transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> which is calculated for the last 8 months before the prediction start, according to the previous subsection results (and labeled as the <code>last_240d</code> option below), we’ll consider a mixture of this matrix and a seasonal one <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D">. The latter is calculated on monthly basis lagging 1 year behind. For example, to predict DAU for November 2022 we define <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> as the transition matrix for November 2021. Then we shift the prediction horizont to December 2022 and calculate <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> for December 2021, etc.</p>
+<p>So we want to predict DAU for 1 year ahead starting from November 2022. Instead of using a single transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> which is calculated for the last 8 months before the prediction start, according to the previous subsection results (and labeled as the <code>last_240d</code> option below), we’ll consider a mixture of this matrix and a seasonal one <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D">. The latter is calculated on monthly basis lagging 1 year behind. For example, to predict DAU for November 2022 we define <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> as the transition matrix for November 2021. Then we shift the prediction horizon to December 2022 and calculate <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> for December 2021, etc.</p>
 <p>In order to mix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> and <img src="https://latex.codecogs.com/png.latex?M_%7Bseasonal%7D"> we define the following two options.</p>
 <ul>
 <li><code>seasonal_0.3</code>: <img src="https://latex.codecogs.com/png.latex?M%20=%200.3%20%5Ccdot%20M_%7Bseasonal%7D%20+%200.7%20%5Ccdot%20M_%7Bbase%7D">. 0.3 is a weight that was chosen as a local minimum after some experiments.</li>
 <li><code>smoothing</code>: <img src="https://latex.codecogs.com/png.latex?M%20=%20%5Cfrac%7Bi%7D%7BN%20-%201%7D%20M_%7Bseasonal%7D%20+%20(1%20-%20%5Cfrac%7Bi%7D%7BN%20-%201%7D)%20M_%7Bbase%7D"> where <img src="https://latex.codecogs.com/png.latex?N"> is the number of months within the predicting period, <img src="https://latex.codecogs.com/png.latex?i%20=%200,%20%5Cldots,%20N%20-%201"> – the month index. The idea of this configuration is to gradually switch from the most recent transition matrix <img src="https://latex.codecogs.com/png.latex?M_%7Bbase%7D"> to seasonal ones as the prediction month moves forward from the prediction start.</li>
 </ul>
-<div id="6bf81796" class="cell" data-execution_count="29">
+<div id="6bf81796" class="cell" data-execution_count="30">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">result <span class="op" style="color: #5E5E5E;
@@ -3271,7 +3271,7 @@ font-style: inherit;">;</span></span></code></pre></div>
 </div>
 </div>
 </div>
-<div id="fe73fae5" class="cell" data-execution_count="30">
+<div id="fe73fae5" class="cell" data-execution_count="31">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">mape <span class="op" style="color: #5E5E5E;
@@ -3301,7 +3301,7 @@ background-color: null;
 font-style: inherit;">'true'</span>], result[col])</span>
 <span id="cb37-5">mape</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="30">
+<div class="cell-output cell-output-display" data-execution_count="31">
 <div>
 
 
@@ -3336,7 +3336,7 @@ font-style: inherit;">'true'</span>], result[col])</span>
 <section id="final-solution" class="level3" data-number="4.5">
 <h3 data-number="4.5" class="anchored" data-anchor-id="final-solution"><span class="header-section-number">4.5</span> Final solution</h3>
 <p>To sum things up, let’s make a final prediction for the 2024 year. We use the <code>seasonal_0.3</code> configuration and the predicted values for new users.</p>
-<div id="8fb64c7e" class="cell" data-execution_count="31">
+<div id="8fb64c7e" class="cell" data-execution_count="32">
 <details class="code-fold">
 <summary>Toggle the code</summary>
 <div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1">dau_pred <span class="op" style="color: #5E5E5E;
@@ -3404,7 +3404,7 @@ font-style: inherit;">;</span></span></code></pre></div>
 <li>the product team will release some new features that would engage and retain users more.</li>
 </ul>
 <p>Our model can take into account such expectations. For the examples above we can adjust the new users prediction, the <code>new</code>→<code>current</code> and the <code>current</code>→<code>current</code> conversion rates respectively. As a result, we can get a prediction that doesn’t match with the historical data but nevertheless would be more realistic. This model’s property is not just flexible – it’s interpretable. You can easily discuss all these adjustments with the stakeholders, and they can understand how the prediction works.</p>
-<p>Another advantage of the model is that it doesn’t require predicting whether a certain user will be active on a certain day. Sometimes binary classifiers are used for this purpose. The downside of this approach is that we need to apply such a classifier to each user including all the dormant users and each day from a prediction horizont. This is a tremedous computational cost. In contrast, the Markov model requires only the initial amount of states (<code>state0</code>). Moreover, such classiffiers are often black-box models: they are poorly interpretable and hard to adjust.</p>
+<p>Another advantage of the model is that it doesn’t require predicting whether a certain user will be active on a certain day. Sometimes binary classifiers are used for this purpose. The downside of this approach is that we need to apply such a classifier to each user including all the dormant users and each day from a prediction horizon. This is a tremedous computational cost. In contrast, the Markov model requires only the initial amount of states (<code>state0</code>). Moreover, such classiffiers are often black-box models: they are poorly interpretable and hard to adjust.</p>
 <p>The Markov model also has some limitations. As we already have seen, it’s sensitive to the new users prediction. It’s easy to totally ruin the prediction by a wrong new users amount. Another problem is that the Markov model is memoryless meaning that it doesn’t take into account the user’s history. For example, it doesn’t distinguish whether a <code>current</code> user is a newbie, experienced, or <code>reactivated</code>/<code>resurrected</code> one. The retention rate of these user types should be certainly different. Also, as we discussed earlier, the user behavior might be of different nature depending on the season, marketing sources, countries, etc. So far our model is not able to capture these differences. However, this might be a subject for further research: we could extend the model by fitting more transition matrices for different user segments.</p>
 <p>Finally, as we promised in the introduction, we provide a <a href="https://docs.google.com/spreadsheets/d/1DxbjrkSy_wvU1lzlNWhrEfWO-Kq1tJrQw0izEHu5ULU/edit?usp=sharing">DAU spreadsheet calculator</a>. In the <code>Prediction</code> sheet you’ll need to fill the initial states distribution row (marked with blue) and the new users prediction column (marked with purple). In the <code>Conversions</code> sheet you can adjust the transition matrix values. Remember that the sum of each row of the matrix should be equal to 1.</p>
 <div class="quarto-figure quarto-figure-center">
