@@ -6,6 +6,29 @@ body {
     font-size: 16px;
 }
 
+.header-section-number {
+    color: inherit;
+}
+
+/* removing extra space in headers */
+.quarto-title-banner {
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+
+.quarto-title-meta {
+    display: block !important;
+    text-align: right;
+}
+
+.quarto-title-meta-heading {
+    margin-top: 0px !important;
+}
+.quarto-banner-title-block {
+    margin-top: 0px;
+}
+
+/* floating images */
 .float-figure {
     float: left;
     margin-right: 20px; /* adjust the margin for spacing */
@@ -16,6 +39,7 @@ body {
     text-align: left;
 }
 
+/* tables formatting */
 .dataframe tr, th, td {
     font-size: 13px;
 }
