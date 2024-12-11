@@ -1,0 +1,27 @@
+---
+title: "Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research"
+date: "2024-12-16"
+draft: true
+categories: [review, quant UXR]
+---
+
+
+When I started my journey as a quantitative UX researcher, I was looking for literature that could provide me with a solid foundation in this area. The book [Quantitative User Experience Research](https://quantuxbook.com/) by Chris Chapman and Kerry Rodden seemed to be a perfect fit for this purpose. Today I'd like to share my thoughts on this book.
+
+Both authors are Ph.D. researchers with extensive experience in the industry. Chris Chapman is a psychologist, currently working as a a Principal UX Researcher at Amazon Lab126. You may be aware of his other books "R for Marketing Research and Analytics" and "Python for Marketing". Kerry Rodden a Senior Principal Researcher at Code for America previously worked at Google and founded the quantitative UX research role there. Probably you've heard about HEART metrics framework, so he's the one who introduced it. As you can see, the authors have a solid background in the field.
+
+Generally speaking, the book is a good starting point for those who want to dive into quantitative UX research. It covers a wide range of topics, from overview of the field to practical advice on how to conduct research. However, I found the general parts too general while practical parts turned out to be too shallow for me. Perhaps, it's because I already have some experience in product analytics, but I expected to get more interesting insights and practical tips from the book. I was quite upset when the authors said that this or that aspect is out of the scope of the book. Come on, this is what I expected to see here! Nevertherless, it was good to refresh some basics, follow the authors' narrative, get some new ideas and references.
+
+The only part I'd like to focus on, part III, relates to some practical aspects of quantitative UX research. The other parts represent rather a big picture of the field and seemed not interesting to me, e.g. state of the art, introduction to statistics and programming (that was especially surprising for me: just a single chapter for such broad topics), career advices, etc.
+
+So part III is called "Tools and Techniques" and consists of 4 chapters.
+
+Chapter 7 "Metrics of User Experience" is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It's a well-known topic, there are many articles on this everywhere (for example, see [Kerry's original paper](https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/)), so I won't go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it's a summary of [another Kerry's paper](https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/)), but besides that, there's nothing practical more in this chapter. Unfortunately.
+
+Funny fact. From this chapter, I finally understood how Gmail labels work. Yes, I still sort emails into folders in old-fashioned way, but I will stop doing this now, I promise. It turned out that, as a Gmail user, it took me 15 years to adopt this feature.
+
+
+
+
+
+
