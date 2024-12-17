@@ -1,7 +1,7 @@
 ---
 title: "Sequen-C: A Multilevel Overview of Temporal Event Sequences"
 date: "2024-11-05"
-categories: [journalclub, clickstream visualizations]
+categories: [journalclub, UX visualizations]
 ---
 
 My name is Vladimir Kukushkin. I've been working as a data analyst/data scientist for more than 10 years. A couple of years ago I heavily shifted to quantitative UX research area which turned into my passion. While eagerly trying to find some sources to read regarding this topic, I realized that there are not so many of them. That's why I decided to write a series of posts towards quantitative UX research. Basically, it will be reviews of papers, books and other publications that I find insightful. I'd be happy to find here enthusiasts who are also interested in this domain.

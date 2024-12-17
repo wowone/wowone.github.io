@@ -3,9 +3,9 @@ project:
   output-dir: docs
 
 website:
-  title: "Quant UX researcher's blog"
+  title: "Quant UX research journal"
   site-url: https://wowone.github.io
-  description: "Vladimir Kukushkin's personal space"
+  description: "Vladimir Kukushkin's blog"
   navbar:
     right:
       - about.qmd
@@ -15,6 +15,7 @@ website:
         href: https://www.linkedin.com/in/vladimir-kukushkin/
       - icon: rss
         href: index.xml
+  draft-mode: unlinked
 format:
   html:
     theme: litera
