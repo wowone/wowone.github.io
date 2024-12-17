@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2024-12-16">
 
-<title>Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research – Quant UX researcher’s blog</title>
+<title>Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research – Quant UX research journal</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -81,7 +81,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Quant UX researcher’s blog</span>
+    <span class="navbar-title">Quant UX research journal</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -155,14 +155,226 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>When I started my journey as a quantitative UX researcher, I was looking for literature that could provide me with a solid foundation in this area. The book <a href="https://quantuxbook.com/">Quantitative User Experience Research</a> by Chris Chapman and Kerry Rodden seemed to be a perfect fit for this purpose. Today I’d like to share my thoughts on this book.</p>
+<section id="general-impression" class="level2">
+<h2 class="anchored" data-anchor-id="general-impression">General impression</h2>
 <p>Both authors are Ph.D.&nbsp;researchers with extensive experience in the industry. Chris Chapman is a psychologist, currently working as a a Principal UX Researcher at Amazon Lab126. You may be aware of his other books “R for Marketing Research and Analytics” and “Python for Marketing”. Kerry Rodden a Senior Principal Researcher at Code for America previously worked at Google and founded the quantitative UX research role there. Probably you’ve heard about HEART metrics framework, so he’s the one who introduced it. As you can see, the authors have a solid background in the field.</p>
 <p>Generally speaking, the book is a good starting point for those who want to dive into quantitative UX research. It covers a wide range of topics, from overview of the field to practical advice on how to conduct research. However, I found the general parts too general while practical parts turned out to be too shallow for me. Perhaps, it’s because I already have some experience in product analytics, but I expected to get more interesting insights and practical tips from the book. I was quite upset when the authors said that this or that aspect is out of the scope of the book. Come on, this is what I expected to see here! Nevertherless, it was good to refresh some basics, follow the authors’ narrative, get some new ideas and references.</p>
 <p>The only part I’d like to focus on, part III, relates to some practical aspects of quantitative UX research. The other parts represent rather a big picture of the field and seemed not interesting to me, e.g.&nbsp;state of the art, introduction to statistics and programming (that was especially surprising for me: just a single chapter for such broad topics), career advices, etc.</p>
-<p>So part III is called “Tools and Techniques” and consists of 4 chapters.</p>
-<p>Chapter 7 “Metrics of User Experience” is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It’s a well-known topic, there are many articles on this everywhere (for example, see <a href="https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/">Kerry’s original paper</a>), so I won’t go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it’s a summary of <a href="https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/">another Kerry’s paper</a>), but besides that, there’s nothing practical more in this chapter. Unfortunately.</p>
+</section>
+<section id="part-iii.-tools-and-techniques" class="level2">
+<h2 class="anchored" data-anchor-id="part-iii.-tools-and-techniques">Part III. Tools and Techniques</h2>
+<p>The part consists of 4 chapters. I’ll briefly summarize each of them sharing my thoughts on them.</p>
+<section id="chapter-7-metrics-of-user-experience" class="level3">
+<h3 class="anchored" data-anchor-id="chapter-7-metrics-of-user-experience">Chapter 7 “Metrics of User Experience”</h3>
+<p>This chapter is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It’s a well-known topic, there are many articles on this everywhere (for example, see <a href="https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/">Kerry’s original paper</a>), so I won’t go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it’s a summary of <a href="https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/">another Kerry’s paper</a>), but besides that, there’s nothing practical more in this chapter. Unfortunately.</p>
 <p>Funny fact. From this chapter, I finally understood how Gmail labels work. Yes, I still sort emails into folders in old-fashioned way, but I will stop doing this now, I promise. It turned out that, as a Gmail user, it took me 15 years to adopt this feature.</p>
+</section>
+<section id="chapter-8-customer-satisfaction-surveys" class="level3">
+<h3 class="anchored" data-anchor-id="chapter-8-customer-satisfaction-surveys">Chapter 8 “Customer Satisfaction Surveys”</h3>
+<p>This chapter is devoted to some practical aspects of Customer Satisfaction surveys (CSat) analysis. Since I rarely deal with surveys in my work, I was curious to extend my knowledge in this area.</p>
+<p>The most surprising fact for me was that the Net Promoter Score (NPS) is far away from being <a href="https://hbr.org/2003/12/the-one-number-you-need-to-grow">“the one number you need to grow”</a> as it was claimed by Frederick F. Reichheld. As a data analyst, I could expect that obviously one number can’t be enough to describe the whole customer satisfaction, but now I can’t understand why it’s still so popular.</p>
+<p>The chapter is provided with a nice and reproducible (code + dataset) example of how to analyze survey data using R. The most interesting part here was yet another example of Simpson’s paradox. The authors showed a declining trend for CSat for a product rolled out in the US and Germany while the same CSat metric was flat for the US and increasing for Germany. The reason, as you may have guessed, was in the different distribution of responses in these countries: the US respondents gave higher scores on average and their share was decreasing over time.</p>
+<p>Finally, the following couple of quotes is worth to be mentioned, no comments needed.</p>
+<blockquote class="blockquote">
+<p>It is common for CSat to remain constant for an be perplexed by this and ask, “We released great feature X! Why isn’t CSat going up?” There are many possible answers to this, but two fundamental ones are that customers don’t care as much as you do about your features; and respondents often answer such questions with a high-level brand evaluation, which changes slowly. Also, when a product is performing well, an unchanging rating is a good thing. The important thing is to use CSat as an indicator of health.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Stakeholders often want to know which factors lead to or “drive” CSat. This is often approached with a large survey and a regression model to look for predictors of CSat; see Chapter 7 in <a href="https://link.springer.com/book/10.1007/978-3-030-14316-9">25</a> or in <a href="https://link.springer.com/book/10.1007/978-3-030-49720-0">127</a>. Unfortunately, such data often has high collinearity (correlation among items) that makes statistical modeling difficult or impossible. We largely recommend to avoid such efforts and to focus on qualitative assessment of reasons for satisfaction or dissatisfaction. If you decide to pursue driver analysis, you’ll want to investigate collinearity and dimensional reduction (discussed in Section 8.6). This involves iterative research to understand relationships in the data and build models that isolate and estimate the important effects.</p>
+</blockquote>
+<p>However, I’m curious why correlation among items seems to be a problem. Some models, such as decision trees or its modifications, should handle correlated features well.</p>
+</section>
+<section id="chapter-9-log-sequence-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="chapter-9-log-sequence-visualization">Chapter 9 “Log Sequence Visualization”</h3>
+<p>I won’t lie if I say that I started reading this book because of this chapter mostly. I know how difficult it is to visualize user behavior data, so I was hoping to get some new ideas. In a nutshell, the only approach the authors demonstrate here is a sunburst diagram. I heard about it later but I’ve never used it in my work, so the comprehensive and reproducible example (again, with R code and a dataset, many thanks to the authors) was quite helpful.</p>
+<p>However, plenty of other visualizations and approaches were not even mentioned even in “Learning more” subsection (look at <a href="https://www.sciencedirect.com/science/article/pii/S0097849323000717">this overwhelming survey</a> for example). I was disappointed. On the other hand, this strengthened my belief that I should keep reviewing papers and writing about them here.</p>
+</section>
+<section id="chapter-10-maxdiff-prioritizing-features-and-user-needs" class="level3">
+<h3 class="anchored" data-anchor-id="chapter-10-maxdiff-prioritizing-features-and-user-needs">Chapter 10 “MaxDiff: Prioritizing Features and User Needs”</h3>
+<p>Yet another promising chapter that my eye caught. The problem that I solve occasionally as a product analyst is how to rank product features according to user preferences. Whereas I basically work with event logs and try to interpret user behavior as a signal of satisfaction, the authors describe an approach based on survey data. The idea of the MaxDiff method is to ask respondents a simple question like “Which item engages you MOST LIKELY and LEAST LIKELY?” for a set of items split into multiple smaller sets. Applying some math, you can get a preference score for each item along with the corresponding confidence interval. As a result, you can not only rank the items but also estimate the significance of the differences between them.</p>
+<p>The chapter provides a step-by-step guide on how to conduct such a survey and a lot of practical advice. As usual, a reproducible example with R code and a dataset is included. Frankly speaking, I didn’t dive into all the details but now I definitely know where to look for them when I need them.</p>
+</section>
+</section>
+<section id="personal-notes" class="level2">
+<h2 class="anchored" data-anchor-id="personal-notes">Personal notes</h2>
+<p>Below I put (for personal use mostly) notes and highlights that I made while reading the book rather.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Notes">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Notes
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p>Which area should you emphasize? It depends on your skills and interests! Beyond that, we have one suggestion: in recent years we have observed that the survey area is in particularly high demand and often outstrips the available skills of Quant UXRs. <strong>Page 51</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>To pose a single question, ask yourself whether you prefer to work with more nebulous, open-ended, primary research problems centered on users—with a substantial chance of any project failing—or you prefer more structured, clearer projects where success consists of improving tools, processes, and reports used by executive stakeholders. The former aligns better with Quant UXR, whereas the latter aligns with analyst positions. <strong>Page 56</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>For social scientists, and especially psychologists, Chris has elsewhere described how skills in human research are advantageous for the activities and needs of general UX research [17]. For statisticians, Tim Hesterberg has outlined common projects, job opportunities, and ways to learn more about roles for statisticians at Google [59]. <strong>Page 61</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>If you conclude that your interests align best with general UX research, an excellent guide to descriptive and basic inferential statistics for UX is Sauro and Lewis, Quantifying the User Experience [124]. Note that Quant UX roles expect a higher level of skill in statistics and experimental design than their book describes. <strong>Page 62</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Conjoint analysis: An introduction to conjoint analysis in R is given in the R companion text [25]. Bryan Orme has written a less technical introduction with extensive guidance for practitioners and research managers [106]. <strong>Page 62</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>In-product and online surveys: A common mistake with surveys is asking what you want to know—instead of what respondents are able to tell you [20]. Too many surveys are not planned well, written well, or pre-tested. Jarrett’s Surveys That Work [63] is a practical guide that emphasizes careful consideration of the decisions you might take according to survey results, and then designing appropriate research plans and items to inform those decisions. More detailed guidance and a comprehensive summary of empirically-based recommendations is Callegaro et al., Web Survey Methodology [12]. If you do many surveys, we recommend that you learn about scale development and psychometrics generally; DeVellis’s Scale Development [39] is an outstanding, approachable introduction. <strong>Page 63</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Experience sampling: These methods range from almost exclusively qualitative approaches, such as diary studies, to longitudinal structural models. A good introduction is Silvia and Cotter, Researching Daily Life [133]. Bolger and Laurenceau [7] discuss technical methods for analysis of longitudinal within-person events and responses, with code for many examples available in R as well as SAS, SPSS, Mplus, and HLM. <strong>Page 64</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>A classic paper by John Gourville, “Why Consumers Don’t Buy” [52], describes how product teams greatly overestimate the value of their offerings. <strong>Page 73</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>4.3 Research Validity <strong>Page 74</strong></p>
+</blockquote>
+<p>Good chapter. Worth reading.</p>
+<blockquote class="blockquote">
+<p>Unfortunately, the incentives in industry research too often lead to inadequate research planning, short timelines, excessive optimism, and rewards for delivering what stakeholders want to hear. Simultaneously there is little appreciation of research quality, especially when it delivers an unwanted answer. This situation can trap even the most earnest and well-intentioned researchers unless they take care to remain diligent about research quality. <strong>Page 74</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Chris and his colleagues have written about other examples that overpromise and have weak scientific bases, including personas (fictional descriptions of users) and the Kano method (a two-item survey that promises to indicate the strategic priority of product features) [24] <strong>Page 75</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>If interested, see Norton [102] for an introduction to metrics for software development.) <strong>Page 76</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>For more on this, see the discussion of sample size planning in Nielsen [99]. <strong>Page 77</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Don Norman’s book The Design of Everyday Things [101] is a classic and enjoyable introduction to thinking like a UX researcher or designer. <strong>Page 84</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Meanwhile, we emphasize this general point: the most important aspects of statistical analysis occur before any data are collected, when you decide on the details of the experimental design. <strong>Page 97</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>A hands-on example of approaching linear modeling in this way is given in Section 7.3 in the companion R [25] and Python [127] texts. <strong>Page 98</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>There is a relevant, famous quote from the statistician John Tukey, “The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data.” [143]. <strong>Page 99</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Those of us who work with data often become caught up in the excitement of understanding users, and stakeholders often share the view that the goal of UX research is to understand users. We believe this is admirable but incorrect; our task is to help stakeholders to make decisions about products. <strong>Page 99</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Statisticians have warned of the misunderstandings and “fantasies” [14] of statistical significance for decades. <strong>Page 100</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>while King, Churchill, and Tan, Designing with Data [69], is focused on the application of A/B testing to design and UX. <strong>Page 103</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>A comprehensive yet approachable guide is Furr, Psychometrics: An Introduction [46]. <strong>Page 104</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Kline’s Principles and Practice of Structural Equation Modeling [70] is a definitive guide with attention to best practices. <strong>Page 104</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>For a complete, enjoyable, eye-opening, readable, and all-around excellent grounding in Bayesian statistical methods, we highly recommend Richard McElreath’s Statistical Rethinking [94]. <strong>Page 104</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Scott Cunningham provides a superb and fun introduction in Causal Inference: The Mixtape [38]. <strong>Page 105</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>For further depth, clustering methods are covered in depth by Everitt et al.&nbsp;in Cluster Analysis [43]. Outstanding coverage of classification methods using R is given in Kuhn and Johnson, Applied Predictive Modeling [76]. <strong>Page 105</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>However, SQL is not a general-purpose language and thus is neither sufficient nor necessary for Quant UX work. We have included a section on SQL in this chapter to help you decide if you want to learn it. <strong>Page 110</strong></p>
+</blockquote>
+<p>RLY?</p>
+<blockquote class="blockquote">
+<p>A good starting point is Tsitoara, Beginning Git and GitHub [142]. <strong>Page 118</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>For Python, a great second book that helps you to think like a Python programmer and solidify your skills is Beyond the Basic Stuff with Python [138]. <strong>Page 121</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>The term “Happiness” came from “Happiness Tracking Surveys (HaTS)” [95] <strong>Page 126</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>The landscape of metrics tools such as dashboard engines is large and constantly changing, so we will not make recommendations here. <strong>Page 131</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Let’s look at a real example of applying HEART and Goals-Signals-Metrics, from one of Kerry’s early Quant UXR projects at Google [119]. <strong>Page 133</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>At the time of the launch, there was an increased incidence of undo-like actions associated with labeling (e.g., removing a label immediately after it was added), perhaps indicating that users were making more errors. This quickly returned to its previous level, so there was no cause for concern. <strong>Page 136</strong></p>
+</blockquote>
+<p>Looks suspicious. Rolling back to the previous values doesn’t mean that the root reason has really gone.</p>
+<blockquote class="blockquote">
+<p>This particular pitfall is well-known enough that it has a name, Goodhart’s Law, phrased by Marilyn Strathern [137] as, “When a measure becomes a target, it ceases to be a good measure.” <strong>Page 139</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>The Gmail labels example is written up in more detail in a case study paper from the same conference [119]. <strong>Page 141</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Our general feeling is that using NPS invites many more problems than it solves, and a standard CSat score is preferable. In a situation where an executive demands an NPS score and will not budge from that demand, we might go ahead and use it. (To be honest, we also try not to work with stakeholders who devalue our expertise and wish to dictate methods.) <strong>Page 151</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>be cautious about committing to a “product-like” delivery of results, such as a dashboard or automation into a data warehouse. The problem with those commitments is that initial enthusiasm will turn into a long-term demand for support, even if key stakeholders lose interest. We always say that we would prefer to do new research than to be dashboard engineers. This is not to discount or dismiss the importance of reporting mechanisms. Rather, you should consider carefully whether maintenance of a dashboard or data warehouse would be of interest to you or maximize your value to the organization. <strong>Page 155</strong></p>
+</blockquote>
+<p>Yeah, that’s a data analyst’s life.</p>
+<blockquote class="blockquote">
+<p>Unchanging ratings: It is common for CSat to remain constant for an extended time period. Designers, PMs, and other stakeholders may be perplexed by this and ask, “We released great feature X! Why isn’t CSat going up?” There are many possible answers to this, but two fundamental ones are that customers don’t care as much as you do about your features; and respondents often answer such questions with a high-­ level brand evaluation, which changes slowly. Also, when a product is performing well, an unchanging rating is a good thing. The important thing is to use CSat as an indicator of health. <strong>Page 157</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Driver analysis: Stakeholders often want to know which factors lead to or “drive” CSat. This is often approached with a large survey and a regression model to look for predictors of CSat; see Chapter 7 in [25] or in [127]. Unfortunately, such data often has high collinearity (correlation among items) that makes statistical modeling difficult or impossible. We largely recommend to avoid such efforts and to focus on qualitative assessment of reasons for satisfaction or dissatisfaction. If you decide to pursue driver analysis, you’ll want to investigate collinearity and dimensional reduction (discussed in Section 8.6). This involves iterative research to understand relationships in the data and build models that isolate and estimate the important effects. <strong>Page 158</strong></p>
+</blockquote>
+<p>Decision trees, GBDT!</p>
+<blockquote class="blockquote">
+<p>Can the pages be grouped into meaningful, higher-order categories? There may be collections of pages that have different URLs but represent very similar user actions or intentions, and could therefore be collapsed into the same category. For example, we could replace the full URL path with a category name such as [search] or [materials]. Such choices are dependent on the goals of the analysis and a detailed understanding of the data. When done well, categorization makes a sunburst diagram clearer and less cluttered [115] <strong>Page 193</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>a frequent path of several searches in a row without a click through to a result could indicate a problem with the search results not being relevant enough. Observing such patterns of behavior can help provide ideas for using logs data to create metrics of task success, as discussed in Chapter 7, “Metrics of User Experience.” <strong>Page 194</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Unless your data include predetermined sessions, you will need to determine a principled way to break the user data into chunks that represent sequences of related behaviors. This involves domain knowledge. A common method is to use gaps in time when a user was inactive (Section 9.2.1.1). <strong>Page 195</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>See [116] for a detailed discussion of the advantages and disadvantages of radial visualizations. <strong>Page 196</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>When you are concerned with such change over the course of time, the R TraMineR (“trajectory miner”) package contains both exploratory and inferential statistical methods for state analysis, including multiple forms of visualization [48]. <strong>Page 197</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Chapter 14 in the R companion [25] gives an introduction to Markov chain analysis. An outstanding general introduction is given by Grinstead and Snell, Introduction to Probability [54]. <strong>Page 197</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>[Code, moderate]. The LSApp data set (https://github.com/ aliannejadi/LSApp) contains sequences of mobile app usage for 292 participants [1] <strong>Page 198</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>too many researchers are hesitant to communicate what they really believe and use vague words to couch everything in statistician speak. This leads to statements such as, “The data in this sample show a trend that is consistent with many users showing interest in X, p &lt; 0.10.” Don’t do that! Instead—if you believe it—simply say, “Users want X.” <strong>Page 304</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Another risk for a tech lead is being asked to take a dual role that combines management alongside IC work. This is often pitched as a win-win situation that brings all the advantages of clearer upward mobility from the management track with the opportunity to keep doing IC work that the TL loves. Our view is that this often does not turn out as expected. It frequently becomes a situation in which either the IC work is abandoned under the pressures of immediate management or the TL is required to work much longer every week. <strong>Page 337</strong></p>
+</blockquote>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>If you’re a beginner in quantitative UX research I definitely recommend this book. For more experienced researchers, this may only be useful if you’re interested in exploring the HEART framework, sunburst diagrams, specific survey techniques (such as customer satisfaction surveys and MaxDiff), or gaining a basic understanding of the work of a quantitative UX researcher. The book is well-structured, easy to read, and provides a lot of references for further reading. Some of them I’ll take to my reading list:</p>
+<ul>
+<li>Schwarz, J., Chapman, C., &amp; Feit, E. M. (2020). Python for Marketing Research and Analytics. Springer.</li>
+<li>Sauro, J., &amp; Lewis, J. R. (2016). Quantifying the User Experience: Practical Statistics for User Research. Morgan Kaufmann.</li>
+<li>Gourville, J. T. (2004). Why Consumers Don’t Buy: The Psychology of New Product Adoption. Harvard Business School.</li>
+<li>Norton, D. (2020). Escape Velocity: Better Metrics for Agile Teams. Onbelay.</li>
+<li>Norman, D. (2013). The Design of Everyday Things (Revised and expanded.) Basic Books.</li>
+<li>Sweigart, A. (2020). Beyond the Basic Stuff with Python: Best Practices for Writing Clean Code. No Starch Press.</li>
+<li>Kline, R. B. (2015). Principles and Practice of Structural Equation Modeling (4th ed.) Guilford Press.</li>
+<li>Carver, R. (1978). The case against statistical significance testing. Harvard Educational Review, 48(3), 378–399.</li>
+</ul>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

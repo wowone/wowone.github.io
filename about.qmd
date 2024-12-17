@@ -13,7 +13,7 @@ about:
 
 ---
 
-Hi! My name is Vladimir Kukushkin, and I have over 10 years of experience as a data scientist / data analyst. The slash signifies that I typically work at the intersection of product analytics and data science, tackling problems that require advanced techniques like predictive analytics, causal inference, and building statistical models. My specialization is user behavior analysis a.k.a. quantitative UX research or, more broadly, sequential data analysis.
+Hi! My name is Vladimir Kukushkin, and I have over 11 years of experience as a data scientist / data analyst. The slash signifies that I typically work at the intersection of product analytics and data science, tackling problems that require advanced techniques like predictive analytics, causal inference, and building statistical models. My specialization is user behavior analysis a.k.a. quantitative UX research or, more broadly, sequential data analysis.
 
 My projects:
 
@@ -21,5 +21,13 @@ My projects:
 
 My publications:
 
-- [Prediction of Hourly Earnings and Completion Time on a Crowdsourcing Platform (KDD-2020)](https://dl.acm.org/doi/10.1145/3394486.3403369)
-- [On the Relation Between Assessor's Agreement and Accuracy in Gamified Relevance Assessment (SIGIR-2015)](http://dl.acm.org/citation.cfm?id=2767727)
+- [Vladimir Kukushkin - Modeling DAU with Markov Chain (TowardsDataScience Editors' Pick)](https://towardsdatascience.com/modeling-dau-with-markov-chain-640ea4fddeb4)
+- [Anna Lioznova, Alexey Drutsa, Vladimir Kukushkin, Anastasia Bezzubtseva - Prediction of Hourly Earnings and Completion Time on a Crowdsourcing Platform. KDD-2020](https://dl.acm.org/doi/10.1145/3394486.3403369)
+- [Olga Megorskaya, Vladimir Kukushkin, Pavel Serdyukov - On the Relation Between Assessor's Agreement and Accuracy in Gamified Relevance Assessment. SIGIR-2015](http://dl.acm.org/citation.cfm?id=2767727)
+
+Books I recommend:
+
+- [Wes McKinney - Python for Data Analysis](https://wesmckinney.com/book/)
+- [Trevor Hastie, Robert Tibshirani, Jerome Friedman - The Elements of Statistical Learning](https://link.springer.com/book/10.1007/978-0-387-84858-7)
+- [Chris Chapman, Kerry Rodden - Quantitative User Experience Research](https://quantuxbook.com)
+- [Matt Harrison - Effective Pandas](https://store.metasnake.com/effective-pandas-book)
