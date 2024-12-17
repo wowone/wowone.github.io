@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-12-16">
+<meta name="dcterms.date" content="2024-12-17">
 
 <title>Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research – Quant UX research journal</title>
 <style>
@@ -67,7 +67,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<meta name="quarto:status" content="draft">
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -76,7 +75,7 @@ ul.task-list li input[type="checkbox"] {
 <body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner"><div id="quarto-draft-alert" class="alert alert-warning"><i class="bi bi-pencil-square"></i>Draft</div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
@@ -123,7 +122,10 @@ ul.task-list li input[type="checkbox"] {
       <h1 class="title">Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">review</div>
-                <div class="quarto-category">quant UXR</div>
+                <div class="quarto-category">product analytics</div>
+                <div class="quarto-category">product metrics</div>
+                <div class="quarto-category">survey analysis</div>
+                <div class="quarto-category">UX visualizations</div>
               </div>
                   </div>
   </div>
@@ -135,7 +137,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">December 16, 2024</p>
+        <p class="date">December 17, 2024</p>
       </div>
     </div>
     
@@ -157,8 +159,11 @@ ul.task-list li input[type="checkbox"] {
 <p>When I started my journey as a quantitative UX researcher, I was looking for literature that could provide me with a solid foundation in this area. The book <a href="https://quantuxbook.com/">Quantitative User Experience Research</a> by Chris Chapman and Kerry Rodden seemed to be a perfect fit for this purpose. Today I’d like to share my thoughts on this book.</p>
 <section id="general-impression" class="level2">
 <h2 class="anchored" data-anchor-id="general-impression">General impression</h2>
-<p>Both authors are Ph.D.&nbsp;researchers with extensive experience in the industry. Chris Chapman is a psychologist, currently working as a a Principal UX Researcher at Amazon Lab126. You may be aware of his other books “R for Marketing Research and Analytics” and “Python for Marketing”. Kerry Rodden a Senior Principal Researcher at Code for America previously worked at Google and founded the quantitative UX research role there. Probably you’ve heard about HEART metrics framework, so he’s the one who introduced it. As you can see, the authors have a solid background in the field.</p>
-<p>Generally speaking, the book is a good starting point for those who want to dive into quantitative UX research. It covers a wide range of topics, from overview of the field to practical advice on how to conduct research. However, I found the general parts too general while practical parts turned out to be too shallow for me. Perhaps, it’s because I already have some experience in product analytics, but I expected to get more interesting insights and practical tips from the book. I was quite upset when the authors said that this or that aspect is out of the scope of the book. Come on, this is what I expected to see here! Nevertherless, it was good to refresh some basics, follow the authors’ narrative, get some new ideas and references.</p>
+<div class="float-figure">
+<p><img src="book_cover.jpg" class="img-fluid"></p>
+</div>
+<p>Both authors are Ph.D.&nbsp;researchers with extensive experience in the industry. Chris Chapman is a psychologist, currently working as a a Principal UX Researcher at Amazon Lab126. You may be aware of his other books “R for Marketing Research and Analytics” and “Python for Marketing Research and Analytics”. Kerry Rodden a Senior Principal Researcher at Code for America previously worked at Google and founded the quantitative UX research role there. Probably you’ve heard about HEART metrics framework, so he’s the one who introduced it. As you can see, the authors have a solid background in the field.</p>
+<p>Generally speaking, the book is a good starting point for those who want to dive into quantitative UX research. It covers a wide range of topics, from overview of the field to practical advice on how to conduct research. However, I found the general parts too general while practical parts turned out to be too shallow for me. Perhaps, it’s because I already have some experience in product analytics, but I expected to get more interesting insights and practical tips from the book. I was quite upset when the authors said that this or that aspect is out of the scope of the book. Nevertherless, it was good to refresh some basics, follow the authors’ narrative, get some new ideas and references. Also, I appreciate the reproducible examples provided in the book: datasets and R code are available so you can understand each concept in detail.</p>
 <p>The only part I’d like to focus on, part III, relates to some practical aspects of quantitative UX research. The other parts represent rather a big picture of the field and seemed not interesting to me, e.g.&nbsp;state of the art, introduction to statistics and programming (that was especially surprising for me: just a single chapter for such broad topics), career advices, etc.</p>
 </section>
 <section id="part-iii.-tools-and-techniques" class="level2">
@@ -166,14 +171,14 @@ ul.task-list li input[type="checkbox"] {
 <p>The part consists of 4 chapters. I’ll briefly summarize each of them sharing my thoughts on them.</p>
 <section id="chapter-7-metrics-of-user-experience" class="level3">
 <h3 class="anchored" data-anchor-id="chapter-7-metrics-of-user-experience">Chapter 7 “Metrics of User Experience”</h3>
-<p>This chapter is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It’s a well-known topic, there are many articles on this everywhere (for example, see <a href="https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/">Kerry’s original paper</a>), so I won’t go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it’s a summary of <a href="https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/">another Kerry’s paper</a>), but besides that, there’s nothing practical more in this chapter. Unfortunately.</p>
-<p>Funny fact. From this chapter, I finally understood how Gmail labels work. Yes, I still sort emails into folders in old-fashioned way, but I will stop doing this now, I promise. It turned out that, as a Gmail user, it took me 15 years to adopt this feature.</p>
+<p>This chapter is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It’s a well-known topic, there are many articles on this everywhere (for example, see <a href="https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/">Kerry’s original paper</a>), so I won’t go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it’s a summary of <a href="https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/">another Kerry’s paper</a>), but besides that, there’s nothing practical more. Unfortunately.</p>
+<p>Funny fact. From this chapter, I finally understood how Gmail labels work. Yes, I still sort emails into folders in old-fashioned way, but I will stop doing this now, I promise. It turned out that it took me, as a Gmail user, 15 years to adopt this feature.</p>
 </section>
 <section id="chapter-8-customer-satisfaction-surveys" class="level3">
 <h3 class="anchored" data-anchor-id="chapter-8-customer-satisfaction-surveys">Chapter 8 “Customer Satisfaction Surveys”</h3>
 <p>This chapter is devoted to some practical aspects of Customer Satisfaction surveys (CSat) analysis. Since I rarely deal with surveys in my work, I was curious to extend my knowledge in this area.</p>
-<p>The most surprising fact for me was that the Net Promoter Score (NPS) is far away from being <a href="https://hbr.org/2003/12/the-one-number-you-need-to-grow">“the one number you need to grow”</a> as it was claimed by Frederick F. Reichheld. As a data analyst, I could expect that obviously one number can’t be enough to describe the whole customer satisfaction, but now I can’t understand why it’s still so popular.</p>
-<p>The chapter is provided with a nice and reproducible (code + dataset) example of how to analyze survey data using R. The most interesting part here was yet another example of Simpson’s paradox. The authors showed a declining trend for CSat for a product rolled out in the US and Germany while the same CSat metric was flat for the US and increasing for Germany. The reason, as you may have guessed, was in the different distribution of responses in these countries: the US respondents gave higher scores on average and their share was decreasing over time.</p>
+<p>The most surprising fact for me was that the Net Promoter Score (NPS) is far away from being <a href="https://hbr.org/2003/12/the-one-number-you-need-to-grow">“the one number you need to grow”</a> as it was claimed by Frederick F. Reichheld. As a data analyst, I could expect that obviously one number can’t be enough to describe the whole customer satisfaction, but now I’m surprised that this metric is still so popular.</p>
+<p>The chapter is provided with a nice and reproducible example of how to analyze survey data using R. The most interesting part here was yet another example of Simpson’s paradox. The authors showed a declining trend for CSat for a product rolled out in the US and Germany while the same CSat metric was flat for the US and increasing for Germany. The reason, as you may have guessed, was in the different distribution of responses in these countries: the US respondents gave higher scores on average and their share was decreasing over time.</p>
 <p>Finally, the following couple of quotes is worth to be mentioned, no comments needed.</p>
 <blockquote class="blockquote">
 <p>It is common for CSat to remain constant for an be perplexed by this and ask, “We released great feature X! Why isn’t CSat going up?” There are many possible answers to this, but two fundamental ones are that customers don’t care as much as you do about your features; and respondents often answer such questions with a high-level brand evaluation, which changes slowly. Also, when a product is performing well, an unchanging rating is a good thing. The important thing is to use CSat as an indicator of health.</p>
@@ -186,7 +191,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="chapter-9-log-sequence-visualization" class="level3">
 <h3 class="anchored" data-anchor-id="chapter-9-log-sequence-visualization">Chapter 9 “Log Sequence Visualization”</h3>
 <p>I won’t lie if I say that I started reading this book because of this chapter mostly. I know how difficult it is to visualize user behavior data, so I was hoping to get some new ideas. In a nutshell, the only approach the authors demonstrate here is a sunburst diagram. I heard about it later but I’ve never used it in my work, so the comprehensive and reproducible example (again, with R code and a dataset, many thanks to the authors) was quite helpful.</p>
-<p>However, plenty of other visualizations and approaches were not even mentioned even in “Learning more” subsection (look at <a href="https://www.sciencedirect.com/science/article/pii/S0097849323000717">this overwhelming survey</a> for example). I was disappointed. On the other hand, this strengthened my belief that I should keep reviewing papers and writing about them here.</p>
+<p>However, plenty of other visualizations and approaches were not even mentioned even in “Learning more” subsection (look at <a href="https://www.sciencedirect.com/science/article/pii/S0097849323000717">this overwhelming survey</a> for example). On the other hand, this strengthened my belief that I should keep reviewing papers and writing about them <a href="https://wowone.github.io/index.html#category=UX%20visualizations">here in my blog</a>.</p>
 </section>
 <section id="chapter-10-maxdiff-prioritizing-features-and-user-needs" class="level3">
 <h3 class="anchored" data-anchor-id="chapter-10-maxdiff-prioritizing-features-and-user-needs">Chapter 10 “MaxDiff: Prioritizing Features and User Needs”</h3>
@@ -361,16 +366,16 @@ Notes
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>If you’re a beginner in quantitative UX research I definitely recommend this book. For more experienced researchers, this may only be useful if you’re interested in exploring the HEART framework, sunburst diagrams, specific survey techniques (such as customer satisfaction surveys and MaxDiff), or gaining a basic understanding of the work of a quantitative UX researcher. The book is well-structured, easy to read, and provides a lot of references for further reading. Some of them I’ll take to my reading list:</p>
+<p>If you’re a beginner in quantitative UX research I definitely recommend this book. For more experienced researchers, it may only be useful if you’re interested in exploring the HEART framework, sunburst diagrams, specific survey techniques (such as customer satisfaction surveys and MaxDiff), or gaining a basic understanding of the work of a quantitative UX researcher. The book is well-structured, easy to read, and provides a lot of references for further reading. Some of them I’ll take to my reading list:</p>
 <ul>
-<li>Schwarz, J., Chapman, C., &amp; Feit, E. M. (2020). Python for Marketing Research and Analytics. Springer.</li>
-<li>Sauro, J., &amp; Lewis, J. R. (2016). Quantifying the User Experience: Practical Statistics for User Research. Morgan Kaufmann.</li>
-<li>Gourville, J. T. (2004). Why Consumers Don’t Buy: The Psychology of New Product Adoption. Harvard Business School.</li>
-<li>Norton, D. (2020). Escape Velocity: Better Metrics for Agile Teams. Onbelay.</li>
-<li>Norman, D. (2013). The Design of Everyday Things (Revised and expanded.) Basic Books.</li>
-<li>Sweigart, A. (2020). Beyond the Basic Stuff with Python: Best Practices for Writing Clean Code. No Starch Press.</li>
-<li>Kline, R. B. (2015). Principles and Practice of Structural Equation Modeling (4th ed.) Guilford Press.</li>
-<li>Carver, R. (1978). The case against statistical significance testing. Harvard Educational Review, 48(3), 378–399.</li>
+<li>Schwarz J., Chapman C., &amp; Feit E. M. (2020). Python for Marketing Research and Analytics. Springer.</li>
+<li>Sauro J., &amp; Lewis J. R. (2016). Quantifying the User Experience: Practical Statistics for User Research. Morgan Kaufmann.</li>
+<li>Gourville J. T. (2004). Why Consumers Don’t Buy: The Psychology of New Product Adoption. Harvard Business School.</li>
+<li>Norton D. (2020). Escape Velocity: Better Metrics for Agile Teams. Onbelay.</li>
+<li>Norman D. (2013). The Design of Everyday Things (Revised and expanded.) Basic Books.</li>
+<li>Sweigart A. (2020). Beyond the Basic Stuff with Python: Best Practices for Writing Clean Code. No Starch Press.</li>
+<li>Kline R. B. (2015). Principles and Practice of Structural Equation Modeling (4th ed.) Guilford Press.</li>
+<li>Carver R. (1978). The case against statistical significance testing. Harvard Educational Review, 48(3), 378–399.</li>
 </ul>
 
 

@@ -1,17 +1,21 @@
 ---
 title: "Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research"
-date: "2024-12-16"
-draft: true
-categories: [review, quant UXR]
+date: "2024-12-17"
+draft: false
+categories: [review, product analytics, product metrics, survey analysis, UX visualizations]
 ---
 
 When I started my journey as a quantitative UX researcher, I was looking for literature that could provide me with a solid foundation in this area. The book [Quantitative User Experience Research](https://quantuxbook.com/) by Chris Chapman and Kerry Rodden seemed to be a perfect fit for this purpose. Today I'd like to share my thoughts on this book.
 
 ## General impression
 
-Both authors are Ph.D. researchers with extensive experience in the industry. Chris Chapman is a psychologist, currently working as a a Principal UX Researcher at Amazon Lab126. You may be aware of his other books "R for Marketing Research and Analytics" and "Python for Marketing". Kerry Rodden a Senior Principal Researcher at Code for America previously worked at Google and founded the quantitative UX research role there. Probably you've heard about HEART metrics framework, so he's the one who introduced it. As you can see, the authors have a solid background in the field.
+<div class="float-figure">
+![](book_cover.jpg)
+</div>
 
-Generally speaking, the book is a good starting point for those who want to dive into quantitative UX research. It covers a wide range of topics, from overview of the field to practical advice on how to conduct research. However, I found the general parts too general while practical parts turned out to be too shallow for me. Perhaps, it's because I already have some experience in product analytics, but I expected to get more interesting insights and practical tips from the book. I was quite upset when the authors said that this or that aspect is out of the scope of the book. Come on, this is what I expected to see here! Nevertherless, it was good to refresh some basics, follow the authors' narrative, get some new ideas and references.
+Both authors are Ph.D. researchers with extensive experience in the industry. Chris Chapman is a psychologist, currently working as a a Principal UX Researcher at Amazon Lab126. You may be aware of his other books "R for Marketing Research and Analytics" and "Python for Marketing Research and Analytics". Kerry Rodden a Senior Principal Researcher at Code for America previously worked at Google and founded the quantitative UX research role there. Probably you've heard about HEART metrics framework, so he's the one who introduced it. As you can see, the authors have a solid background in the field.
+
+Generally speaking, the book is a good starting point for those who want to dive into quantitative UX research. It covers a wide range of topics, from overview of the field to practical advice on how to conduct research. However, I found the general parts too general while practical parts turned out to be too shallow for me. Perhaps, it's because I already have some experience in product analytics, but I expected to get more interesting insights and practical tips from the book. I was quite upset when the authors said that this or that aspect is out of the scope of the book. Nevertherless, it was good to refresh some basics, follow the authors' narrative, get some new ideas and references. Also, I appreciate the reproducible examples provided in the book: datasets and R code are available so you can understand each concept in detail.
 
 The only part I'd like to focus on, part III, relates to some practical aspects of quantitative UX research. The other parts represent rather a big picture of the field and seemed not interesting to me, e.g. state of the art, introduction to statistics and programming (that was especially surprising for me: just a single chapter for such broad topics), career advices, etc.
 
@@ -22,17 +26,17 @@ The part consists of 4 chapters. I'll briefly summarize each of them sharing my 
 
 ### Chapter 7 "Metrics of User Experience"
 
-This chapter is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It's a well-known topic, there are many articles on this everywhere (for example, see [Kerry's original paper](https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/)), so I won't go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it's a summary of [another Kerry's paper](https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/)), but besides that, there's nothing practical more in this chapter. Unfortunately.
+This chapter is mostly devoted to the HEART framework: Happiness, Engagement, Adoption, Retention, Task success. It's a well-known topic, there are many articles on this everywhere (for example, see [Kerry's original paper](https://research.google/pubs/measuring-the-user-experience-on-a-large-scale-user-centered-metrics-for-web-applications/)), so I won't go into details here. Their example of how the framework was applied to Gmail when the labels feature was introduced in 2009 is good (actually it's a summary of [another Kerry's paper](https://research.google/pubs/best-of-both-worlds-improving-gmail-labels-with-the-affordances-of-folders/)), but besides that, there's nothing practical more. Unfortunately.
 
-Funny fact. From this chapter, I finally understood how Gmail labels work. Yes, I still sort emails into folders in old-fashioned way, but I will stop doing this now, I promise. It turned out that, as a Gmail user, it took me 15 years to adopt this feature.
+Funny fact. From this chapter, I finally understood how Gmail labels work. Yes, I still sort emails into folders in old-fashioned way, but I will stop doing this now, I promise. It turned out that it took me, as a Gmail user, 15 years to adopt this feature.
 
 ### Chapter 8 "Customer Satisfaction Surveys"
 
 This chapter is devoted to some practical aspects of Customer Satisfaction surveys (CSat) analysis. Since I rarely deal with surveys in my work, I was curious to extend my knowledge in this area.
 
-The most surprising fact for me was that the Net Promoter Score (NPS) is far away from being ["the one number you need to grow"](https://hbr.org/2003/12/the-one-number-you-need-to-grow) as it was claimed by Frederick F. Reichheld. As a data analyst, I could expect that obviously one number can't be enough to describe the whole customer satisfaction, but now I can't understand why it's still so popular.
+The most surprising fact for me was that the Net Promoter Score (NPS) is far away from being ["the one number you need to grow"](https://hbr.org/2003/12/the-one-number-you-need-to-grow) as it was claimed by Frederick F. Reichheld. As a data analyst, I could expect that obviously one number can't be enough to describe the whole customer satisfaction, but now I'm surprised that this metric is still so popular.
 
-The chapter is provided with a nice and reproducible (code + dataset) example of how to analyze survey data using R. The most interesting part here was yet another example of Simpson's paradox. The authors showed a declining trend for CSat for a product rolled out in the US and Germany while the same CSat metric was flat for the US and increasing for Germany. The reason, as you may have guessed, was in the different distribution of responses in these countries: the US respondents gave higher scores on average and their share was decreasing over time.
+The chapter is provided with a nice and reproducible example of how to analyze survey data using R. The most interesting part here was yet another example of Simpson's paradox. The authors showed a declining trend for CSat for a product rolled out in the US and Germany while the same CSat metric was flat for the US and increasing for Germany. The reason, as you may have guessed, was in the different distribution of responses in these countries: the US respondents gave higher scores on average and their share was decreasing over time.
 
 Finally, the following couple of quotes is worth to be mentioned, no comments needed.
 
@@ -46,7 +50,7 @@ However, I'm curious why correlation among items seems to be a problem. Some mod
 
 I won't lie if I say that I started reading this book because of this chapter mostly. I know how difficult it is to visualize user behavior data, so I was hoping to get some new ideas. In a nutshell, the only approach the authors demonstrate here is a sunburst diagram. I heard about it later but I've never used it in my work, so the comprehensive and reproducible example (again, with R code and a dataset, many thanks to the authors) was quite helpful. 
 
-However, plenty of other visualizations and approaches were not even mentioned even in "Learning more" subsection (look at [this overwhelming survey](https://www.sciencedirect.com/science/article/pii/S0097849323000717) for example). I was disappointed. On the other hand, this strengthened my belief that I should keep reviewing papers and writing about them here.
+However, plenty of other visualizations and approaches were not even mentioned even in "Learning more" subsection (look at [this overwhelming survey](https://www.sciencedirect.com/science/article/pii/S0097849323000717) for example). On the other hand, this strengthened my belief that I should keep reviewing papers and writing about them [here in my blog](https://wowone.github.io/index.html#category=UX%20visualizations).
 
 ### Chapter 10 "MaxDiff: Prioritizing Features and User Needs"
 
@@ -408,13 +412,13 @@ Decision trees, GBDT!
 
 ## Conclusion
 
-If you're a beginner in quantitative UX research I definitely recommend this book. For more experienced researchers, this may only be useful if you're interested in exploring the HEART framework, sunburst diagrams, specific survey techniques (such as customer satisfaction surveys and MaxDiff), or gaining a basic understanding of the work of a quantitative UX researcher. The book is well-structured, easy to read, and provides a lot of references for further reading. Some of them I'll take to my reading list:
+If you're a beginner in quantitative UX research I definitely recommend this book. For more experienced researchers, it may only be useful if you're interested in exploring the HEART framework, sunburst diagrams, specific survey techniques (such as customer satisfaction surveys and MaxDiff), or gaining a basic understanding of the work of a quantitative UX researcher. The book is well-structured, easy to read, and provides a lot of references for further reading. Some of them I'll take to my reading list:
 
-- Schwarz, J., Chapman, C., & Feit, E. M. (2020). Python for Marketing Research and Analytics. Springer.
-- Sauro, J., & Lewis, J. R. (2016). Quantifying the User Experience: Practical Statistics for User Research. Morgan Kaufmann.
-- Gourville, J. T. (2004). Why Consumers Don’t Buy: The Psychology of New Product Adoption. Harvard Business School.
-- Norton, D. (2020). Escape Velocity: Better Metrics for Agile Teams. Onbelay.
-- Norman, D. (2013). The Design of Everyday Things (Revised and expanded.) Basic Books.
-- Sweigart, A. (2020). Beyond the Basic Stuff with Python: Best Practices for Writing Clean Code. No Starch Press.
-- Kline, R. B. (2015). Principles and Practice of Structural Equation Modeling (4th ed.) Guilford Press.
-- Carver, R. (1978). The case against statistical significance testing. Harvard Educational Review, 48(3), 378–399.
+- Schwarz J., Chapman C., & Feit E. M. (2020). Python for Marketing Research and Analytics. Springer.
+- Sauro J., & Lewis J. R. (2016). Quantifying the User Experience: Practical Statistics for User Research. Morgan Kaufmann.
+- Gourville J. T. (2004). Why Consumers Don’t Buy: The Psychology of New Product Adoption. Harvard Business School.
+- Norton D. (2020). Escape Velocity: Better Metrics for Agile Teams. Onbelay.
+- Norman D. (2013). The Design of Everyday Things (Revised and expanded.) Basic Books.
+- Sweigart A. (2020). Beyond the Basic Stuff with Python: Best Practices for Writing Clean Code. No Starch Press.
+- Kline R. B. (2015). Principles and Practice of Structural Equation Modeling (4th ed.) Guilford Press.
+- Carver R. (1978). The case against statistical significance testing. Harvard Educational Review, 48(3), 378–399.
