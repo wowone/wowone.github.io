@@ -1,0 +1,19 @@
+---
+title: "A book review. Carl Gold - Fighting Churn with Data"
+date: "YYYY-MM-DD"
+draft: true
+categories: [review, product analytics, product metrics]
+---
+
+
+- Define churn. The definition depends on the following aspects:
+  - What period of time are we considering? E.g. if a user hasn't logged in for 30 days, it is churn.
+  - What is the user's activity? E.g. if a user hasn't made a purchase for 30 days, it is churn.
+  - Should we weight users who purchased more than others?
+    - Standard churn: indicates proportion of users who churned in a period ahead. 1 user = 1 churn or 1 retention, $churn rate = 1 - \frac{\# churned users}{\# total users}$.
+    - Net churn: indicates proportion of revenue lost in a period ahead.  $churn rate = 1 - \frac{Revenue_{end\_period}}{Revenue_{start\_period}$. Unlike standard churn, net churn might be negative.
+- Create churn measurements. Split the timeline into reasonable periods (e.g. weeks). For each period and each user calculate whether a user churned in a period ahead.
+- Create metrics measurents. For the same periods, calculate the metrics describing user activity.
+  - Count metrics. E.g. number of purchases, number of logins, number of times a user interacted with a product feature.
+  - User tenure. How long a user has been with a product (or being subscribed to a service). Might be measured in time or revenue units. Also, might be calculated in session-like manner: short periods of inactivity or non-purchase are ignored while long periods break the "session"; the last session is associated with the user tenure while the previous sessions are ignored.
+  - 

@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-12-02">
+
+<title>Modeling DAU with Markov chain – Quant UX research journal</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Quant UX research journal</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/wowone"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/vladimir-kukushkin/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Modeling DAU with Markov chain</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">product analytics</div>
+                <div class="quarto-category">predictive analytics</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 2, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Doubtlessly, DAU, WAU, and MAU are critical business metrics. An article <a href="https://www.lennysnewsletter.com/p/how-duolingo-reignited-user-growth">“How Duolingo reignited user growth”</a> by <a href="https://www.linkedin.com/in/jorgemazal/">Jorge Mazal</a>, former CPO of Duolingo, is #1 in the Growth section of Lenny’s Newsletter blog. In this article, Jorge paid special attention to the methodology Duolingo used to model the DAU metric (see another article <a href="https://blog.duolingo.com/growth-model-duolingo/">“Meaningful metrics: how data sharpened the focus of product teams”</a> by <a href="https://blog.duolingo.com/author/erin/">Erin Gustafson</a>). This methodology has multiple strengths, but I’d like to focus on how one can use this approach for DAU forecasting.</p>
+<p>The new year is coming soon, so many companies are planning their budgets for the next year these days. Cost estimations often require DAU forecasts. In this article, I’ll show how you can get this prediction using Duolingo’s growth model. I’ll explain why this approach is better compared to standard time-series forecasting methods and how you can adjust the prediction according to your teams’ plans (e.g., marketing, activation, product teams).</p>
+<p>The article text goes along with the code, and a simulated dataset is attached so the research is fully reproducible. The Jupyter notebook version is available <a href="https://github.com/wowone/wowone.github.io/blob/master/posts/2024-12-02_dau_prediction/dau_prediction.ipynb">here</a>. In the end, I’ll share a DAU “calculator” designed in Google Spreadsheet format.</p>
+<p>I’ll be narrating on behalf of the collective “we” as if we’re talking together.</p>
+</section>
+<section id="methodology" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="methodology"><span class="header-section-number">2</span> Methodology</h2>
+<p>A quick recap on how the <a href="https://blog.duolingo.com/growth-model-duolingo/">Duolingo’s growth model</a> works. At day <span class="math inline">\(d\)</span> (<span class="math inline">\(d=1,2,\ldots,\)</span>) of a user’s lifetime, the user can be in one of the following 7 (mutually-exclusive) states: <code>new</code>, <code>current</code>, <code>reactivated</code>, <code>resurrected</code>, <code>at_risk_wau</code>, <code>at_risk_mau</code>, <code>dormant</code>. The states are defined according to indicators of whether a user was active today, in the last 7 days, or in the last 30 days. The definition summary is given in the table below:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>
+state
+</th>
+<th width="120">
+d = 1
+</th>
+<th width="120">
+active<br>today
+</th>
+<th width="120">
+active in<br>[d-6, d-1]
+</th>
+<th width="120">
+active in<br>[d-29, d-7]
+</th>
+<th width="150">
+active<br>before d-30
+</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>
+new
+</td>
+<td>
+✅
+</td>
+<td>
+?
+</td>
+<td>
+NA
+</td>
+<td>
+NA
+</td>
+<td>
+NA
+</td>
+</tr>
+<tr>
+<td>
+current
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+❓
+</td>
+<td>
+❓
+</td>
+</tr>
+<tr>
+<td>
+reactivated
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+?
+</td>
+</tr>
+<tr>
+<td>
+resurrected
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+</tr>
+<tr>
+<td>
+at_risk_wau
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+?
+</td>
+<td>
+?
+</td>
+</tr>
+<tr>
+<td>
+at_risk_mau
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+?
+</td>
+</tr>
+<tr>
+<td>
+dormant
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+</tr>
+</tbody></table>
+<p>Having these states defined (as a set <span class="math inline">\(S\)</span>), we can consider user behavior as a <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov chain</a>. Here’s an example of a user’s trajectory: <code>new</code>→<code>current</code>→<code>current</code>→<code>at_risk_wau</code>→…→<code>at_risk_mau</code>→…→<code>dormant</code>. Let <span class="math inline">\(M\)</span> be a transition matrix associated with this Markov process: <span class="math inline">\(m_{i, j} = P(s_j | s_i)\)</span> are the probabilities that a user moves to state <span class="math inline">\(s_j\)</span> right after being at state <span class="math inline">\(s_i\)</span>, where <span class="math inline">\(s_i, s_j \in S\)</span>. Such a matrix is inferred from the historical data.</p>
+<p>If we assume that user behavior is stationary (independent of time), the matrix <span class="math inline">\(M\)</span> fully describes the states of all users in the future. Suppose that the vector <span class="math inline">\(u_0\)</span> of length 7 contains the counts of users in certain states on a given day, denoted as day 0. According to the Markov model, on the next day 1, we expect to have the following number of users states <span class="math inline">\(u_1\)</span>:</p>
+<p><span class="math display">\[
+\underbrace{
+\begin{pmatrix}  \#New_1 \\ \#Current_1 \\ \#Reactivated_1 \\ \#Resurrected_1 \\ \#AtRiskWau_1 \\ \#AtRiskMau_1 \\ \#Dormant_1 \end{pmatrix}
+}_{u_1} = M^T \cdot
+\underbrace{
+\begin{pmatrix}  \#New_0 \\ \#Current_0 \\ \#Reactivated_0 \\ \#Resurrected_0 \\ \#AtRiskWau_0 \\ \#AtRiskMau_0 \\ \#Dormant_0 \end{pmatrix}
+}_{u_0}
+\]</span></p>
+<p>Applying this formula recursively, we derive the number of users in certain states on any arbitrary day <span class="math inline">\(t &gt; 0\)</span> in the future.</p>
+<p>Besides the initial distribution <span class="math inline">\(u_0\)</span>, we need to provide the number of new users that will appear in the product each day in the future. We’ll address this problem as a general time-series forecasting.</p>
+<p>Now, having <span class="math inline">\(u_t\)</span> calculated, we can determine DAU values on day <span class="math inline">\(t\)</span>: <span class="math display">\[\begin{equation} DAU_t = \#New_t + \#Current_t + \#Reactivated_t + \#Resurrected_t \end{equation}.\]</span></p>
+<p>Additionally, we can easily calculate WAU and MAU metrics: <span class="math display">\[WAU_t = DAU_t + \#AtRiskWau_t,\]</span> <span class="math display">\[MAU_t = DAU_t + \#AtRiskWau_t + \#AtRiskMau_t.\]</span></p>
+<p>Finally, here’s the algorithm outline:</p>
+<ol type="1">
+<li>For each prediction day <span class="math inline">\(t=1, \ldots, T\)</span>, calculate the expected number of new users <span class="math inline">\(\#New_1, \ldots, \#New_T\)</span>.</li>
+<li>For each lifetime day of each user, assign one of the 7 states.</li>
+<li>Calculate the transition matrix <span class="math inline">\(M\)</span> from the historical data.</li>
+<li>Calculate initial state counts <span class="math inline">\(u_0\)</span> corresponding to day <span class="math inline">\(t=0\)</span>.</li>
+<li>Recursively calculate <span class="math inline">\(u_{t+1} = M^T u_t\)</span>.</li>
+<li>Calculate DAU, WAU, and MAU for each prediction day <span class="math inline">\(t=1, \ldots, T\)</span>.</li>
+</ol>
+</section>
+<section id="implementation" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="implementation"><span class="header-section-number">3</span> Implementation</h2>
+<p>This section is devoted to technical aspects of the implementation. If you’re interested in studying the model properties rather than code, you may skip this section and go to the <a href="#sec-model-evaluation" class="quarto-xref">Section&nbsp;4</a>.</p>
+<section id="dataset" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="dataset"><span class="header-section-number">3.1</span> Dataset</h3>
+<p>We use a simulated dataset based on historical data of a SaaS app. The data is stored in the <a href="https://drive.google.com/file/d/16kd8rJBvcgmw95jY42MedRfIxcO4LpPd/view?usp=sharing">dau_data.csv.gz</a> file and contains three columns: <code>user_id</code>, <code>date</code>, and <code>registration_date</code>. Each record indicates a day when a user was active. The dataset includes activity indicators for 51480 users from <code>2020-11-01</code> to <code>2023-10-31</code>. Additionally, data from October 2020 is included to calculate user states properly, as the <code>at_risk_mau</code> and <code>dormant</code> states require data from one month prior.</p>
+<div id="d8e524c5" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'dau_data.csv.gz'</span>, compression<span class="op">=</span><span class="st">'gzip'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'date'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'date'</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'registration_date'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'registration_date'</span>])</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Shape: </span><span class="sc">{</span>df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Total users: </span><span class="sc">{</span>df[<span class="st">'user_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Data range: [</span><span class="sc">{</span>df[<span class="st">'date'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>df[<span class="st">'date'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss">]'</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape: (667236, 3)
+Total users: 51480
+Data range: [2020-10-01 00:00:00, 2023-10-31 00:00:00]</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">user_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">registration_date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>d8c465ab-e9fd-5edd-9e4e-c77094700cb5</td>
+<td>2020-10-01</td>
+<td>2020-08-25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>269b7f13-a509-5174-85cb-95a8f7b932e8</td>
+<td>2020-10-01</td>
+<td>2020-08-25</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>bfeac474-5b66-566f-8654-262bb79c873e</td>
+<td>2020-10-01</td>
+<td>2020-05-31</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>d32fcac5-122c-5463-8aea-01b39b9ad0bb</td>
+<td>2020-10-01</td>
+<td>2020-09-30</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>c1ece677-e643-5bb3-8701-f1c59a0bf4cd</td>
+<td>2020-10-01</td>
+<td>2020-09-05</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>This is how the DAU time-series looks like.</p>
+<div id="888aa0d7" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.groupby(<span class="st">'date'</span>).size()<span class="op">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'DAU, historical'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Suppose that today is 2023-10-31 and we want to predict the DAU metric for the next 2024 year. We define a couple of global constants <code>PREDICTION_START</code> and <code>PREDICTION_END</code> which encompass the prediction period.</p>
+<div id="8cc8c106" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>PREDICTION_START <span class="op">=</span> <span class="st">'2023-11-01'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>PREDICTION_END <span class="op">=</span> <span class="st">'2024-12-31'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="predicting-new-users-amount" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="predicting-new-users-amount"><span class="header-section-number">3.2</span> Predicting new users amount</h3>
+<p>Let’s start from the new users prediction. We use the <a href="http://facebook.github.io/prophet/">prophet</a> library as one of the easiest ways to forecast time-series data. The <code>new_users</code> Series contains such data. We extract it from the original <code>df</code> dataset selecting the rows where the <code>registration date</code> is equal to the <code>date</code>.</p>
+<div id="8d953a72" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>new_users <span class="op">=</span> df[df[<span class="st">'date'</span>] <span class="op">==</span> df[<span class="st">'registration_date'</span>]]<span class="op">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">'date'</span>).size()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="7c954e0a" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>new_users.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>date
+2020-10-01    4
+2020-10-02    4
+2020-10-03    3
+2020-10-04    4
+2020-10-05    8
+dtype: int64</code></pre>
+</div>
+</div>
+<p><code>prophet</code> requires a time-series as a DataFrame containing two columns <code>ds</code> and <code>y</code>, so we reformat the <code>new_users</code> Series to the <code>new_users_prophet</code> DataFrame. Another thing we need to prepare is to create the <code>future</code> variable containing certain days for prediction: from <code>prediction_start</code> to <code>prediction_end</code>. This logic is implemented in the <code>predict_new_users</code> function. The plot below illustrates predictions for both past and future periods.</p>
+<div id="cc95c915" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prophet <span class="im">import</span> Prophet</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># suppress prophet logs</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">'prophet'</span>).setLevel(logging.WARNING)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>logging.getLogger(<span class="st">'cmdstanpy'</span>).disabled<span class="op">=</span><span class="va">True</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_new_users(prediction_start, prediction_end, new_users_train, show_plot<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Forecasts a time-seires for new users</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">    prediction_start : str</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">        Date in YYYY-MM-DD format.</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">    prediction_end : str</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">        Date in YYYY-MM-DD format.</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">    new_users_train : pandas.Series</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">        Historical data for the time-series preceding the prediction period.</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">    show_plot : boolean, default=True</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">        If True, a chart with the train and predicted time-series values is displayed.</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">    pandas.Series</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">        Series containing the predicted values.</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> Prophet()</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    new_users_train <span class="op">=</span> new_users_train.loc[new_users_train.index <span class="op">&lt;</span> prediction_start]</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    new_users_prophet <span class="op">=</span> pd.DataFrame({<span class="st">'ds'</span>: new_users_train.index, <span class="st">'y'</span>: new_users_train.values})</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    m.fit(new_users_prophet)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    periods <span class="op">=</span> <span class="bu">len</span>(pd.date_range(prediction_start, prediction_end))</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    future <span class="op">=</span> m.make_future_dataframe(periods<span class="op">=</span>periods)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    new_users_pred <span class="op">=</span> m.predict(future)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_plot:</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        m.plot(new_users_pred)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        plt.title(<span class="st">'New users prediction'</span>)<span class="op">;</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    new_users_pred <span class="op">=</span> new_users_pred<span class="op">\</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>        .assign(yhat<span class="op">=</span><span class="kw">lambda</span> _df: _df[<span class="st">'yhat'</span>].astype(<span class="bu">int</span>))<span class="op">\</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        .rename(columns<span class="op">=</span>{<span class="st">'ds'</span>: <span class="st">'date'</span>, <span class="st">'yhat'</span>: <span class="st">'count'</span>})<span class="op">\</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>        .set_index(<span class="st">'date'</span>)<span class="op">\</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        .clip(lower<span class="op">=</span><span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'count'</span>]</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> new_users_pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/v.kukushkin/Documents/private/wowone.github.io/.venv/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm</code></pre>
+</div>
+</div>
+<div id="e0974ae6" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>new_users_pred <span class="op">=</span> predict_new_users(PREDICTION_START, PREDICTION_END, new_users)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The <code>new_users_pred</code> Series stores the predicted users amount.</p>
+<div id="dfa2a6b7" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>new_users_pred.tail(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>date
+2024-12-27    52
+2024-12-28    56
+2024-12-29    71
+2024-12-30    79
+2024-12-31    74
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+</section>
+<section id="getting-the-states" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="getting-the-states"><span class="header-section-number">3.3</span> Getting the states</h3>
+<p>In practice, the most calculations are reasonable to execute as SQL queries to a database where the data is stored. Hereafter, we will simulate such querying using the <a href="https://duckdb.org">duckdb</a> library.</p>
+<p>We want to assign one of the 7 states to each day of a user’s lifetime within the app. According to the definition, for each day, we need to consider at least the past 30 days. This is where SQL window functions come in. However, since the <code>df</code> data contains only records of <em>active days</em>, we need to explicitly extend them and include the days when a user was not active. In other words, instead of this list of records:</p>
+<pre><code>user_id    date          registration_date
+1234567    2023-01-01    2023-01-01
+1234567    2023-01-03    2023-01-01</code></pre>
+<p>we’d like to get a list like this:</p>
+<pre><code>user_id    date          is_active    registration_date
+1234567    2023-01-01    TRUE         2023-01-01
+1234567    2023-01-02    FALSE        2023-01-01
+1234567    2023-01-03    TRUE         2023-01-01
+1234567    2023-01-04    FALSE        2023-01-01
+1234567    2023-01-05    FALSE        2023-01-01
+...        ...           ...          ...
+1234567    2023-10-31    FALSE        2023-01-01</code></pre>
+<p>For readability purposes we split the following SQL query into multiple subqueries.</p>
+<ul>
+<li><code>full_range</code>: Create a full sequence of dates for each user.</li>
+<li><code>dau_full</code>: Get the full list of both active and inactive records.</li>
+<li><code>states</code>: Assign one of the 7 states for each day of a user’s lifetime.</li>
+</ul>
+<div id="7f67aa64" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>DATASET_START <span class="op">=</span> <span class="st">'2020-11-01'</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>DATASET_END <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>OBSERVATION_START <span class="op">=</span> <span class="st">'2020-10-01'</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ss">WITH</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="ss">full_range AS (</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="ss">        user_id, UNNEST(generate_series(greatest(registration_date, '</span><span class="sc">{</span>OBSERVATION_START<span class="sc">}</span><span class="ss">'), date '</span><span class="sc">{</span>DATASET_END<span class="sc">}</span><span class="ss">', INTERVAL 1 DAY))::date AS date</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM (</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="ss">        SELECT DISTINCT user_id, registration_date FROM df</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="ss">    )</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="ss">),</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="ss">dau_full AS (</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="ss">        fr.user_id,</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="ss">        fr.date,</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="ss">        df.date IS NOT NULL AS is_active,</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="ss">        registration_date</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM full_range AS fr</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="ss">    LEFT JOIN df USING(user_id, date)</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="ss">),</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="ss">states AS (</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="ss">        user_id,</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="ss">        date,</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="ss">        is_active,</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="ss">        first_value(registration_date IGNORE NULLS) OVER (PARTITION BY user_id ORDER BY date) AS registration_date,</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="ss">        SUM(is_active::int) OVER (PARTITION BY user_id ORDER BY date ROWS BETWEEN 6 PRECEDING and 1 PRECEDING) AS active_days_back_6d,</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="ss">        SUM(is_active::int) OVER (PARTITION BY user_id ORDER BY date ROWS BETWEEN 29 PRECEDING and 1 PRECEDING) AS active_days_back_29d,</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="ss">        CASE</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN date = registration_date THEN 'new'</span></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = TRUE AND active_days_back_6d BETWEEN 1 and 6 THEN 'current'</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = TRUE AND active_days_back_6d = 0 AND IFNULL(active_days_back_29d, 0) &gt; 0 THEN 'reactivated'</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = TRUE AND active_days_back_6d = 0 AND IFNULL(active_days_back_29d, 0) = 0 THEN 'resurrected'</span></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = FALSE AND active_days_back_6d &gt; 0 THEN 'at_risk_wau'</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="ss">            WHEN is_active = FALSE AND active_days_back_6d = 0 AND ifnull(active_days_back_29d, 0) &gt; 0 THEN 'at_risk_mau'</span></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a><span class="ss">            ELSE 'dormant'</span></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="ss">        END AS state</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM dau_full</span></span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a><span class="ss">)</span></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="ss">SELECT user_id, date, state FROM states</span></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="ss">WHERE date BETWEEN '</span><span class="sc">{</span>DATASET_START<span class="sc">}</span><span class="ss">' AND '</span><span class="sc">{</span>DATASET_END<span class="sc">}</span><span class="ss">'</span></span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a><span class="ss">ORDER BY user_id, date</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> duckdb.sql(query).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The query results are kept in the <code>states</code> DataFrame:</p>
+<div id="8a488fa8" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>states.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">user_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">state</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-23</td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-24</td>
+<td>current</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-25</td>
+<td>current</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-26</td>
+<td>current</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>00002b68-adba-5a55-92d7-8ea8934c6db3</td>
+<td>2023-06-27</td>
+<td>current</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="calculating-the-transition-matrix" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="calculating-the-transition-matrix"><span class="header-section-number">3.4</span> Calculating the transition matrix</h3>
+<p>Having obtained these states, we can calculate state transition frequencies. In the <a href="#sec-transitions-period-impact" class="quarto-xref">Section&nbsp;4.3</a> we’ll study how the prediction depends on a period in which transitions are considered, so it’s reasonable to pre-aggregate this data on daily basis. The resulting <code>transitions</code> DataFrame contains <code>date</code>, <code>state_from</code>, <code>state_to</code>, and <code>cnt</code> columns.</p>
+<div id="f2385527" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ss">SELECT</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ss">    date,</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ss">    state_from,</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ss">    state_to,</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="ss">    COUNT(*) AS cnt,</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="ss">FROM (</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="ss">        date,</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="ss">        state AS state_to,</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="ss">        lag(state) OVER (PARTITION BY user_id ORDER BY date) AS state_from</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM states</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="ss">)</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="ss">WHERE state_from IS NOT NULL</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="ss">GROUP BY date, state_from, state_to</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="ss">ORDER BY date, state_from, state_to;</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>transitions <span class="op">=</span> duckdb.sql(query).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="264b1d0e" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>transitions.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">state_from</th>
+<th data-quarto-table-cell-role="th">state_to</th>
+<th data-quarto-table-cell-role="th">cnt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2020-11-02</td>
+<td>at_risk_mau</td>
+<td>at_risk_mau</td>
+<td>273</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2020-11-02</td>
+<td>at_risk_mau</td>
+<td>dormant</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2020-11-02</td>
+<td>at_risk_mau</td>
+<td>reactivated</td>
+<td>14</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2020-11-02</td>
+<td>at_risk_wau</td>
+<td>at_risk_mau</td>
+<td>18</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2020-11-02</td>
+<td>at_risk_wau</td>
+<td>at_risk_wau</td>
+<td>138</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Now, we can calculate the transition matrix <span class="math inline">\(M\)</span>. We implement the <code>get_transition_matrix</code> function, which accepts the <code>transitions</code> DataFrame and a pair of dates that encompass the transitions period to be considered.</p>
+<div id="529fbf8a" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>states_order <span class="op">=</span> [<span class="st">'new'</span>, <span class="st">'current'</span>, <span class="st">'reactivated'</span>, <span class="st">'resurrected'</span>, <span class="st">'at_risk_wau'</span>, <span class="st">'at_risk_mau'</span>, <span class="st">'dormant'</span>]</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_transition_matrix(transitions, date1, date2):</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pd.to_datetime(date1) <span class="op">&gt;</span> pd.to_datetime(DATASET_END):</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        date1 <span class="op">=</span> pd.to_datetime(DATASET_END) <span class="op">-</span> pd.Timedelta(days<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    probs <span class="op">=</span> transitions<span class="op">\</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        .loc[<span class="kw">lambda</span> _df: _df[<span class="st">'date'</span>].between(date1, date2)]<span class="op">\</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        .groupby([<span class="st">'state_from'</span>, <span class="st">'state_to'</span>], as_index<span class="op">=</span><span class="va">False</span>)<span class="op">\</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'cnt'</span>].<span class="bu">sum</span>()<span class="op">\</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        .assign(</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>            supp<span class="op">=</span><span class="kw">lambda</span> _df: _df.groupby(<span class="st">'state_from'</span>)[<span class="st">'cnt'</span>].transform(<span class="st">'sum'</span>),</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            prob<span class="op">=</span><span class="kw">lambda</span> _df: _df[<span class="st">'cnt'</span>] <span class="op">/</span> _df[<span class="st">'supp'</span>]</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> probs.pivot(index<span class="op">=</span><span class="st">'state_from'</span>, columns<span class="op">=</span><span class="st">'state_to'</span>, values<span class="op">=</span><span class="st">'prob'</span>)<span class="op">\</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        .reindex(states_order, axis<span class="op">=</span><span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>        .reindex(states_order, axis<span class="op">=</span><span class="dv">1</span>)<span class="op">\</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>        .fillna(<span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>        .astype(<span class="bu">float</span>)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> M</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>As a baseline, let’s calculate the transition matrix for the whole year from <code>2022-11-01</code> to <code>2023-10-31</code>.</p>
+<div id="c481d451" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> get_transition_matrix(transitions, <span class="st">'2022-11-01'</span>, <span class="st">'2023-10-31'</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>M</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">state_to</th>
+<th data-quarto-table-cell-role="th">new</th>
+<th data-quarto-table-cell-role="th">current</th>
+<th data-quarto-table-cell-role="th">reactivated</th>
+<th data-quarto-table-cell-role="th">resurrected</th>
+<th data-quarto-table-cell-role="th">at_risk_wau</th>
+<th data-quarto-table-cell-role="th">at_risk_mau</th>
+<th data-quarto-table-cell-role="th">dormant</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">state_from</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">new</td>
+<td>0.0</td>
+<td>0.515934</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.484066</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">current</td>
+<td>0.0</td>
+<td>0.851325</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.148675</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">reactivated</td>
+<td>0.0</td>
+<td>0.365867</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.634133</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">resurrected</td>
+<td>0.0</td>
+<td>0.316474</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.683526</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">at_risk_wau</td>
+<td>0.0</td>
+<td>0.098246</td>
+<td>0.004472</td>
+<td>0.000000</td>
+<td>0.766263</td>
+<td>0.131020</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">at_risk_mau</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.009598</td>
+<td>0.000173</td>
+<td>0.000000</td>
+<td>0.950109</td>
+<td>0.040120</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">dormant</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000387</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.999613</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The sum of each row of any transition matrix equals 1 since it represents the probabilities of moving from one state to any other state.</p>
+</section>
+<section id="getting-the-initial-state-counts" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="getting-the-initial-state-counts"><span class="header-section-number">3.5</span> Getting the initial state counts</h3>
+<p>An initial state is retrieved from the <code>states</code> DataFrame by the <code>get_state0</code> function and the corresponding SQL query. The only argument of the function is the date for which we want to get the initial state. We assign the result to the <code>state0</code> variable.</p>
+<div id="33b26b29" class="cell" data-execution_count="15">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_state0(date):</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT state, count(*) AS cnt</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM states</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ss">    WHERE date = '</span><span class="sc">{</span>date<span class="sc">}</span><span class="ss">'</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="ss">    GROUP BY state</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> duckdb.sql(query).df()</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> state0.set_index(<span class="st">'state'</span>).reindex(states_order)[<span class="st">'cnt'</span>]</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> state0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="708cd4f5" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>state0 <span class="op">=</span> get_state0(DATASET_END)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>state0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>state
+new               20
+current          475
+reactivated       15
+resurrected       19
+at_risk_wau      404
+at_risk_mau     1024
+dormant        49523
+Name: cnt, dtype: int64</code></pre>
+</div>
+</div>
+</section>
+<section id="sec-predicting-dau" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="sec-predicting-dau"><span class="header-section-number">3.6</span> Predicting DAU</h3>
+<p>The <code>predict_dau</code> function below accepts all the previous variables required for the DAU prediction and makes this prediction for a date range defined by the <code>start_date</code> and <code>end_date</code> arguments.</p>
+<div id="ffd464d7" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_dau(M, state0, start_date, end_date, new_users):</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Predicts DAU over a given date range.</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">    M : pandas.DataFrame</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co">        Transition matrix representing user state changes.</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co">    state0 : pandas.Series</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">        counts of initial state of users.</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co">    start_date : str</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co">        Start date of the prediction period in 'YYYY-MM-DD' format.</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">    end_date : str</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co">        End date of the prediction period in 'YYYY-MM-DD' format.</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="co">    new_users : int or pandas.Series</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co">        The expected amount of new users for each day between `start_date` and `end_date`.</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co">        If a Series, it should have dates as the index.</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co">        If an int, the same number is used for each day.</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="co">        </span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="co">    pandas.DataFrame</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="co">        DataFrame containing the predicted DAU, WAU, and MAU for each day in the date range,</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="co">        with columns for different user states and tot.</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    dates <span class="op">=</span> pd.date_range(start_date, end_date)</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    dates.name <span class="op">=</span> <span class="st">'date'</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    dau_pred <span class="op">=</span> []</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    new_dau <span class="op">=</span> state0.copy()</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> date <span class="kw">in</span> dates:</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>        new_dau <span class="op">=</span> (M.transpose() <span class="op">@</span> new_dau).astype(<span class="bu">int</span>)</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(new_users, <span class="bu">int</span>):</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>            new_users_today <span class="op">=</span> new_users</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>            new_users_today <span class="op">=</span> new_users.astype(<span class="bu">int</span>).loc[date] </span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>        new_dau.loc[<span class="st">'new'</span>] <span class="op">=</span> new_users_today</span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>        dau_pred.append(new_dau.tolist())</span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>    dau_pred <span class="op">=</span> pd.DataFrame(dau_pred, index<span class="op">=</span>dates, columns<span class="op">=</span>states_order)</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>    dau_pred[<span class="st">'dau'</span>] <span class="op">=</span> dau_pred[<span class="st">'new'</span>] <span class="op">+</span> dau_pred[<span class="st">'current'</span>] <span class="op">+</span> dau_pred[<span class="st">'reactivated'</span>] <span class="op">+</span> dau_pred[<span class="st">'resurrected'</span>]</span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>    dau_pred[<span class="st">'wau'</span>] <span class="op">=</span> dau_pred[<span class="st">'dau'</span>] <span class="op">+</span> dau_pred[<span class="st">'at_risk_wau'</span>]</span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>    dau_pred[<span class="st">'mau'</span>] <span class="op">=</span> dau_pred[<span class="st">'dau'</span>] <span class="op">+</span> dau_pred[<span class="st">'at_risk_wau'</span>] <span class="op">+</span> dau_pred[<span class="st">'at_risk_mau'</span>]</span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dau_pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="07b1d7bb" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> predict_dau(M, state0, PREDICTION_START, PREDICTION_END, new_users_pred)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>dau_pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">new</th>
+<th data-quarto-table-cell-role="th">current</th>
+<th data-quarto-table-cell-role="th">reactivated</th>
+<th data-quarto-table-cell-role="th">resurrected</th>
+<th data-quarto-table-cell-role="th">at_risk_wau</th>
+<th data-quarto-table-cell-role="th">at_risk_mau</th>
+<th data-quarto-table-cell-role="th">dormant</th>
+<th data-quarto-table-cell-role="th">dau</th>
+<th data-quarto-table-cell-role="th">wau</th>
+<th data-quarto-table-cell-role="th">mau</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-11-01</td>
+<td>29</td>
+<td>465</td>
+<td>11</td>
+<td>19</td>
+<td>412</td>
+<td>1025</td>
+<td>49544</td>
+<td>524</td>
+<td>936</td>
+<td>1961</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-11-02</td>
+<td>25</td>
+<td>461</td>
+<td>11</td>
+<td>19</td>
+<td>418</td>
+<td>1027</td>
+<td>49565</td>
+<td>516</td>
+<td>934</td>
+<td>1961</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-11-03</td>
+<td>21</td>
+<td>456</td>
+<td>11</td>
+<td>19</td>
+<td>420</td>
+<td>1030</td>
+<td>49587</td>
+<td>507</td>
+<td>927</td>
+<td>1957</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2023-11-04</td>
+<td>22</td>
+<td>450</td>
+<td>11</td>
+<td>19</td>
+<td>419</td>
+<td>1033</td>
+<td>49609</td>
+<td>502</td>
+<td>921</td>
+<td>1954</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2023-11-05</td>
+<td>34</td>
+<td>445</td>
+<td>11</td>
+<td>19</td>
+<td>418</td>
+<td>1036</td>
+<td>49631</td>
+<td>509</td>
+<td>927</td>
+<td>1963</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2024-12-27</td>
+<td>52</td>
+<td>505</td>
+<td>12</td>
+<td>24</td>
+<td>487</td>
+<td>1129</td>
+<td>61599</td>
+<td>593</td>
+<td>1080</td>
+<td>2209</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2024-12-28</td>
+<td>56</td>
+<td>516</td>
+<td>13</td>
+<td>24</td>
+<td>497</td>
+<td>1136</td>
+<td>61620</td>
+<td>609</td>
+<td>1106</td>
+<td>2242</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2024-12-29</td>
+<td>71</td>
+<td>529</td>
+<td>13</td>
+<td>24</td>
+<td>509</td>
+<td>1144</td>
+<td>61641</td>
+<td>637</td>
+<td>1146</td>
+<td>2290</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2024-12-30</td>
+<td>79</td>
+<td>549</td>
+<td>13</td>
+<td>24</td>
+<td>527</td>
+<td>1153</td>
+<td>61663</td>
+<td>665</td>
+<td>1192</td>
+<td>2345</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2024-12-31</td>
+<td>74</td>
+<td>572</td>
+<td>13</td>
+<td>24</td>
+<td>548</td>
+<td>1164</td>
+<td>61685</td>
+<td>683</td>
+<td>1231</td>
+<td>2395</td>
+</tr>
+</tbody>
+</table>
+
+<p>427 rows × 10 columns</p>
+</div>
+</div>
+</div>
+<p>This is how the DAU prediction <code>dau_pred</code> looks like for the <code>PREDICTION_START</code> - <code>PREDICTION_END</code> period. Besides the expected <code>dau</code>, <code>wau</code>, and <code>mau</code> columns, the output contains the number of users in each state for each prediction date.</p>
+<p>Finally, we calculate the ground-truth values of DAU, WAU, and MAU (along with the user state counts), keep them in the <code>dau_true</code> DataFrame, and plot the predicted and true values altogether.</p>
+<div id="c7223b81" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ss">SELECT date, state, COUNT(*) AS cnt</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ss">FROM states</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="ss">GROUP BY date, state</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ss">ORDER BY date, state;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>dau_true <span class="op">=</span> duckdb.sql(query).df()</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'date'</span>] <span class="op">=</span> pd.to_datetime(dau_true[<span class="st">'date'</span>])</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>dau_true <span class="op">=</span> dau_true.pivot(index<span class="op">=</span><span class="st">'date'</span>, columns<span class="op">=</span><span class="st">'state'</span>, values<span class="op">=</span><span class="st">'cnt'</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'dau'</span>] <span class="op">=</span> dau_true[<span class="st">'new'</span>] <span class="op">+</span> dau_true[<span class="st">'current'</span>] <span class="op">+</span> dau_true[<span class="st">'reactivated'</span>] <span class="op">+</span> dau_true[<span class="st">'resurrected'</span>]</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'wau'</span>] <span class="op">=</span> dau_true[<span class="st">'dau'</span>] <span class="op">+</span> dau_true[<span class="st">'at_risk_wau'</span>]</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'mau'</span>] <span class="op">=</span> dau_true[<span class="st">'dau'</span>] <span class="op">+</span> dau_true[<span class="st">'at_risk_wau'</span>] <span class="op">+</span> dau_true[<span class="st">'at_risk_mau'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="30a750f7" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dau_true.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">state</th>
+<th data-quarto-table-cell-role="th">at_risk_mau</th>
+<th data-quarto-table-cell-role="th">at_risk_wau</th>
+<th data-quarto-table-cell-role="th">current</th>
+<th data-quarto-table-cell-role="th">dormant</th>
+<th data-quarto-table-cell-role="th">new</th>
+<th data-quarto-table-cell-role="th">reactivated</th>
+<th data-quarto-table-cell-role="th">resurrected</th>
+<th data-quarto-table-cell-role="th">dau</th>
+<th data-quarto-table-cell-role="th">wau</th>
+<th data-quarto-table-cell-role="th">mau</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-11-01</td>
+<td>291.0</td>
+<td>207.0</td>
+<td>293.0</td>
+<td>840.0</td>
+<td>36.0</td>
+<td>14.0</td>
+<td>3.0</td>
+<td>346.0</td>
+<td>553.0</td>
+<td>844.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-11-02</td>
+<td>291.0</td>
+<td>208.0</td>
+<td>327.0</td>
+<td>836.0</td>
+<td>53.0</td>
+<td>14.0</td>
+<td>8.0</td>
+<td>402.0</td>
+<td>610.0</td>
+<td>901.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-11-03</td>
+<td>296.0</td>
+<td>205.0</td>
+<td>383.0</td>
+<td>840.0</td>
+<td>41.0</td>
+<td>10.0</td>
+<td>3.0</td>
+<td>437.0</td>
+<td>642.0</td>
+<td>938.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-11-04</td>
+<td>296.0</td>
+<td>246.0</td>
+<td>375.0</td>
+<td>842.0</td>
+<td>27.0</td>
+<td>13.0</td>
+<td>6.0</td>
+<td>421.0</td>
+<td>667.0</td>
+<td>963.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-11-05</td>
+<td>300.0</td>
+<td>275.0</td>
+<td>373.0</td>
+<td>845.0</td>
+<td>33.0</td>
+<td>8.0</td>
+<td>4.0</td>
+<td>418.0</td>
+<td>693.0</td>
+<td>993.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="87251bb7" class="cell" data-execution_count="21">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>pd.concat([dau_true[<span class="st">'dau'</span>], dau_pred[<span class="st">'dau'</span>]])<span class="op">\</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'DAU, historical &amp; predicted'</span>)<span class="op">;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>plt.axvline(PREDICTION_START, color<span class="op">=</span><span class="st">'k'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We’ve obtained the prediction but so far it’s not clear whether it’s fair or not. In the next section, we’ll evaluate the model.</p>
+</section>
+</section>
+<section id="sec-model-evaluation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-model-evaluation"><span class="header-section-number">4</span> Model evaluation</h2>
+<section id="sec-baseline-model" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="sec-baseline-model"><span class="header-section-number">4.1</span> Baseline model</h3>
+<p>First of all, let’s check whether we really need to build a complex model to predict DAU. Wouldn’t it be better to predict DAU as a general time-series using the mentioned <code>prophet</code> library? The function <code>predict_dau_prophet</code> below implements this. We try to use some tweaks available in the library in order to make the prediction more accurate. In particular:</p>
+<ul>
+<li>we use logistic model instead of linear to avoid negative values;</li>
+<li>we add explicitly monthly and yearly seasonality;</li>
+<li>we remove the outliers;</li>
+<li>we explicitly define a peak period in January and February as “holidays”.</li>
+</ul>
+<div id="be3bc544" class="cell" data-execution_count="22">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_dau_prophet(prediction_start, prediction_end, dau_true, show_plot<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># assigning peak days for the new year</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    holidays <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'holiday'</span>: <span class="st">'january_spike'</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'ds'</span>: pd.date_range(<span class="st">'2022-01-01'</span>, <span class="st">'2022-01-31'</span>, freq<span class="op">=</span><span class="st">'D'</span>).tolist() <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>              pd.date_range(<span class="st">'2023-01-01'</span>, <span class="st">'2023-01-31'</span>, freq<span class="op">=</span><span class="st">'D'</span>).tolist(),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'lower_window'</span>: <span class="dv">0</span>,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'upper_window'</span>: <span class="dv">40</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> Prophet(growth<span class="op">=</span><span class="st">'logistic'</span>, holidays<span class="op">=</span>holidays)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    m.add_seasonality(name<span class="op">=</span><span class="st">'monthly'</span>, period<span class="op">=</span><span class="fl">30.5</span>, fourier_order<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    m.add_seasonality(name<span class="op">=</span><span class="st">'yearly'</span>, period<span class="op">=</span><span class="dv">365</span>, fourier_order<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    train <span class="op">=</span> dau_true.loc[(dau_true.index <span class="op">&lt;</span> prediction_start) <span class="op">&amp;</span> (dau_true.index <span class="op">&gt;=</span> <span class="st">'2021-08-01'</span>)]</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    train_prophet <span class="op">=</span> pd.DataFrame({<span class="st">'ds'</span>: train.index, <span class="st">'y'</span>: train.values})</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># removining outliers</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    train_prophet.loc[train_prophet[<span class="st">'ds'</span>].between(<span class="st">'2022-06-07'</span>, <span class="st">'2022-06-09'</span>), <span class="st">'y'</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    train_prophet[<span class="st">'new_year_peak'</span>] <span class="op">=</span> (train_prophet[<span class="st">'ds'</span>] <span class="op">&gt;=</span> <span class="st">'2022-01-01'</span>) <span class="op">&amp;\</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>                                     (train_prophet[<span class="st">'ds'</span>] <span class="op">&lt;=</span> <span class="st">'2022-02-14'</span>)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    m.add_regressor(<span class="st">'new_year_peak'</span>)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># setting logistic upper and lower bounds</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    train_prophet[<span class="st">'cap'</span>] <span class="op">=</span> dau_true.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.1</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>    train_prophet[<span class="st">'floor'</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>    m.fit(train_prophet)</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    periods <span class="op">=</span> <span class="bu">len</span>(pd.date_range(prediction_start, prediction_end))</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    future <span class="op">=</span> m.make_future_dataframe(periods<span class="op">=</span>periods)</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>    future[<span class="st">'new_year_peak'</span>] <span class="op">=</span> (future[<span class="st">'ds'</span>] <span class="op">&gt;=</span> <span class="st">'2022-01-01'</span>) <span class="op">&amp;</span> (future[<span class="st">'ds'</span>] <span class="op">&lt;=</span> <span class="st">'2022-02-14'</span>)</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>    future[<span class="st">'cap'</span>] <span class="op">=</span> dau_true.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.1</span></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>    future[<span class="st">'floor'</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> m.predict(future)</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_plot:</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>        m.plot(pred)<span class="op">;</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># converting the predictions to an appropriate format</span></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> pred<span class="op">\</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>        .assign(yhat<span class="op">=</span><span class="kw">lambda</span> _df: _df[<span class="st">'yhat'</span>].astype(<span class="bu">int</span>))<span class="op">\</span></span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>        .rename(columns<span class="op">=</span>{<span class="st">'ds'</span>: <span class="st">'date'</span>, <span class="st">'yhat'</span>: <span class="st">'count'</span>})<span class="op">\</span></span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>        .set_index(<span class="st">'date'</span>)<span class="op">\</span></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>        .clip(lower<span class="op">=</span><span class="dv">0</span>)<span class="op">\</span></span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>        [<span class="st">'count'</span>]<span class="op">\</span></span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>        .loc[<span class="kw">lambda</span> s: (s.index <span class="op">&gt;=</span> prediction_start) <span class="op">&amp;</span> (s.index <span class="op">&lt;=</span> prediction_end)]</span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The fact that the code turns out to be quite sophisticated indicates that one can’t simply apply <code>prophet</code> to the DAU time-series.</p>
+<p>Hereafter we test a prediction for multiple predicting horizons: 3, 6, and 12 months. As a result, we get 3 test sets:</p>
+<ul>
+<li>3-months horizon: <code>2023-08-01</code> - <code>2023-10-31</code>,</li>
+<li>6-months horizon: <code>2023-05-01</code> - <code>2023-10-31</code>,</li>
+<li>1-year horizon: <code>2022-11-01</code> - <code>2023-10-31</code>.</li>
+</ul>
+<p>For each test set we calculate the <a href="https://en.wikipedia.org/wiki/Mean_absolute_percentage_error">MAPE</a> loss function.</p>
+<div id="5a0e673e" class="cell" data-execution_count="23">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_percentage_error</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> []</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>prediction_horizon <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">12</span>]</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> offset <span class="kw">in</span> prediction_horizon:</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>offset <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> predict_dau_prophet(prediction_start, prediction_end, dau_true[<span class="st">'dau'</span>], show_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    mape <span class="op">=</span> mean_absolute_percentage_error(dau_true[<span class="st">'dau'</span>].reindex(pred.index), pred)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    mapes.append(mape)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> pd.DataFrame({<span class="st">'horizon'</span>: prediction_horizon, <span class="st">'MAPE'</span>: mapes})</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>mapes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">horizon</th>
+<th data-quarto-table-cell-role="th">MAPE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>3</td>
+<td>0.350167</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>6</td>
+<td>0.185246</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>12</td>
+<td>0.215338</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The MAPE error turns out to be high: 18% - 35%. The fact that the shortest horizon has the highest error means that the model is tuned for the long-term predictions. This is another inconvenience of such an approach: we have to tune the model for each prediction horizon. Anyway, this is our baseline. In the next section we’ll compare it with more advanced models.</p>
+</section>
+<section id="sec-general-evaluation" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="sec-general-evaluation"><span class="header-section-number">4.2</span> General evaluation</h3>
+<p>In this section we evaluate the model implemented in the <a href="#sec-predicting-dau" class="quarto-xref">Section&nbsp;3.6</a>. So far we set the transition period as 1 year before the prediction start. We’ll study how the prediction depends on the transition period in the <a href="#sec-transitions-period-impact" class="quarto-xref">Section&nbsp;4.3</a>. As for the new users, we run the model using two options: the real values and the predicted ones. Similarly, we fix the same 3 prediction horizon and test the model on them.</p>
+<p>The <code>make_predicion</code> helper function below implements the described options. It accepts <code>prediction_start</code>, <code>prediction_end</code> arguments defining the prediction period for a given horizon, <code>new_users_mode</code> which can be either <code>true</code> or <code>predict</code>, and <code>transition_period</code>. The options of the latter argument will be explained further.</p>
+<div id="2a7c7a08" class="cell" data-execution_count="24">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_prediction(prediction_start, prediction_end, new_users_mode<span class="op">=</span><span class="st">'predict'</span>, transition_period<span class="op">=</span><span class="st">'last_30d'</span>):</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    prediction_start_minus_1d <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(<span class="st">'1d'</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    state0 <span class="op">=</span> get_state0(prediction_start_minus_1d)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> new_users_mode <span class="op">==</span> <span class="st">'predict'</span>:</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>        new_users_pred <span class="op">=</span> predict_new_users(prediction_start, prediction_end, new_users, show_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> new_users_mode <span class="op">==</span> <span class="st">'true'</span>:</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        new_users_pred <span class="op">=</span> new_users.copy()</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> transition_period.startswith(<span class="st">'last_'</span>):</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>        shift <span class="op">=</span> <span class="bu">int</span>(re.search(<span class="vs">r'last_(\d+)d'</span>, transition_period).group(<span class="dv">1</span>))</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>        transitions_start <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(shift, <span class="st">'d'</span>)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>        M <span class="op">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> predict_dau(M, state0, prediction_start, prediction_end, new_users_pred)</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>        transitions_start <span class="op">=</span> pd.to_datetime(prediction_start) <span class="op">-</span> pd.Timedelta(<span class="dv">240</span>, <span class="st">'d'</span>)</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>        M_base <span class="op">=</span> get_transition_matrix(transitions, transitions_start, prediction_start_minus_1d)</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>        month_starts <span class="op">=</span> pd.date_range(prediction_start, prediction_end, freq<span class="op">=</span><span class="st">'1MS'</span>)</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>        N <span class="op">=</span> <span class="bu">len</span>(month_starts)</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, prediction_month_start <span class="kw">in</span> <span class="bu">enumerate</span>(month_starts):</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>            prediction_month_end <span class="op">=</span> pd.offsets.MonthEnd().rollforward(prediction_month_start)</span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>            transitions_month_start <span class="op">=</span> prediction_month_start <span class="op">-</span> pd.Timedelta(<span class="st">'365D'</span>)</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>            transitions_month_end <span class="op">=</span> prediction_month_end <span class="op">-</span> pd.Timedelta(<span class="st">'365D'</span>)</span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>            M_seasonal <span class="op">=</span> get_transition_matrix(transitions, transitions_month_start, transitions_month_end)</span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> transition_period <span class="op">==</span> <span class="st">'smoothing'</span>:</span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>                i <span class="op">=</span> <span class="bu">min</span>(i, <span class="dv">12</span>)</span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>                M <span class="op">=</span> M_seasonal <span class="op">*</span> i <span class="op">/</span> (N <span class="op">-</span> <span class="dv">1</span>)  <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> i <span class="op">/</span> (N <span class="op">-</span> <span class="dv">1</span>)) <span class="op">*</span> M_base</span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> transition_period.startswith(<span class="st">'seasonal_'</span>):</span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>                seasonal_coef <span class="op">=</span> <span class="bu">float</span>(re.search(<span class="vs">r'seasonal_(0\.\d+)'</span>, transition_period).group(<span class="dv">1</span>))</span>
+<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>                M <span class="op">=</span> seasonal_coef <span class="op">*</span> M_seasonal <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> seasonal_coef) <span class="op">*</span> M_base</span>
+<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>            dau_tmp <span class="op">=</span> predict_dau(M, state0, prediction_month_start, prediction_month_end, new_users_pred)</span>
+<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>            dau_pred <span class="op">=</span> pd.concat([dau_pred, dau_tmp])</span>
+<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a>            state0 <span class="op">=</span> dau_tmp.loc[prediction_month_end][states_order]</span>
+<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dau_pred</span>
+<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prediction_details(dau_true, dau_pred, show_plot<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>    y_true <span class="op">=</span> dau_true.reindex(dau_pred.index)[<span class="st">'dau'</span>]</span>
+<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> dau_pred[<span class="st">'dau'</span>]</span>
+<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>    mape <span class="op">=</span> mean_absolute_percentage_error(y_true, y_pred) </span>
+<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> show_plot:</span>
+<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a>        prediction_start <span class="op">=</span> <span class="bu">str</span>(y_true.index.<span class="bu">min</span>().date())</span>
+<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>        prediction_end <span class="op">=</span> <span class="bu">str</span>(y_true.index.<span class="bu">max</span>().date())</span>
+<span id="cb31-54"><a href="#cb31-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ax <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb31-55"><a href="#cb31-55" aria-hidden="true" tabindex="-1"></a>            y_true.plot(label<span class="op">=</span><span class="st">'DAU true'</span>)</span>
+<span id="cb31-56"><a href="#cb31-56" aria-hidden="true" tabindex="-1"></a>            y_pred.plot(label<span class="op">=</span><span class="st">'DAU pred'</span>)</span>
+<span id="cb31-57"><a href="#cb31-57" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="ss">f'DAU prediction, </span><span class="sc">{</span>prediction_start<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>prediction_end<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb31-58"><a href="#cb31-58" aria-hidden="true" tabindex="-1"></a>            plt.legend()</span>
+<span id="cb31-59"><a href="#cb31-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb31-60"><a href="#cb31-60" aria-hidden="true" tabindex="-1"></a>            y_true.plot(label<span class="op">=</span><span class="st">'DAU true'</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb31-61"><a href="#cb31-61" aria-hidden="true" tabindex="-1"></a>            y_pred.plot(label<span class="op">=</span><span class="st">'DAU pred'</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb31-62"><a href="#cb31-62" aria-hidden="true" tabindex="-1"></a>            ax.set_title(<span class="ss">f'DAU prediction, </span><span class="sc">{</span>prediction_start<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>prediction_end<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb31-63"><a href="#cb31-63" aria-hidden="true" tabindex="-1"></a>            ax.legend()</span>
+<span id="cb31-64"><a href="#cb31-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>In total, we have 6 prediction scenarios: 2 options for new users and 3 prediction horizons. The diagram below illustrates the results. The charts on the left relate to the <code>new_users_mode = 'predict'</code> option, while the right ones relate to the <code>new_users_mode = 'true'</code> option.</p>
+<div id="2def0809" class="cell" data-execution_count="25">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> []</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>prediction_end <span class="op">=</span> <span class="st">'2023-10-31'</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>prediction_horizon <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">12</span>]</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, offset <span class="kw">in</span> <span class="bu">enumerate</span>(prediction_horizon):</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>offset <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> {</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'prediction_start'</span>: prediction_start,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'prediction_end'</span>: prediction_end,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'transition_period'</span>: <span class="st">'last_365d'</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j, new_users_mode <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">'predict'</span>, <span class="st">'true'</span>]):</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>        args[<span class="st">'new_users_mode'</span>] <span class="op">=</span> new_users_mode</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> make_prediction(<span class="op">**</span>args)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>        mape <span class="op">=</span> prediction_details(dau_true, dau_pred, ax<span class="op">=</span>axs[i, j])</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>        mapes.append([offset, new_users_mode, mape])</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>mapes <span class="op">=</span> pd.DataFrame(mapes, columns<span class="op">=</span>[<span class="st">'horizon'</span>, <span class="st">'new_users'</span>, <span class="st">'MAPE'</span>])</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And here are the MAPE values summarizing the prediction quality:</p>
+<div id="c457ce87" class="cell" data-execution_count="27">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mapes.pivot(index<span class="op">=</span><span class="st">'horizon'</span>, columns<span class="op">=</span><span class="st">'new_users'</span>, values<span class="op">=</span><span class="st">'MAPE'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">new_users</th>
+<th data-quarto-table-cell-role="th">predict</th>
+<th data-quarto-table-cell-role="th">true</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">horizon</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.079538</td>
+<td>0.103631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>0.125035</td>
+<td>0.084652</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>0.651502</td>
+<td>0.086885</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>We notice multiple things.</p>
+<ul>
+<li>In general, the model demonstrates much better results than the baseline. Indeed, the baseline is based on the historical DAU data only, while the model uses the user states information.</li>
+<li>However, for the 1-year horizon and <code>new_users_mode='predict'</code> the MAPE error is huge: 65%. This is 3 times higher than the corresponding baseline error (21%). On the other hand, <code>new_users_mode='true'</code> option gives a much better result: 8%. It means that the new users prediction has a huge impact on the model, especially for long-term predictions. For the shorter periods the difference is less dramatic. The major reason for such a difference is that 1-year period includes Christmas with its extreme values. As a result, i) it’s hard to predict such high new user values, ii) the period heavily impacts user behavior, the transition matrix and, consequently, DAU values. Hence, we strongly recommend to implement the new user prediction carefully. The baseline model was specially tuned for this Christmas period, so it’s not surprising that it outperforms the Markov model.</li>
+<li>When the new users prediction is accurate, the model captures trends well. It means that using last 365 days for the transition matrix calculation is a reasonable choice.</li>
+<li>Interestingly, the true new users data provides worse results for the 3-months prediction. This is nothing but a coincidence. The wrong new users prediction in October 2023 reversed the predicted DAU trend and made MAPE a bit lower.</li>
+</ul>
+<p>Now, let’s decompose the prediction error and see which states contribure the most. By error we mean here <code>dau_pred</code> - <code>dau_true</code> values, by relative error – (<code>dau_pred</code> - <code>dau_true</code>) / <code>dau_true</code> – see left and right diagrams below correspondingly. In order to focus on this aspect, we’ll narrow the configuration to the 3-months prediction horizon and the <code>new_users_mode='true'</code> option.</p>
+<div id="8384a2ee" class="cell" data-execution_count="28">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dau_component_cols <span class="op">=</span> [<span class="st">'new'</span>, <span class="st">'current'</span>, <span class="st">'reactivated'</span>, <span class="st">'resurrected'</span>]</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> make_prediction(<span class="st">'2023-08-01'</span>, <span class="st">'2023-10-31'</span>, new_users_mode<span class="op">=</span><span class="st">'true'</span>, transition_period<span class="op">=</span><span class="st">'last_365d'</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>figure, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>dau_pred[dau_component_cols]<span class="op">\</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    .subtract(dau_true[dau_component_cols])<span class="op">\</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    .reindex(dau_pred.index)<span class="op">\</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'Prediction error by state'</span>, ax<span class="op">=</span>ax1)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>dau_pred[[<span class="st">'current'</span>]]<span class="op">\</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    .subtract(dau_true[[<span class="st">'current'</span>]])<span class="op">\</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    .div(dau_true[[<span class="st">'current'</span>]])<span class="op">\</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    .reindex(dau_pred.index)<span class="op">\</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'Relative prediction error (current state)'</span>, ax<span class="op">=</span>ax2)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the left chart we notice that the error is basically contributed by the <code>current</code> state. It’s not surprising since this state contributes to DAU the most. The error for the <code>reactivated</code>, and <code>resurrected</code> states is quite low. Another interesting thing is that this error is mostly negative for the <code>current</code> state and mostly positive for the <code>resurrected</code> state. The former might be explained by the fact that the new users who appeared in the prediction period are more engaged that the users from the past. The latter indicates that the <code>resurrected</code> users in reality contribute to DAU less than the transition matrix expects, so the <code>dormant</code>→<code>resurrected</code> conversion rate is overestimated.</p>
+<p>As for the relative error, it makes sense to analyze it for the <code>current</code> state only. This is because the daily amount of the reactivated and resurrected states are low so the relative error is high and noisy. The relative error for the <code>current</code> state varies between -25% and 4% which is quite high. And since we’ve fixed the new users prediction, this error is explained by the transition matrix inaccuracy only. In particular, the <code>current</code>→<code>current</code> conversion rate is roughly 0.8 which is high and, as a result, it contributes to the error a lot. So if we want to improve the prediction we need to consider tuning this conversion rate foremost.</p>
+</section>
+<section id="sec-transitions-period-impact" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="sec-transitions-period-impact"><span class="header-section-number">4.3</span> Transitions period impact</h3>
+<p>In the previous section we kept the transitions period fixed: 1 year before a prediction start. Now we’re going to study how long this period should be to get more accurate prediction. We consider the same prediction horizon of 3, 6, and 12 months. In order to mitigate the noise from the new users prediction, we use the real values of the new users amount: <code>new_users_mode='true'</code>.</p>
+<p>Here comes varying of the <code>transition_period</code> argument. Its values are masked with the <code>last_&lt;N&gt;d</code> pattern where <code>N</code> stands for the number of days in a transitions period. For each prediction horizon we calculate 12 different transition periods of 1, 2, …, 12 months. Then we calculate the MAPE error for each of the options and plot the results.</p>
+<div id="1d5fc43c" class="cell" data-execution_count="29">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> []</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prediction_offset <span class="kw">in</span> prediction_horizon:</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> pd.to_datetime(prediction_end) <span class="op">-</span> pd.DateOffset(months<span class="op">=</span>prediction_offset <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    prediction_start <span class="op">=</span> prediction_start.replace(day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> transition_offset <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">13</span>):</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>        dau_pred <span class="op">=</span> make_prediction(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>            prediction_start, prediction_end, new_users_mode<span class="op">=</span><span class="st">'true'</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>            transition_period<span class="op">=</span><span class="ss">f'last_</span><span class="sc">{</span>transition_offset<span class="op">*</span><span class="dv">30</span><span class="sc">}</span><span class="ss">d'</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>        mape <span class="op">=</span> prediction_details(dau_true, dau_pred, show_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>        result.append([prediction_offset, transition_offset, mape])</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pd.DataFrame(result, columns<span class="op">=</span>[<span class="st">'prediction_period'</span>, <span class="st">'transition_period'</span>, <span class="st">'mape'</span>])</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>result.pivot(index<span class="op">=</span><span class="st">'transition_period'</span>, columns<span class="op">=</span><span class="st">'prediction_period'</span>, values<span class="op">=</span><span class="st">'mape'</span>)<span class="op">\</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    .plot(title<span class="op">=</span><span class="st">'MAPE by prediction and transition period'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It turns out that the optimal transitions period depends on the prediction horizon. Shorter horizons require shorter transitions periods: the minimal MAPE error is achieved at 1, 4, and 8 transition periods for the 3, 6, and 12 months correspondingly. Apparently, this is because the longer horizons contain some seasonal effects that could be captured only by the longer transitions periods. Also, it seems that for the longer prediction horizons the MAPE curve is U-shaped meaning that too long and too short transitions periods are both not good for the prediction. We’ll develop this idea in the next section.</p>
+</section>
+<section id="obsolence-and-seasonality" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="obsolence-and-seasonality"><span class="header-section-number">4.4</span> Obsolence and seasonality</h3>
+<p>Nevertheless, fixing a single transition matrix for predicting the whole year ahead doesn’t seem to be a good idea: such a model would be too rigid. Usually, user behavior varies depending on a season. For example, users who appear after Christmas might have some shifts in behavior. Another typical situation is when users change their behavior in summer. In this section, we’ll try to take into account these seasonal effects.</p>
+<p>So we want to predict DAU for 1 year ahead starting from November 2022. Instead of using a single transition matrix <span class="math inline">\(M_{base}\)</span> which is calculated for the last 8 months before the prediction start, according to the previous subsection results (and labeled as the <code>last_240d</code> option below), we’ll consider a mixture of this matrix and a seasonal one <span class="math inline">\(M_{seasonal}\)</span>. The latter is calculated on monthly basis lagging 1 year behind. For example, to predict DAU for November 2022 we define <span class="math inline">\(M_{seasonal}\)</span> as the transition matrix for November 2021. Then we shift the prediction horizon to December 2022 and calculate <span class="math inline">\(M_{seasonal}\)</span> for December 2021, etc.</p>
+<p>In order to mix <span class="math inline">\(M_{base}\)</span> and <span class="math inline">\(M_{seasonal}\)</span> we define the following two options.</p>
+<ul>
+<li><code>seasonal_0.3</code>: <span class="math inline">\(M = 0.3 \cdot M_{seasonal} + 0.7 \cdot M_{base}\)</span>. 0.3 is a weight that was chosen as a local minimum after some experiments.</li>
+<li><code>smoothing</code>: <span class="math inline">\(M = \frac{i}{N - 1} M_{seasonal} + (1 - \frac{i}{N - 1}) M_{base}\)</span> where <span class="math inline">\(N\)</span> is the number of months within the predicting period, <span class="math inline">\(i = 0, \ldots, N - 1\)</span> – the month index. The idea of this configuration is to gradually switch from the most recent transition matrix <span class="math inline">\(M_{base}\)</span> to seasonal ones as the prediction month moves forward from the prediction start.</li>
+</ul>
+<div id="6bf81796" class="cell" data-execution_count="30">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> transition_period <span class="kw">in</span> [<span class="st">'last_240d'</span>, <span class="st">'seasonal_0.3'</span>, <span class="st">'smoothing'</span>]:</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    result[transition_period] <span class="op">=</span> make_prediction(<span class="st">'2022-11-01'</span>, <span class="st">'2023-10-31'</span>, <span class="st">'true'</span>, transition_period)[<span class="st">'dau'</span>]</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>result[<span class="st">'true'</span>] <span class="op">=</span> dau_true[<span class="st">'dau'</span>]</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>result[<span class="st">'true'</span>] <span class="op">=</span> result[<span class="st">'true'</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>result.plot(title<span class="op">=</span><span class="st">'DAU prediction by different transition matrices'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="fe73fae5" class="cell" data-execution_count="31">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>mape <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> result.columns:</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="op">!=</span> <span class="st">'true'</span>:</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>        mape.loc[col, <span class="st">'mape'</span>] <span class="op">=</span> mean_absolute_percentage_error(result[<span class="st">'true'</span>], result[col])</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>mape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">mape</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">last_240d</td>
+<td>0.080804</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">seasonal_0.3</td>
+<td>0.077545</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">smoothing</td>
+<td>0.097802</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>According to the MAPE errors, <code>seasonal_0.3</code> configuration provides the best results. Interestingly, <code>smoothing</code> approach has appeared to be even worse than the <code>last_240d</code>. From the diagram above we see that all three models start to underestimate the DAU values in July 2023, especially the <code>smoothing</code> model. It seems that the new users who started appearing in July 2023 are more engaged than the users from 2022. Probably, the app was improved sufficiently or the marketing team did a great job. As a result, the <code>smoothing</code> model that much relies on the outdated transitions data from July 2022 - October 2022 fails more than the other models.</p>
+</section>
+<section id="final-solution" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="final-solution"><span class="header-section-number">4.5</span> Final solution</h3>
+<p>To sum things up, let’s make a final prediction for the 2024 year. We use the <code>seasonal_0.3</code> configuration and the predicted values for new users.</p>
+<div id="8fb64c7e" class="cell" data-execution_count="32">
+<details class="code-fold">
+<summary>Toggle the code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>dau_pred <span class="op">=</span> make_prediction(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    PREDICTION_START, PREDICTION_END,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    new_users_mode<span class="op">=</span><span class="st">'predict'</span>,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    transition_period<span class="op">=</span><span class="st">'seasonal_0.3'</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>dau_true[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'true'</span>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>dau_pred[<span class="st">'dau'</span>].plot(label<span class="op">=</span><span class="st">'seasonal_0.3'</span>)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DAU, historical &amp; predicted'</span>)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>plt.axvline(PREDICTION_START, color<span class="op">=</span><span class="st">'k'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>plt.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="discussion" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="discussion"><span class="header-section-number">5</span> Discussion</h2>
+<p>In the <a href="#sec-model-evaluation" class="quarto-xref">Section&nbsp;4</a> we studied the model performance from the prediction accuracy perspective. Now let’s discuss the model from the practical point of view.</p>
+<p>Besides poor accuracy, predicting DAU as a time-series (see the <a href="#sec-baseline-model" class="quarto-xref">Section&nbsp;4.1</a>) makes this approach very stiff. Essentially, it makes a prediction in such a manner so it would fit <em>historical</em> data best. In practice, when making plans for a next year we usually have some certain expectations about the future. For example,</p>
+<ul>
+<li>the marketing team is going to launch some new more effective campaings,</li>
+<li>the activation team is planning to improve the onboarding process,</li>
+<li>the product team will release some new features that would engage and retain users more.</li>
+</ul>
+<p>Our model can take into account such expectations. For the examples above we can adjust the new users prediction, the <code>new</code>→<code>current</code> and the <code>current</code>→<code>current</code> conversion rates respectively. As a result, we can get a prediction that doesn’t match with the historical data but nevertheless would be more realistic. This model’s property is not just flexible – it’s interpretable. You can easily discuss all these adjustments with the stakeholders, and they can understand how the prediction works.</p>
+<p>Another advantage of the model is that it doesn’t require predicting whether a certain user will be active on a certain day. Sometimes binary classifiers are used for this purpose. The downside of this approach is that we need to apply such a classifier to each user including all the dormant users and each day from a prediction horizon. This is a tremedous computational cost. In contrast, the Markov model requires only the initial amount of states (<code>state0</code>). Moreover, such classiffiers are often black-box models: they are poorly interpretable and hard to adjust.</p>
+<p>The Markov model also has some limitations. As we already have seen, it’s sensitive to the new users prediction. It’s easy to totally ruin the prediction by a wrong new users amount. Another problem is that the Markov model is memoryless meaning that it doesn’t take into account the user’s history. For example, it doesn’t distinguish whether a <code>current</code> user is a newbie, experienced, or <code>reactivated</code>/<code>resurrected</code> one. The retention rate of these user types should be certainly different. Also, as we discussed earlier, the user behavior might be of different nature depending on the season, marketing sources, countries, etc. So far our model is not able to capture these differences. However, this might be a subject for further research: we could extend the model by fitting more transition matrices for different user segments.</p>
+<p>Finally, as we promised in the introduction, we provide a <a href="https://docs.google.com/spreadsheets/d/1DxbjrkSy_wvU1lzlNWhrEfWO-Kq1tJrQw0izEHu5ULU/edit?usp=sharing">DAU spreadsheet calculator</a>. In the <code>Prediction</code> sheet you’ll need to fill the initial states distribution row (marked with blue) and the new users prediction column (marked with purple). In the <code>Conversions</code> sheet you can adjust the transition matrix values. Remember that the sum of each row of the matrix should be equal to 1.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="dau_prediction_files/figure-html/2b5c1f9a-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>A screenshot of the DAU spreadsheet calculator</figcaption>
+</figure>
+</div>
+<p>That’s all for now. I hope that this article was useful for you. In case of any questions or suggestions, feel free to ask in the comments below or contact me directly on <a href="https://www.linkedin.com/in/vladimir-kukushkin/">LinkedIn</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/wowone\.github\.io");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="wowone/wowone.github.io" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
