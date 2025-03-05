@@ -1,0 +1,36 @@
+---
+title: "Set Your Jupyter"
+date: "YYYY-MM-DD"
+draft: true
+categories: [jupyter]
+---
+
+Jupyter is a fantastic tool for data analysis, machine learning, scientific research, computational journalism, etc. One of the major advantages of Jupyter is that it has made programming more accessible to a wider audience. Its contribution to making Python the most popular language is huge, meanwhile Jupyter itself (or its variations) has become a standard environment for anyone who works with data and is able to write code.
+
+As a data scientist, I've been using Jupyter for many years. In this article, I want to tell you about my Jupyter setup and share some practical tips. The text is written mostly for advanced users, but I hope that beginners will also find something useful here. I personally prefer MacOS so I'll demonstrate everything on MacOS. Windows users I'm sorry. Linux users you know what to do.
+
+## Why Jupyter and not something else?
+
+## Jupyter Notebook, JupyterLab, JupyterLab Desktop
+
+## Kernels and virtual environments
+
+::: {.callout-note}
+Kernel from custom python
+:::
+
+::: {.callout-note}
+`!pip` VS `%pip` VS `pip`
+
+https://jakevdp.github.io/PythonDataScienceHandbook/01.05-ipython-and-shell-commands.html#Shell-Related-Magic-Commands
+https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-automagic
+https://discourse.jupyter.org/t/how-to-use-the-kernel-version-of-python-or-pip-when-execute-with-exclamation-mark-in-notebook/8508
+:::
+
+::: {.callout-note}
+workspaces
+:::
+
+## Repositories
+
+Take it or leave it, ipynb files must be stored in a repository.

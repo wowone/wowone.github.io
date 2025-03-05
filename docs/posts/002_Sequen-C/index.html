@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2024-11-05">
 
-<title>Home – Quant UX research journal</title>
+<title>Sequen-C: A Multilevel Overview of Temporal Event Sequences – Quant UX research journal</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +24,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,35 +67,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -128,17 +98,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
-<link rel="alternate" type="application/rss+xml" title="Quant UX research journal" href="index.xml" data-external="1"></head>
+<link rel="stylesheet" href="../../styles.css">
+</head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Quant UX research journal</span>
     </a>
   </div>
@@ -149,7 +119,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -163,7 +133,7 @@ window.Quarto = {
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="./index.xml"> <i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -177,218 +147,116 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Home</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">Sequen-C: A Multilevel Overview of Temporal Event Sequences</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">journalclub</div>
+                <div class="quarto-category">UX visualizations</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 5, 2024</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="UX visualizations">UX visualizations <span class="quarto-category-count">(2)</span></div><div class="category" data-category="churn">churn <span class="quarto-category-count">(1)</span></div><div class="category" data-category="journalclub">journalclub <span class="quarto-category-count">(1)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(1)</span></div><div class="category" data-category="predictive analytics">predictive analytics <span class="quarto-category-count">(2)</span></div><div class="category" data-category="product analytics">product analytics <span class="quarto-category-count">(3)</span></div><div class="category" data-category="product metrics">product metrics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="review">review <span class="quarto-category-count">(1)</span></div><div class="category" data-category="survey analysis">survey analysis <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<p>My name is Vladimir Kukushkin. I’ve been working as a data analyst/data scientist for more than 10 years. A couple of years ago I heavily shifted to quantitative UX research area which turned into my passion. While eagerly trying to find some sources to read regarding this topic, I realized that there are not so many of them. That’s why I decided to write a series of posts towards quantitative UX research. Basically, it will be reviews of papers, books and other publications that I find insightful. I’d be happy to find here enthusiasts who are also interested in this domain.</p>
+<p>Let me start our journal club with the most impressive paper related to clickstream visualizations I’ve ever read: <a href="https://arxiv.org/abs/2108.03043">Sequen-C: A Multilevel Overview of Temporal Event Sequences</a> by Jessica Magallanes, Tony Stone, Paul D. Morris, Suzanne Mason, Steven Wood, and Maria-Cruz Villa-Uriol.</p>
+<p>The authors address two very common issues that any quantitative UX researcher encounters:</p>
+<ol type="1">
+<li>Clickstream data often comprises multiple behavioral paths. Treating and visualizing it as a whole is incorrect and often leads to contradictory results.</li>
+<li>Despite the fact that users follow certain (latent) scenarios, the ways they perform particular steps vary greatly: they may repeat the same steps multiple times, deviate from a scenario, or switch it. When analyzing such data, it’s hard to understand the patterns of repetition, deviation, and switching.</li>
+</ol>
+<p>In the paper, the authors describe an interactive visualization tool that tackles both these issues and provides a methodology they call Align-Score-Simplify.</p>
+<section id="methodology" class="level2">
+<h2 class="anchored" data-anchor-id="methodology">Methodology</h2>
+<p>The first problem is addressed by applying (agglomerative) clustering. I’ll explain further why they chose this algorithm. The second problem is solved using their framework called Align-Score-Simplify.</p>
+<section id="align" class="level3">
+<h3 class="anchored" data-anchor-id="align">Align</h3>
+<p>This part is the most elegant, amazing, and surprizing in the whole paper. They apply the <a href="https://en.wikipedia.org/wiki/Multiple_sequence_alignment">MSA algorithm (Multiple Sequence Alignment)</a> stemming from bioinformatics. Originally, it was created to align amino acids or nucleotides in DNA sequences to identify common subsequences across DNAs belonging to multiple species. But this is exactly one of the goals we pursue in clickstream data analysis. Once we align user trajectories in similar way, we understand what events are common for the most users at some specific steps.</p>
+<figure class="figure">
+<center>
+<img src="MSA_example.png" height="100" class="figure-img">
+<figcaption>
+Inserting <code>-</code> as gaps to align events in sequences. The coloured events might be considered as common at some steps. The others are considered as noise.
+</figcaption>
+</center>
+</figure>
+</section>
+<section id="score" class="level3">
+<h3 class="anchored" data-anchor-id="score">Score</h3>
+<p>Let <span class="math inline">\(\lambda\)</span> be the output of the MSA algorithm applied to a set of unique sequences <span class="math inline">\(S\)</span> (the frequency of each path is denoted as <span class="math inline">\(P_i\)</span>). They calculate the information score <span class="math inline">\(I_j\)</span> for each column <span class="math inline">\(j\)</span> in <span class="math inline">\(\lambda\)</span> as a measure of the column’s impurity, somewhat similar to entropy but with some additional penalty for the high amount of gaps:</p>
+<p><span class="math display">\[
+I_j = 1 - \frac{E_j}{\log_2(|A| + 1)}, \;\;\;\; E_j = \sum_{a\in A_j\cup\{-\}}
+\begin{cases}
+-P_a\log_2\left(\frac{P_a}{G_j}\right)\, &amp; \text{if } a = \text{'-'}\\
+-P_a\log_2 P_a, &amp; \text{otherwise},
+\end{cases}
+\]</span></p>
+<p>where</p>
+<ul>
+<li><span class="math inline">\(A\)</span> – the set of unique events in <span class="math inline">\(S\)</span>,</li>
+<li><span class="math inline">\(A_j\)</span> – the set of unique events in column <span class="math inline">\(j\)</span>,</li>
+<li><span class="math inline">\(P_a\)</span> – the probability of the event <span class="math inline">\(a\)</span> in column <span class="math inline">\(j\)</span>,</li>
+<li><span class="math inline">\(G_j\)</span> – is the count of gaps in column <span class="math inline">\(j\)</span>.</li>
+</ul>
+</section>
+<section id="simplify" class="level3">
+<h3 class="anchored" data-anchor-id="simplify">Simplify</h3>
+<p>Once the <span class="math inline">\(I_j\)</span> score is calculated for each column <span class="math inline">\(j\)</span>, we can treat each column that exceeds a certain threshold <span class="math inline">\(I_\tau\)</span> as an event that prevails in this column, while all other columns might be collapsed as noise. As a result, we get a new table <span class="math inline">\(\alpha\)</span> that simplifies the initial clickstream <span class="math inline">\(S\)</span>, as shown in the image below.</p>
+<figure class="figure">
+<center>
+<img src="simplified_clickstream.png" height="220" class="figure-img">
+<figcaption>
+The outline of the Align-Score-Simplify workflow.
+</figcaption>
+</center>
+</figure>
+<p>Finally, we can granulate our clickstream representation using two axes:</p>
+<ol type="1">
+<li>We can consider different clusters of the agglomerative clustering output tree <span class="math inline">\(T\)</span>. Now it’s clear why they preferred this clustering algorithm instead of, say, K-Means. Considering different levels of <span class="math inline">\(T\)</span>, we obtain more/less homogeneous clusters. More homogeneous clusters provide better and clearer output of the MSA algorithm.</li>
+<li><span class="math inline">\(\tau\)</span>. By varying <span class="math inline">\(\tau\)</span>, we can make the sequence visualization more/less coarse.</li>
+</ol>
+<p>As a result, we get the interface like this:</p>
+<figure class="figure">
+<center>
+<img src="framework_outline.png" height="500" class="figure-img">
+<figcaption>
+The outline of the whole framework. (A) Building aggregate tree <span class="math inline">\(T\)</span> for input unique sequences <span class="math inline">\(S = \{s_1, ...s_6\}\)</span>. (B) Each node in <span class="math inline">\(T\)</span> has an alignment matrix <span class="math inline">\(\lambda\)</span> for its child sequences, a row-wise probabilities vector <span class="math inline">\(P\)</span>, and a column-wise information score vector <span class="math inline">\(I\)</span>. Two or more consecutive columns in <span class="math inline">\(\lambda\)</span> with <span class="math inline">\(I_j &lt; 0.8\)</span> are not coloured. (C) Multilevel overviews for a range of number of clusters <span class="math inline">\(k\)</span> retrieved from <span class="math inline">\(T\)</span>, where black blocks represent merged columns. Image by authors.
+</figcaption>
+</center>
+</figure>
+<p>In the following sections, the authors describe the GUI of a more complex tool developed as an application for a couple of particular datasets from the public health domain. I won’t talk about it here since its underlying idea is the same, while the interface is more sophisticated and includes some information about events distribution, unique sequence view, and individual sequence view.</p>
+<p>The datasets are more related to process mining, so the event cardinality is low. This is much lower than what happens in product analytics. The paths are very structured with few deviations from the main flow. That’s why I’m quite skeptical about applying this framework to product analytics clickstream data. Additionally, it’s not clear how fast MSA would work with clickstream data.</p>
+<p>Anyway, the idea of the paper and the framework are super interesting to me. It would be great to implement such a tool someday.</p>
 
 
+</section>
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="churn,predictive analytics,product analytics" data-listing-date-sort="1741129200000" data-listing-file-modified-sort="1741200542617" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1240">
-<div class="thumbnail">
-<p><a href="./posts/005_churn_dataset_construction/index.html" class="no-external"></a></p><a href="./posts/005_churn_dataset_construction/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/005_churn_dataset_construction/observation_dates.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/005_churn_dataset_construction/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/005_churn_dataset_construction/index.html" class="no-external">Constructing a dataset for churn reasons analysis</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/005_churn_dataset_construction/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('churn'); return false;">
-churn
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('predictive analytics'); return false;">
-predictive analytics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('product analytics'); return false;">
-product analytics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/005_churn_dataset_construction/index.html" class="no-external">I’ve been reading a book by Carl Gold “Fighting Churn with Data”. I’m going to write a full review of the book later, but now I want to share some thoughts on a dataset…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/005_churn_dataset_construction/index.html" class="no-external">
-<div class="listing-date">
-Mar 5, 2025
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="review,product analytics,product metrics,survey analysis,UX visualizations" data-listing-date-sort="1734390000000" data-listing-file-modified-sort="1734468027351" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3472">
-<div class="thumbnail">
-<p><a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external"></a></p><a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/004_Quantitative_User_Experience_Research/book_cover.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external">Book review. Chris Chapman, Kerry Rodden - Quantitative User Experience Research</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('review'); return false;">
-review
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('product analytics'); return false;">
-product analytics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('product metrics'); return false;">
-product metrics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('survey analysis'); return false;">
-survey analysis
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('UX visualizations'); return false;">
-UX visualizations
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external">When I started my journey as a quantitative UX researcher, I was looking for literature that could provide me with a solid foundation in this area. The book Quantitative…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/004_Quantitative_User_Experience_Research/index.html" class="no-external">
-<div class="listing-date">
-Dec 17, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="product analytics,predictive analytics" data-listing-date-sort="1733094000000" data-listing-file-modified-sort="1733346839272" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3593">
-<div class="thumbnail">
-<p><a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external"></a></p><a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external">
-<p class="card-img-top"><img src="posts/003_dau_prediction/dau_prediction_files/figure-html/cell-3-output-1.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external">Modeling DAU with Markov chain</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('product analytics'); return false;">
-product analytics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('predictive analytics'); return false;">
-predictive analytics
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external">Doubtlessly, DAU, WAU, and MAU are critical business metrics. An article “How Duolingo reignited user growth” by Jorge Mazal, former CPO of Duolingo, is #1 in the Growth…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/003_dau_prediction/dau_prediction.html" class="no-external">
-<div class="listing-date">
-Dec 2, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="journalclub,UX visualizations" data-listing-date-sort="1730761200000" data-listing-file-modified-sort="1734465324413" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="870">
-<div class="thumbnail">
-<p><a href="./posts/002_Sequen-C/index.html" class="no-external"></a></p><a href="./posts/002_Sequen-C/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/002_Sequen-C/MSA_example.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/002_Sequen-C/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/002_Sequen-C/index.html" class="no-external">Sequen-C: A Multilevel Overview of Temporal Event Sequences</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/002_Sequen-C/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('journalclub'); return false;">
-journalclub
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('UX visualizations'); return false;">
-UX visualizations
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/002_Sequen-C/index.html" class="no-external">My name is Vladimir Kukushkin. I’ve been working as a data analyst/data scientist for more than 10 years. A couple of years ago I heavily shifted to quantitative UX research…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/002_Sequen-C/index.html" class="no-external">
-<div class="listing-date">
-Nov 5, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="news" data-listing-date-sort="1729548000000" data-listing-file-modified-sort="1729616654981" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="300">
-<div class="thumbnail">
-<p><a href="./posts/001_Welcome/index.html" class="no-external"></a></p><a href="./posts/001_Welcome/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/001_Welcome/Sgt_Peppers_Lonely_Hearts_Club_Band.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/001_Welcome/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/001_Welcome/index.html" class="no-external">Welcome to Journal Papers Product Minds Club</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/001_Welcome/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('news'); return false;">
-news
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/001_Welcome/index.html" class="no-external">I’ve been working as a data scientist / data analyst over 10 years. The slash signifies that I typically work at the intersection of product analytics and data science…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/001_Welcome/index.html" class="no-external">
-<div class="listing-date">
-Oct 22, 2024
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -808,6 +676,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
+</script>
+<script src="https://utteranc.es/client.js" repo="wowone/wowone.github.io" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
 </script>
 </div> <!-- /content -->
 
